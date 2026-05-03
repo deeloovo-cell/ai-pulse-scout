@@ -30,3 +30,29 @@ Prefer discovering available local tooling before relying on skill example paths
 - Related Files: /opt/homebrew/lib/node_modules/openclaw/skills/notion-ludi/SKILL.md
 
 ---
+
+## [ERR-20260503-002] exec-node-stdin-preflight
+
+**Logged**: 2026-05-03T10:45:00+08:00
+**Priority**: low
+**Status**: pending
+**Area**: config
+
+### Summary
+OpenClaw exec refused a `node - <<NODE` inline interpreter command due to preflight validation.
+
+### Error
+```
+exec preflight: complex interpreter invocation detected; refusing to run without script preflight validation. Use a direct `python <file>.py` or `node <file>.js` command.
+```
+
+### Context
+Need to prefer writing temporary script files and executing them directly instead of heredoc node/python invocations in this environment.
+
+### Suggested Fix
+Use `write` to create a script in workspace and run `node path/to/script.mjs`.
+
+### Metadata
+- Reproducible: yes
+
+---
