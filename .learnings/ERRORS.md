@@ -56,3 +56,31 @@ Use `write` to create a script in workspace and run `node path/to/script.mjs`.
 - Reproducible: yes
 
 ---
+## [ERR-20260506-001] notion database lookup
+
+**Logged**: 2026-05-06T09:30:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: config
+
+### Summary
+Cached/local KB database id was no longer accessible to the current Notion integration.
+
+### Error
+```
+Notion API 错误: Could not find database with ID: 33aec093-c49c-81d9-b581-eddba05a835e. Make sure the relevant pages and databases are shared with your integration "My Notes".
+```
+
+### Context
+- Operation attempted: summarize/inspect Notion KB database via local helper script
+- Trigger: KB ingestion workflow for a martinfowler.com article
+- Impact: must rediscover accessible DL-KB database dynamically instead of relying on stale id
+
+### Suggested Fix
+Search Notion by database/page title at runtime and avoid assuming the previous DL-KB database id remains valid.
+
+### Metadata
+- Reproducible: unknown
+- Related Files: tmp_notion_summarize_db.mjs, tmp_create_kb_record.mjs
+
+---
