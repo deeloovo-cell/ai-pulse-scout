@@ -84,3 +84,31 @@ Search Notion by database/page title at runtime and avoid assuming the previous 
 - Related Files: tmp_notion_summarize_db.mjs, tmp_create_kb_record.mjs
 
 ---
+## [ERR-20260506-002] kb create command quoting
+
+**Logged**: 2026-05-06T14:21:40+08:00
+**Priority**: low
+**Status**: pending
+**Area**: docs
+
+### Summary
+A KB record creation shell command failed because a Chinese closing quote was embedded in the summary argument, causing shell parsing failure.
+
+### Error
+```
+zsh:105: unmatched "
+```
+
+### Context
+- Operation attempted: create Notion KB record for Anthropic finance agents article
+- Cause: mixed smart quote / plain quote in long shell argument
+
+### Suggested Fix
+When passing long multilingual summaries to shell commands, write arguments via temp files or use JSON-safe/ENV-safe quoting instead of inline long quoted strings.
+
+### Metadata
+- Reproducible: yes
+- Related Files: tmp_create_kb_record.mjs
+- See Also: ERR-20260506-001
+
+---
