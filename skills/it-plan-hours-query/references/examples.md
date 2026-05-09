@@ -50,7 +50,17 @@
 - 将 需求分析师 + 业务分析师 合并后重算
 - 明确说明本次采用了角色同义合并规则
 
-## Example 6: Override columns and date range
+## Example 6: Role keyword filtering
+
+用户：
+> 帮我识别 5/15 哪些软件开发顾问部的开发人员计划工时不足 4 小时。
+
+期望：
+- 使用组织过滤
+- 使用小时阈值换算
+- 用岗位关键词 `开发工程师` 过滤开发人员
+
+## Example 7: Override columns and date range
 
 用户：
 > 姓名列是 D，岗位列是 E，开始列是 M，结束列是 N，计划工时列是 Q，查询 2026-06-01 到 2026-06-14，阈值 1.0。

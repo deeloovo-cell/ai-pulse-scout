@@ -138,6 +138,16 @@ python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
   --threshold 1 --role-alias analyst
 ```
 
+### Role keyword filter
+
+```bash
+python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
+  --file "/path/to/file.xlsx" \
+  --start-date 2026-05-15 --end-date 2026-05-15 \
+  --threshold-hours 4 --org-value "软件开发顾问部" \
+  --role-contains "开发工程师"
+```
+
 ### Export full Excel
 
 ```bash
@@ -157,6 +167,7 @@ python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
 - If the user says “原要求不变”, preserve the previous calculation rule and only apply the requested delta
 - Do **not** assume “未排满” means the same threshold every time; infer from the user's wording and normalize explicitly
 - Do **not** assume business titles are distinct if the user says they are the same concept
+- When the user describes a broad岗位集合 such as “开发人员”, prefer keyword filtering like `开发工程师` unless the user gives a stricter definition
 - Do **not** assume informal organization names exactly match sheet values; inspect and confirm the closest real value when needed
 
 ## Error Handling

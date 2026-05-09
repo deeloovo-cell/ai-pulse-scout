@@ -217,6 +217,7 @@ def aggregate_person_day(
     org_col=None,
     org_value=None,
     role_alias_preset=None,
+    role_contains=None,
 ):
     target_days = workdays(start_date, end_date)
     target_set = set(target_days)
@@ -232,6 +233,8 @@ def aggregate_person_day(
             continue
         role = str(row.get(role_col, "")).strip() or "未填写"
         if allowed_roles is not None and role not in allowed_roles:
+            continue
+        if role_contains and role_contains not in role:
             continue
         if org_col is not None and org_value is not None:
             current_org = str(row.get(org_col, "")).strip()
@@ -397,6 +400,7 @@ def build_parser():
     parser.add_argument("--end-date")
     parser.add_argument("--exclude-resigned", action="store_true")
     parser.add_argument("--role-alias", choices=sorted(ROLE_ALIAS_PRESETS.keys()))
+    parser.add_argument("--role-contains")
     parser.add_argument("--org-value")
     parser.add_argument("--sort", default="low_days_desc")
     parser.add_argument("--top", type=int)
@@ -454,6 +458,7 @@ def main():
             org_col=org_col,
             org_value=org_value,
             role_alias_preset=args.role_alias,
+            role_contains=args.role_contains,
         )
         sort_results(results, args.sort)
         print("RANGE", start_date.isoformat(), end_date.isoformat())
