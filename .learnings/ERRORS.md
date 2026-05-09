@@ -112,3 +112,87 @@ When passing long multilingual summaries to shell commands, write arguments via 
 - See Also: ERR-20260506-001
 
 ---
+
+## [ERR-20260508-001] rg-command-missing
+
+**Logged**: 2026-05-08T16:23:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: config
+
+### Summary
+Attempted to use rg in workspace but ripgrep is not installed in this environment.
+
+### Error
+
+
+### Context
+- Command attempted: rg -n "顾问|二级部门|department|timesheet" /Users/aactest/.openclaw/workspace -S
+- Need fallback to grep/find or read known files directly.
+
+### Suggested Fix
+Prefer grep -R or direct file reads when rg is unavailable; add this to tool-use habits.
+
+### Metadata
+- Reproducible: yes
+- Related Files: .learnings/ERRORS.md
+
+---
+
+## [ERR-20260509-001] python-openpyxl-import
+
+**Logged**: 2026-05-09T06:55:34+00:00
+**Priority**: low
+**Status**: pending
+**Area**: docs
+
+### Summary
+Attempted to read an xlsx file with Python openpyxl, but the module was not installed in the local environment
+
+### Error
+```
+ModuleNotFoundError: No module named 'openpyxl'
+```
+
+### Context
+- Command/operation attempted: Python snippet using `from openpyxl import load_workbook`
+- Input: `未来两周计划工时不满8小时名单.xlsx`
+- Environment: local workspace Python 3 without openpyxl installed
+
+### Suggested Fix
+Prefer a dependency-free xlsx parsing approach first, or check available libraries before choosing the parser
+
+### Metadata
+- Reproducible: yes
+- Related Files: 未来两周计划工时不满8小时名单.xlsx
+
+---
+## [ERR-20260509-001] notion-kb-inline-script
+
+**Logged**: 2026-05-09T14:11:30Z
+**Priority**: medium
+**Status**: pending
+**Area**: docs
+
+### Summary
+Inline Node script for KB Notion page creation failed due to an extra closing parenthesis in the children block builder.
+
+### Error
+```text
+Expected ',', got ')'
+SyntaxError: Unexpected token ')'
+```
+
+### Context
+- Operation attempted: create a KB page in Notion from an X post
+- Environment: inline `node - <<'NODE'` script from workspace root
+- Cause: accidental extra `)` at the final `children.push(bul(...))` call
+
+### Suggested Fix
+When using long inline scripts for Notion block assembly, either build `children` via array literals carefully or write the script to a temp file and run it to reduce bracket/paren mistakes.
+
+### Metadata
+- Reproducible: yes
+- Related Files: /Users/aactest/.openclaw/workspace
+
+---

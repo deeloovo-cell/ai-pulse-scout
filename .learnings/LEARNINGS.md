@@ -55,3 +55,49 @@ Do not present fallback KB saves as equivalent to the standard KB pipeline. Eith
 - Last-Seen: 2026-05-01
 
 ---
+
+## [LRN-20260509-001] correction
+
+**Logged**: 2026-05-09T07:25:13+00:00
+**Priority**: medium
+**Status**: pending
+**Area**: docs
+
+### Summary
+When the user asks for low-workload results by person, do not switch to role-level aggregation unless explicitly requested
+
+### Details
+The user wanted a person-level list of future workdays where daily planned workload is below 0.5. A role summary was produced instead, which changed the output grain and format.
+
+### Suggested Action
+Keep the original grain (person-day detail) unless the user explicitly asks for grouping or summary aggregation.
+
+### Metadata
+- Source: user_feedback
+- Related Files: .learnings/LEARNINGS.md
+- Tags: output-format, aggregation, excel
+
+---
+
+## [LRN-20260509-002] correction
+
+**Logged**: 2026-05-09T08:07:02+00:00
+**Priority**: medium
+**Status**: pending
+**Area**: docs
+
+### Summary
+For this user's workload queries, 需求分析师 and 业务分析师 should be treated as the same concept unless the user asks to separate them
+
+### Details
+The user corrected the role interpretation after a query limited to 需求分析师. Future workload filtering for this user should combine both labels when they ask for 需求分析师 unless they explicitly want the roles separated.
+
+### Suggested Action
+When filtering by analyst roles for this user, include both 需求分析师 and 业务分析师 by default, and mention the combined rule in the output.
+
+### Metadata
+- Source: user_feedback
+- Related Files: skills/it-plan-hours-query/SKILL.md
+- Tags: role-mapping, workload, analyst
+
+---
