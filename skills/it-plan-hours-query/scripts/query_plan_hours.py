@@ -17,9 +17,14 @@ NS = {
 HEADER_ALIASES = {
     "name": ["姓名", "人员姓名", "成员姓名", "员工姓名"],
     "role": ["岗位", "职位", "岗位名称"],
+    "org": ["二级部门", "二级组织", "二级机构", "部门", "组织"],
     "start": ["开始日期", "任务开始日期", "jira任务开始日期", "开始时间"],
     "end": ["结束日期", "任务结束日期", "jira任务结束日期", "结束时间"],
     "plan": ["计划工时", "计划工时(天)", "计划天数", "任务计划天数", "预估工时", "预估天数"],
+}
+
+ROLE_ALIAS_PRESETS = {
+    "analyst": {"需求分析师", "业务分析师"},
 }
 
 
@@ -72,6 +77,30 @@ def resolve_column(args_value, detected, field_name):
     if field_name in detected:
         return detected[field_name]
     raise ValueError(f"required column missing: {field_name}")
+
+
+def common_prefix_len(a: str, b: str) -> int:
+    size = 0
+    for x, y in zip(a, b):
+        if x != y:
+            break
+        size += 1
+    return size
+
+
+def suggest_values(target: str, values):
+    nt = normalize_header(target)
+    scored = []
+    for value in values:
+        nv = normalize_header(value)
+        score = 0
+        if nt in nv or nv in nt:
+            score += 100
+        score += common_prefix_len(nt, nv)
+        if score > 0:
+            scored.append((score, value))
+    scored.sort(key=lambda x: (-x[0], x[1]))
+    return [value for _, value in scored[:5]]
 
 
 def parse_date(value):
@@ -174,11 +203,26 @@ def read_sheet_rows(path: Path, sheet_name=None):
     return rows
 
 
-def aggregate_person_day(rows, name_col, role_col, start_col, end_col, plan_col, start_date, end_date, threshold, exclude_resigned):
+def aggregate_person_day(
+    rows,
+    name_col,
+    role_col,
+    start_col,
+    end_col,
+    plan_col,
+    start_date,
+    end_date,
+    threshold,
+    exclude_resigned,
+    org_col=None,
+    org_value=None,
+    role_alias_preset=None,
+):
     target_days = workdays(start_date, end_date)
     target_set = set(target_days)
     person_day = defaultdict(float)
     person_role = {}
+    allowed_roles = ROLE_ALIAS_PRESETS.get(role_alias_preset, set()) if role_alias_preset else None
 
     for row in rows[1:]:
         name = str(row.get(name_col, "")).strip()
@@ -187,6 +231,12 @@ def aggregate_person_day(rows, name_col, role_col, start_col, end_col, plan_col,
         if exclude_resigned and "离职" in name:
             continue
         role = str(row.get(role_col, "")).strip() or "未填写"
+        if allowed_roles is not None and role not in allowed_roles:
+            continue
+        if org_col is not None and org_value is not None:
+            current_org = str(row.get(org_col, "")).strip()
+            if current_org != org_value:
+                continue
         person_role.setdefault(name, role)
         start = parse_date(row.get(start_col, ""))
         end = parse_date(row.get(end_col, ""))
@@ -337,13 +387,17 @@ def build_parser():
     parser.add_argument("--sheet")
     parser.add_argument("--name-col")
     parser.add_argument("--role-col")
+    parser.add_argument("--org-col")
     parser.add_argument("--start-col")
     parser.add_argument("--end-col")
     parser.add_argument("--plan-col")
     parser.add_argument("--threshold", type=float, default=0.5)
+    parser.add_argument("--threshold-hours", type=float)
     parser.add_argument("--start-date")
     parser.add_argument("--end-date")
     parser.add_argument("--exclude-resigned", action="store_true")
+    parser.add_argument("--role-alias", choices=sorted(ROLE_ALIAS_PRESETS.keys()))
+    parser.add_argument("--org-value")
     parser.add_argument("--sort", default="low_days_desc")
     parser.add_argument("--top", type=int)
     parser.add_argument("--export")
@@ -368,17 +422,38 @@ def main():
             raise ValueError("date parse failure for start-date/end-date")
         if end_date < start_date:
             raise ValueError("end date is earlier than start date")
+        threshold = args.threshold_hours / 8.0 if args.threshold_hours is not None else args.threshold
+        name_col = resolve_column(args.name_col, detected, "name")
+        role_col = resolve_column(args.role_col, detected, "role")
+        start_col = resolve_column(args.start_col, detected, "start")
+        end_col = resolve_column(args.end_col, detected, "end")
+        plan_col = resolve_column(args.plan_col, detected, "plan")
+        org_col = None
+        org_value = None
+        if args.org_value is not None:
+            org_col = resolve_column(args.org_col, detected, "org")
+            org_values = sorted({str(row.get(org_col, "")).strip() for row in rows[1:] if str(row.get(org_col, "")).strip()})
+            if args.org_value in org_values:
+                org_value = args.org_value
+            else:
+                suggestions = suggest_values(args.org_value, org_values)
+                if suggestions:
+                    raise ValueError(f"organization not found: {args.org_value}; did you mean: {', '.join(suggestions)}")
+                raise ValueError(f"organization not found: {args.org_value}")
         target_days, results = aggregate_person_day(
             rows=rows,
-            name_col=resolve_column(args.name_col, detected, "name"),
-            role_col=resolve_column(args.role_col, detected, "role"),
-            start_col=resolve_column(args.start_col, detected, "start"),
-            end_col=resolve_column(args.end_col, detected, "end"),
-            plan_col=resolve_column(args.plan_col, detected, "plan"),
+            name_col=name_col,
+            role_col=role_col,
+            start_col=start_col,
+            end_col=end_col,
+            plan_col=plan_col,
             start_date=start_date,
             end_date=end_date,
-            threshold=args.threshold,
+            threshold=threshold,
             exclude_resigned=args.exclude_resigned,
+            org_col=org_col,
+            org_value=org_value,
+            role_alias_preset=args.role_alias,
         )
         sort_results(results, args.sort)
         print("RANGE", start_date.isoformat(), end_date.isoformat())

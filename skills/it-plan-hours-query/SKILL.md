@@ -120,6 +120,24 @@ python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
   --threshold 0.5 --exclude-resigned --top 10
 ```
 
+### Hour-based threshold
+
+```bash
+python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
+  --file "/path/to/file.xlsx" \
+  --start-date 2026-05-15 --end-date 2026-05-15 \
+  --threshold-hours 4 --org-value "软件开发顾问部"
+```
+
+### Role synonym preset
+
+```bash
+python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
+  --file "/path/to/file.xlsx" \
+  --start-date 2026-05-13 --end-date 2026-05-14 \
+  --threshold 1 --role-alias analyst
+```
+
 ### Export full Excel
 
 ```bash
