@@ -15,6 +15,9 @@ Default behavior:
 - Default threshold: `0.5`
 - Default date range: **future two workweeks** if the user does not specify a range
 - Auto-detect common headers for 姓名 / 岗位 / 开始日期 / 结束日期 / 计划工时 when column letters are not provided
+- If the user expresses a threshold in hours, convert it with the rule **1天 = 8小时** unless the user overrides it
+- Support business-role synonyms when the user implies merged concepts, for example **需求分析师 ≈ 业务分析师**
+- When the user names an organization informally (for example “顾问组”), inspect actual organization values first and confirm the closest match when needed
 - If the user asks to exclude resigned staff, filter names containing `离职`
 
 ## When to Use
@@ -56,9 +59,13 @@ Unless the user overrides it:
    - prefer user-provided column letters
    - otherwise auto-detect common Chinese/English-style headers
 4. Determine date range, threshold, resignation filter, sort rule, and output mode
-5. Run the script:
+5. Normalize business language before calculating:
+   - convert hour-based thresholds into day-based thresholds when needed
+   - expand role synonyms when the user treats multiple titles as one concept
+   - resolve informal organization names against actual organization values in the sheet
+6. Run the script:
    - `skills/it-plan-hours-query/scripts/query_plan_hours.py`
-6. Return top preview rows or send the generated Excel file
+7. Return top preview rows or send the generated Excel file
 
 ## Clarification Order
 
@@ -67,8 +74,11 @@ Only ask follow-up questions when the file or mapping is unclear. Ask in this or
 2. Which columns map to name / role / start / end / planned workload
 3. Date range
 4. Threshold
-5. Whether to exclude resigned staff
-6. Preview vs full export
+5. Whether the threshold is expressed in days or hours
+6. Whether role synonyms should be merged (for example 需求分析师 + 业务分析师)
+7. Whether the named organization matches an actual organization value in the sheet
+8. Whether to exclude resigned staff
+9. Preview vs full export
 
 If the file and columns are already clear, calculate directly.
 
@@ -127,6 +137,9 @@ python3 skills/it-plan-hours-query/scripts/query_plan_hours.py \
 - Keep preview results and exported Excel under the **same calculation rule**
 - If headers differ from expectation, inspect first and explain the detected mapping
 - If the user says “原要求不变”, preserve the previous calculation rule and only apply the requested delta
+- Do **not** assume “未排满” means the same threshold every time; infer from the user's wording and normalize explicitly
+- Do **not** assume business titles are distinct if the user says they are the same concept
+- Do **not** assume informal organization names exactly match sheet values; inspect and confirm the closest real value when needed
 
 ## Error Handling
 
