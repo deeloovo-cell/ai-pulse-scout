@@ -20,7 +20,17 @@
 - 排除姓名中含“离职”的人员
 - 导出完整 Excel 文件
 
-## Example 3: Override columns and date range
+## Example 3: Auto-detect headers without column letters
+
+用户：
+> 这个表头里有“姓名 / 岗位 / JIRA任务开始日期 / JIRA任务结束日期 / 任务计划天数”，帮我查未来两周单日低于 0.5 的人员，先给前十条。
+
+期望：
+- 不手动传列字母
+- 自动识别表头
+- 输出仍然是按个人 + 明确日期
+
+## Example 4: Override columns and date range
 
 用户：
 > 姓名列是 D，岗位列是 E，开始列是 M，结束列是 N，计划工时列是 Q，查询 2026-06-01 到 2026-06-14，阈值 1.0。

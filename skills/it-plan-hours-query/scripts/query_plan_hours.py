@@ -14,6 +14,14 @@ NS = {
     "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
 }
 
+HEADER_ALIASES = {
+    "name": ["姓名", "人员姓名", "成员姓名", "员工姓名"],
+    "role": ["岗位", "职位", "岗位名称"],
+    "start": ["开始日期", "任务开始日期", "jira任务开始日期", "开始时间"],
+    "end": ["结束日期", "任务结束日期", "jira任务结束日期", "结束时间"],
+    "plan": ["计划工时", "计划工时(天)", "计划天数", "任务计划天数", "预估工时", "预估天数"],
+}
+
 
 def col_to_num(col: str) -> int:
     n = 0
@@ -29,6 +37,41 @@ def excel_col(n: int) -> str:
         n, r = divmod(n - 1, 26)
         s = chr(65 + r) + s
     return s
+
+
+def normalize_header(value):
+    s = str(value or "").strip().lower()
+    s = re.sub(r"\s+", "", s)
+    s = s.replace("（", "(").replace("）", ")")
+    return s
+
+
+def detect_columns(header_row):
+    normalized = {col: normalize_header(value) for col, value in header_row.items()}
+    result = {}
+    for field, aliases in HEADER_ALIASES.items():
+        alias_set = {normalize_header(a) for a in aliases}
+        exact_matches = [col for col, value in normalized.items() if value in alias_set]
+        if exact_matches:
+            result[field] = min(exact_matches)
+            continue
+        fuzzy_matches = []
+        for col, value in normalized.items():
+            if not value:
+                continue
+            if any(alias in value or value in alias for alias in alias_set):
+                fuzzy_matches.append(col)
+        if fuzzy_matches:
+            result[field] = min(fuzzy_matches)
+    return result
+
+
+def resolve_column(args_value, detected, field_name):
+    if args_value:
+        return col_to_num(args_value)
+    if field_name in detected:
+        return detected[field_name]
+    raise ValueError(f"required column missing: {field_name}")
 
 
 def parse_date(value):
@@ -292,11 +335,11 @@ def build_parser():
     parser = argparse.ArgumentParser(description="Query IT plan-hours Excel data")
     parser.add_argument("--file", required=True)
     parser.add_argument("--sheet")
-    parser.add_argument("--name-col", default="B")
-    parser.add_argument("--role-col", default="C")
-    parser.add_argument("--start-col", default="K")
-    parser.add_argument("--end-col", default="L")
-    parser.add_argument("--plan-col", default="N")
+    parser.add_argument("--name-col")
+    parser.add_argument("--role-col")
+    parser.add_argument("--start-col")
+    parser.add_argument("--end-col")
+    parser.add_argument("--plan-col")
     parser.add_argument("--threshold", type=float, default=0.5)
     parser.add_argument("--start-date")
     parser.add_argument("--end-date")
@@ -313,6 +356,9 @@ def main():
     try:
         file_path = Path(args.file)
         rows = read_sheet_rows(file_path, args.sheet)
+        if not rows:
+            raise ValueError("sheet has no rows")
+        detected = detect_columns(rows[0])
         if args.start_date and args.end_date:
             start_date = parse_date(args.start_date)
             end_date = parse_date(args.end_date)
@@ -324,11 +370,11 @@ def main():
             raise ValueError("end date is earlier than start date")
         target_days, results = aggregate_person_day(
             rows=rows,
-            name_col=col_to_num(args.name_col),
-            role_col=col_to_num(args.role_col),
-            start_col=col_to_num(args.start_col),
-            end_col=col_to_num(args.end_col),
-            plan_col=col_to_num(args.plan_col),
+            name_col=resolve_column(args.name_col, detected, "name"),
+            role_col=resolve_column(args.role_col, detected, "role"),
+            start_col=resolve_column(args.start_col, detected, "start"),
+            end_col=resolve_column(args.end_col, detected, "end"),
+            plan_col=resolve_column(args.plan_col, detected, "plan"),
             start_date=start_date,
             end_date=end_date,
             threshold=args.threshold,

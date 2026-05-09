@@ -14,6 +14,7 @@ Default behavior:
 - Split planned workload evenly across **workdays** between task start and end dates
 - Default threshold: `0.5`
 - Default date range: **future two workweeks** if the user does not specify a range
+- Auto-detect common headers for 姓名 / 岗位 / 开始日期 / 结束日期 / 计划工时 when column letters are not provided
 - If the user asks to exclude resigned staff, filter names containing `离职`
 
 ## When to Use
@@ -52,6 +53,8 @@ Unless the user overrides it:
 1. Locate the Excel file the user provided
 2. Inspect workbook/sheet/header structure if the mapping is unclear
 3. Determine effective columns
+   - prefer user-provided column letters
+   - otherwise auto-detect common Chinese/English-style headers
 4. Determine date range, threshold, resignation filter, sort rule, and output mode
 5. Run the script:
    - `skills/it-plan-hours-query/scripts/query_plan_hours.py`
@@ -131,6 +134,7 @@ Report specific issues instead of giving a vague failure:
 - file not found
 - sheet not found
 - required column missing
+- header auto-detection failed for a required field
 - date parse failure
 - planned workload parse failure
 - export generation failure
