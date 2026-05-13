@@ -4,6 +4,35 @@ Command failures and integration errors.
 
 ---
 
+## [ERR-20260513-001] notion_db_inspect_missing_database
+
+**Logged**: 2026-05-13T22:39:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: config
+
+### Summary
+Local Notion DB inspection script failed because one configured database ID is no longer accessible to the integration.
+
+### Error
+```
+Error: Notion API 错误: Could not find database with ID: 33aec093-c49c-81d9-b581-eddba05a835e. Make sure the relevant pages and databases are shared with your integration "My Notes".
+```
+
+### Context
+- Command attempted: `node tmp_notion_db_inspect.mjs`
+- Environment: local notion-api helper in workspace
+- Impact: broad DB listing failed, so KB ingestion needs a more targeted create/update path instead of relying on that inspection script
+
+### Suggested Fix
+Avoid assuming all historical database IDs remain shared. Keep a direct, current DL-KB database locator or make the inspector skip inaccessible databases.
+
+### Metadata
+- Reproducible: yes
+- Related Files: tmp_notion_db_inspect.mjs
+
+---
+
 ## [ERR-20260503-001] notion-ludi-script-path
 
 **Logged**: 2026-05-03T10:30:00+08:00
