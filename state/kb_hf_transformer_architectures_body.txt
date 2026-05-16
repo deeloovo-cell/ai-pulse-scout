@@ -1,0 +1,90 @@
+Transformer Architectures
+
+这篇 Hugging Face LLM Course 文章系统梳理了 Transformer 的三种核心架构：Encoder-only、Decoder-only 和 Encoder-Decoder，并给出它们各自适配的 NLP 任务。文章的主线很清楚：先理解注意力可见范围与预训练方式，再反推模型适用场景。Encoder 擅长“理解”，适合分类、命名实体识别、抽取式问答；Decoder 擅长“生成”，适合续写、对话与现代 LLM；Encoder-Decoder 则专长“输入到输出的变换”，如翻译、摘要和生成式问答。后半部分还补充了为长文本而设计的稀疏注意力变体，如 Reformer 的 LSH attention、Longformer 的 local attention，以及 Reformer 使用的 axial positional encodings，帮助读者理解为什么标准全注意力在长序列上会遇到 O(n²) 的计算瓶颈。整体上，这是一篇很适合入门者建立“任务—架构—能力”映射关系的教学文章。
+
+EN: Transformer models mainly come in three architectural variants: encoder-only, decoder-only, and encoder-decoder.
+ZH: Transformer 模型主要分为三种架构变体：仅编码器、仅解码器，以及编码器—解码器。
+
+EN: Understanding the differences between these architectures helps practitioners choose the right model for a specific NLP task.
+ZH: 理解这些架构之间的差异，有助于实践者为特定 NLP 任务选择合适的模型。
+
+EN: Encoder models use only the encoder stack, and each token can attend to all tokens in the input sentence.
+ZH: 编码器模型只使用编码器堆栈，并且每个 token 都可以关注输入句子中的所有 token。
+
+EN: Because they can look in both directions, encoder models are often described as bidirectional or auto-encoding models.
+ZH: 由于它们可以双向查看上下文，编码器模型通常被称为双向模型或自编码模型。
+
+EN: Their pretraining commonly involves corrupting a sentence, such as masking random words, and asking the model to reconstruct the original text.
+ZH: 这类模型的预训练通常会先破坏句子，例如随机遮盖一些词，再要求模型重建原始文本。
+
+EN: Encoder models are best suited for tasks that require deep understanding of the whole input, such as sentence classification, named entity recognition, and extractive question answering.
+ZH: 编码器模型最适合需要深入理解整体输入的任务，例如句子分类、命名实体识别和抽取式问答。
+
+EN: BERT, DistilBERT, and ModernBERT are representative encoder-based models.
+ZH: BERT、DistilBERT 和 ModernBERT 是具有代表性的编码器模型。
+
+EN: Decoder models use only the decoder stack, and each token can attend only to the tokens that appear before it.
+ZH: 解码器模型只使用解码器堆栈，并且每个 token 只能关注出现在它之前的 token。
+
+EN: This restricted attention pattern makes decoder models auto-regressive.
+ZH: 这种受限的注意力模式使解码器模型成为自回归模型。
+
+EN: Their pretraining typically focuses on predicting the next token in a sequence.
+ZH: 这类模型的预训练通常围绕序列中的下一个 token 预测展开。
+
+EN: Decoder models are therefore especially effective for text generation tasks.
+ZH: 因此，解码器模型特别适合文本生成任务。
+
+EN: Modern large language models are mostly decoder-only systems trained first with large-scale next-token prediction and then refined with instruction tuning.
+ZH: 现代大语言模型大多采用仅解码器架构，先通过大规模下一个 token 预测进行预训练，再通过指令微调进一步优化。
+
+EN: These modern decoder-based LLMs support capabilities such as text generation, summarization, translation, question answering, code generation, reasoning, and few-shot learning.
+ZH: 这些现代解码器型 LLM 具备文本生成、摘要、翻译、问答、代码生成、推理和小样本学习等能力。
+
+EN: Examples of decoder-oriented model families include SmolLM, Llama, Gemma, and DeepSeek V3.
+ZH: 仅解码器模型家族的代表包括 SmolLM、Llama、Gemma 和 DeepSeek V3。
+
+EN: Encoder-decoder models combine the strengths of both components: the encoder reads the full input, while the decoder generates output token by token.
+ZH: 编码器—解码器模型结合了两部分的优势：编码器读取完整输入，解码器逐 token 生成输出。
+
+EN: Their pretraining can take various forms, including reconstructing corrupted sentences or predicting missing spans, as in T5.
+ZH: 它们的预训练形式可以多种多样，包括重建被破坏的句子，或像 T5 那样预测缺失的文本片段。
+
+EN: Sequence-to-sequence models are ideal for tasks that transform one sequence into another, such as translation, summarization, grammar correction, and generative question answering.
+ZH: 序列到序列模型非常适合将一种序列转换成另一种序列的任务，例如翻译、摘要、语法纠错和生成式问答。
+
+EN: BART, mBART, Marian, and T5 are well-known representatives of this family.
+ZH: BART、mBART、Marian 和 T5 是这一家族的知名代表。
+
+EN: The article also provides a practical mapping from task types to suggested architectures.
+ZH: 文章还给出了一个从任务类型到推荐架构的实用映射表。
+
+EN: For example, text classification and named entity recognition usually align with encoder models, while creative writing and conversational AI are more naturally matched with decoder models.
+ZH: 例如，文本分类和命名实体识别通常更适合编码器模型，而创意写作和对话式 AI 则更自然地匹配解码器模型。
+
+EN: Translation and summarization are classic encoder-decoder tasks because they require transforming an input sequence into a new output sequence.
+ZH: 翻译和摘要是经典的编码器—解码器任务，因为它们需要把输入序列转换成新的输出序列。
+
+EN: Beyond architecture choice, the article discusses attention efficiency for long-context processing.
+ZH: 除了架构选择，文章还讨论了长上下文处理中的注意力效率问题。
+
+EN: Standard full attention has quadratic O(n²) complexity with respect to sequence length, which becomes a major bottleneck for long texts.
+ZH: 标准全注意力相对于序列长度具有 O(n²) 的二次复杂度，这会在长文本场景中成为主要瓶颈。
+
+EN: Reformer addresses this with LSH attention, which uses hashing to limit attention to keys that are likely to be most relevant to a query.
+ZH: Reformer 通过 LSH attention 来缓解这一问题，它利用哈希机制，把注意力限制在最可能与查询相关的 key 上。
+
+EN: Longformer uses local attention, allowing each token to focus on a nearby window while giving selected tokens global attention.
+ZH: Longformer 使用局部注意力，使每个 token 主要关注附近窗口，同时让少数被选中的 token 拥有全局注意力。
+
+EN: This design reduces computation while still allowing information to propagate across the whole sequence through stacked layers and global tokens.
+ZH: 这种设计在降低计算量的同时，仍能借助多层堆叠和全局 token 让信息传播到整个序列。
+
+EN: Reformer also employs axial positional encodings to reduce the memory burden of very large positional embedding matrices.
+ZH: Reformer 还使用轴向位置编码，以降低超大位置嵌入矩阵带来的内存负担。
+
+EN: The central takeaway is that model selection should be guided by the type of understanding or generation a task requires, not just by which model family is popular.
+ZH: 这篇文章最核心的启发是：模型选择应由任务所需的理解或生成方式来驱动，而不只是跟随流行模型家族。
+
+EN: If a task mainly needs bidirectional comprehension, encoder models are a strong fit; if it needs open-ended generation, decoder models are usually better; and if it needs structured transformation from input to output, encoder-decoder models are often the right choice.
+ZH: 如果任务主要需要双向理解，编码器模型通常更合适；如果需要开放式生成，解码器模型往往更好；如果需要从输入到输出的结构化转换，则通常应优先考虑编码器—解码器模型。
