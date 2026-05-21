@@ -44,7 +44,7 @@ export async function fetchAllSources(
   windowStart: Date,
   now: Date,
 ): Promise<FetchResult[]> {
-  const rssSources = sources.filter((s) => s.type === 'rss' || s.type === 'atom');
+  const rssSources = sources.filter((s) => s.type === 'rss' || s.type === 'atom' || s.type === 'podcast');
   const results = await Promise.allSettled(
     rssSources.map((s) => fetchRssSource(s, windowStart, now)),
   );

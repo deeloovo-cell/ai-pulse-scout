@@ -27,7 +27,7 @@ export function loadConfig(): AppConfig {
   }
 
   return {
-    sources: sourcesFile.sources,
+    sources: sourcesFile.sources.filter((s) => s.enabled !== false),
     digest: digestFile.digest,
     scoring: digestFile.scoring,
     email,

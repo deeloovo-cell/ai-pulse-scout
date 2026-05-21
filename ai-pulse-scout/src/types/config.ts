@@ -1,10 +1,21 @@
 export type SourceType = 'rss' | 'atom' | 'youtube' | 'podcast' | 'github';
 
+export type CoverageStatus =
+  | 'live'
+  | 'deferred_youtube'
+  | 'deferred_podcast'
+  | 'deferred_social'
+  | 'deferred_no_feed'
+  | 'deferred_github_watch';
+
 export interface SourceConfig {
   name: string;
   category: string;
   url: string;
   type: SourceType;
+  enabled?: boolean;
+  coverage_status?: CoverageStatus;
+  notes?: string;
 }
 
 export interface ScoringConfig {
