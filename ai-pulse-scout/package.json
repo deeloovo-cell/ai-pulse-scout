@@ -7,6 +7,7 @@
     "build": "tsc",
     "preview": "tsx src/cli/preview.ts",
     "send-test": "tsx src/cli/sendTest.ts",
+    "backfill": "tsx src/cli/backfill.ts",
     "validate-sources": "tsx src/cli/validateSources.ts",
     "test": "vitest run",
     "test:watch": "vitest"

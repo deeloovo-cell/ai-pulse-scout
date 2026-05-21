@@ -1,4 +1,4 @@
-import { format, subHours } from 'date-fns';
+import { format, subHours, subDays } from 'date-fns';
 
 export function formatDigestDate(date: Date): string {
   return format(date, 'MM-dd-yyyy');
@@ -7,6 +7,10 @@ export function formatDigestDate(date: Date): string {
 export function computeWindowStart(lastRun: Date | null, windowHours: number, bufferHours: number): Date {
   const anchor = lastRun ?? subHours(new Date(), windowHours);
   return subHours(anchor, bufferHours);
+}
+
+export function computeBackfillWindowStart(days: number): Date {
+  return subDays(new Date(), days);
 }
 
 export function isWithinWindow(publishedAt: Date | null, windowStart: Date, now: Date): boolean {
