@@ -67,3 +67,51 @@ Backfill runs share the same fetch/score/render pipeline via `runBackfill()` but
 - Subject: `AI Pulse Scout -- MM-DD-YYYY`
 - Each item: bold + underlined title, alternating background colors, source link at end
 - 8–15 items per digest, ordered by relevance score
+
+## Daily Automation (macOS launchd)
+
+The project ships a launchd-based scheduler that fires `scripts/send-daily.sh` every day at **07:00 host local time**.
+
+### One-time install
+
+```bash
+npm run schedule:install
+```
+
+This:
+1. Substitutes the project path into `scripts/com.ai-pulse-scout.daily.plist`
+2. Writes the final plist to `~/Library/LaunchAgents/com.ai-pulse-scout.daily.plist`
+3. Loads it with `launchctl load`
+
+The agent is persistent across reboots (LaunchAgents load automatically on login).
+
+### Verification
+
+```bash
+npm run schedule:status           # should show PID and LastExitStatus
+launchctl list com.ai-pulse-scout.daily
+```
+
+### Manual send (same command the scheduler uses)
+
+```bash
+npm run send-daily                # or: bash scripts/send-daily.sh
+```
+
+### Logs
+
+Each run appends to `data/logs/digest-YYYY-MM-DD.log`. The launchd-level wrapper logs go to `data/logs/launchd-stdout.log` / `launchd-stderr.log`.
+
+```bash
+tail -f data/logs/digest-$(date +%Y-%m-%d).log
+```
+
+### Remove the schedule
+
+```bash
+npm run schedule:uninstall
+```
+
+### Timezone note
+
+launchd `StartCalendarInterval` fires on **host local time**. If the machine clock is set to Asia/Shanghai the job fires at 07:00 CST. No extra timezone configuration is required on a correctly-set machine.
