@@ -1,0 +1,124 @@
+# AI Pulse Scout — Digest Configuration
+
+digest:
+  # Max items to include in each digest
+  max_items: 12
+  min_items: 3
+
+  # Collection window: fetch items published within this many hours before last_successful_run
+  collection_window_hours: 28
+
+  # Safety overlap buffer added before window start (catches clock skew, delayed feeds)
+  safety_buffer_hours: 2
+
+  # Minimum relevance score to include an item (0.0–1.0)
+  min_score: 0.15
+
+scoring:
+  # Keyword groups for heuristic scoring (case-insensitive)
+  ai_engineering_keywords:
+    - "agent"
+    - "agentic"
+    - "llm"
+    - "large language model"
+    - "transformer"
+    - "foundation model"
+    - "fine-tuning"
+    - "rag"
+    - "retrieval augmented"
+    - "inference"
+    - "claude"
+    - "gpt"
+    - "gemini"
+    - "mistral"
+    - "llama"
+    - "prompt engineering"
+    - "multimodal"
+    - "reasoning model"
+    - "chain of thought"
+
+  industrial_ai_keywords:
+    - "manufacturing"
+    - "industrial"
+    - "factory"
+    - "automation"
+    - "robotics"
+    - "digital twin"
+    - "predictive maintenance"
+    - "quality control"
+    - "supply chain"
+    - "iiot"
+    - "industry 4.0"
+
+  cad_cae_cam_keywords:
+    - "cad"
+    - "cae"
+    - "cam"
+    - "simulation"
+    - "finite element"
+    - "generative design"
+    - "topology optimization"
+    - "parametric"
+    - "3d modeling"
+    - "solidworks"
+    - "ansys"
+    - "siemens nx"
+    - "ptc"
+
+  executive_signal_keywords:
+    - "cio"
+    - "enterprise"
+    - "governance"
+    - "compliance"
+    - "strategy"
+    - "deployment"
+    - "roi"
+    - "benchmark"
+    - "release"
+    - "open source"
+    - "api"
+    - "platform"
+    - "architecture"
+    - "infrastructure"
+    - "security"
+    - "cost"
+    - "efficiency"
+
+  aac_relevance_keywords:
+    - "agentic"
+    - "enterprise ai"
+    - "manufacturing ai"
+    - "cad"
+    - "cae"
+    - "cam"
+    - "industrial automation"
+    - "engineering software"
+    - "digital manufacturing"
+
+  # High-signal words that boost score significantly
+  high_signal_boost_keywords:
+    - "breakthrough"
+    - "launch"
+    - "released"
+    - "announces"
+    - "open source"
+    - "new model"
+    - "new release"
+    - "major update"
+    - "significant"
+    - "outperforms"
+    - "state of the art"
+    - "sota"
+
+  # Spam/noise words that reduce score
+  low_signal_penalty_keywords:
+    - "webinar"
+    - "register now"
+    - "sign up"
+    - "newsletter"
+    - "sponsored"
+    - "advertisement"
+    - "click here"
+    - "limited time"
+    - "discount"
+    - "sale"

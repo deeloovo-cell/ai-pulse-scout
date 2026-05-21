@@ -1,0 +1,62 @@
+# AI Pulse Scout — Source Registry
+# Each source needs: name, category, url (feed URL), type (rss|atom|youtube|podcast)
+
+sources:
+  # Core AI Engineering & Agentic AI
+  - name: "OpenAI Blog"
+    category: ai_engineering
+    url: "https://openai.com/news/rss.xml"
+    type: rss
+
+  - name: "Anthropic News"
+    category: ai_engineering
+    url: "https://www.anthropic.com/rss.xml"
+    type: rss
+
+  - name: "Google DeepMind Blog"
+    category: ai_engineering
+    url: "https://deepmind.google/blog/rss.xml"
+    type: rss
+
+  - name: "Hugging Face Blog"
+    category: ai_engineering
+    url: "https://huggingface.co/blog/feed.xml"
+    type: rss
+
+  - name: "LangChain Blog"
+    category: ai_engineering
+    url: "https://blog.langchain.dev/rss/"
+    type: rss
+
+  # Industrial AI / Manufacturing AI
+  - name: "MIT Technology Review AI"
+    category: industrial_ai
+    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/"
+    type: rss
+
+  - name: "VentureBeat AI"
+    category: industrial_ai
+    url: "https://venturebeat.com/category/ai/feed/"
+    type: rss
+
+  # Research Sources
+  - name: "arXiv CS.AI (recent)"
+    category: research
+    url: "https://rss.arxiv.org/rss/cs.AI"
+    type: rss
+
+  - name: "arXiv CS.LG (recent)"
+    category: research
+    url: "https://rss.arxiv.org/rss/cs.LG"
+    type: rss
+
+  # Open Source / Communities
+  - name: "The Gradient"
+    category: research
+    url: "https://thegradient.pub/rss/"
+    type: rss
+
+  - name: "Towards Data Science"
+    category: ai_engineering
+    url: "https://towardsdatascience.com/feed"
+    type: rss
