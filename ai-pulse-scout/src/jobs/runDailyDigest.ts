@@ -60,7 +60,7 @@ export async function runDailyDigest(
   writeFileSync(outputPath, html, 'utf8');
   logger.info(`Saved HTML artifact: ${outputPath}`);
 
-  if (sendEmail && mailClient) {
+  if (sendEmail && mailClient && selected.length > 0) {
     const fromAddr = config.email.from_address || process.env.SMTP_USER || 'pulse@example.com';
     await mailClient.send({
       to: config.email.to,
@@ -71,6 +71,8 @@ export async function runDailyDigest(
     appendToLedger(selected);
     saveSuccessfulRun(now);
     logger.info('Ledger updated and run state saved.');
+  } else if (sendEmail && selected.length === 0) {
+    logger.info('No digest items selected — skipping email send and state update.');
   }
 
   return { subject, html, items: selected, itemCount: selected.length, outputPath };

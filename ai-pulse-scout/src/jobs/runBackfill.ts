@@ -72,7 +72,7 @@ export async function runBackfill(
   writeFileSync(outputPath, html, 'utf8');
   logger.info(`Saved backfill HTML artifact: ${outputPath}`);
 
-  if (options.send && mailClient) {
+  if (options.send && mailClient && selected.length > 0) {
     const fromAddr = config.email.from_address || process.env.SMTP_USER || 'pulse@example.com';
     await mailClient.send({
       to: config.email.to,
@@ -83,6 +83,8 @@ export async function runBackfill(
     // Mark sent items in ledger so they won't be re-sent; do NOT advance last_successful_run.
     appendToLedger(selected);
     logger.info('Ledger updated (last_successful_run NOT advanced — daily cadence preserved).');
+  } else if (options.send && selected.length === 0) {
+    logger.info('No backfill items selected — skipping email send and ledger update.');
   }
 
   return { subject, html, items: selected, itemCount: selected.length, outputPath, windowStart };

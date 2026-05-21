@@ -24,7 +24,9 @@ try {
   console.log(`Subject: ${result.subject}`);
   console.log(`Items:   ${result.itemCount}`);
   console.log(`Output:  ${result.outputPath}`);
-  if (!isDryRun && smtpConfig.user && smtpConfig.pass) {
+  if (!isDryRun && result.itemCount === 0) {
+    console.log('No qualifying items — email skipped, output saved.');
+  } else if (!isDryRun && smtpConfig.user && smtpConfig.pass) {
     console.log('Email sent successfully.');
   } else if (isDryRun) {
     console.log('Dry run complete — no email sent, output saved.');
