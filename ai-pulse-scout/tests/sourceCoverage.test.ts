@@ -5,6 +5,8 @@ import type { CoverageResult, SourceUniverseRecord } from '../src/inbox/types.js
 import { buildSourceUniverse } from '../src/inbox/buildSourceUniverse.js';
 import { runSourceCoverage } from '../src/jobs/runSourceCoverage.js';
 import { canUseFeedAdapter, resolveFeedSource } from '../src/adapters/feedAdapter.js';
+import { canUseGitHubAdapter, resolveGitHubSource } from '../src/adapters/githubAdapter.js';
+import { canUseYouTubeAdapter, resolveYouTubeSource } from '../src/adapters/youtubeAdapter.js';
 
 describe('feedAdapter', () => {
   it('supports feed-like strategies and rejects others', () => {
@@ -27,6 +29,28 @@ describe('feedAdapter', () => {
     expect(resolveFeedSource('https://changelog.com/practicalai')).toMatchObject({
       strategy: 'podcast_feed',
       url: 'https://changelog.com/practicalai/feed',
+    });
+  });
+});
+
+describe('githubAdapter', () => {
+  it('supports github coverage and resolves repo URLs to release feeds', () => {
+    expect(canUseGitHubAdapter('github_release_feed')).toBe(true);
+    expect(canUseGitHubAdapter('generic_web_discovery')).toBe(false);
+    expect(resolveGitHubSource('https://github.com/langchain-ai/langchain')).toMatchObject({
+      url: 'https://github.com/langchain-ai/langchain/releases.atom',
+      strategy: 'github_release_feed',
+    });
+  });
+});
+
+describe('youtubeAdapter', () => {
+  it('supports youtube coverage and resolves known handles to feed URLs', () => {
+    expect(canUseYouTubeAdapter('youtube_channel_resolution')).toBe(true);
+    expect(canUseYouTubeAdapter('generic_web_discovery')).toBe(false);
+    expect(resolveYouTubeSource('https://www.youtube.com/@aiDotEngineer')).toMatchObject({
+      strategy: 'youtube_channel_resolution',
+      url: expect.stringContaining('https://www.youtube.com/feeds/videos.xml?channel_id='),
     });
   });
 });
@@ -57,8 +81,8 @@ describe('real source inbox coverage baseline', () => {
 });
 
 describe('runSourceCoverage', () => {
-  it('uses feed-backed coverage results when a feed adapter is provided', async () => {
-    const feedSource = {
+  it('uses adapter results when an adapter is provided', async () => {
+    const source = {
       section: 'rss_newsletters',
       subsection: null,
       label: null,
@@ -73,19 +97,19 @@ describe('runSourceCoverage', () => {
       },
     } satisfies SourceUniverseRecord;
 
-    const fakeFeedAdapter = {
+    const fakeAdapter = {
       canHandle: vi.fn().mockReturnValue(true),
       run: vi.fn().mockResolvedValue({
-        source: feedSource,
+        source,
         status: 'success',
         discoveredCount: 2,
       }),
     };
 
-    const results = await runSourceCoverage([feedSource], { adapters: [fakeFeedAdapter] });
+    const results = await runSourceCoverage([source], { adapters: [fakeAdapter] });
 
-    expect(fakeFeedAdapter.canHandle).toHaveBeenCalled();
-    expect(fakeFeedAdapter.run).toHaveBeenCalled();
+    expect(fakeAdapter.canHandle).toHaveBeenCalled();
+    expect(fakeAdapter.run).toHaveBeenCalled();
     expect(results[0]).toMatchObject({ status: 'success', discoveredCount: 2 });
   });
 });
