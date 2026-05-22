@@ -49,6 +49,7 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 ### Blogs / Personal Sites
 
 - https://karpathy.ai/
+- https://www.philschmid.de/
 - https://simonwillison.net/
 - https://simonwillison.net/tags/llms/
 - https://www.darioamodei.com/
