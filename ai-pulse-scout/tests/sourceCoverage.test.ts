@@ -7,6 +7,7 @@ import { runSourceCoverage } from '../src/jobs/runSourceCoverage.js';
 import { canUseFeedAdapter, resolveFeedSource } from '../src/adapters/feedAdapter.js';
 import { canUseGitHubAdapter, resolveGitHubSource } from '../src/adapters/githubAdapter.js';
 import { canUseYouTubeAdapter, resolveYouTubeSource } from '../src/adapters/youtubeAdapter.js';
+import { extractFeedUrlFromHtml, extractRecentArticleLinksFromHtml } from '../src/adapters/genericWebAdapter.js';
 
 describe('feedAdapter', () => {
   it('supports feed-like strategies and rejects others', () => {
@@ -52,6 +53,21 @@ describe('youtubeAdapter', () => {
       strategy: 'youtube_channel_resolution',
       url: expect.stringContaining('https://www.youtube.com/feeds/videos.xml?channel_id='),
     });
+  });
+});
+
+describe('genericWebAdapter', () => {
+  it('extracts feed URLs from html link tags', () => {
+    const html = '<html><head><link rel="alternate" type="application/rss+xml" href="/feed.xml"></head></html>';
+    expect(extractFeedUrlFromHtml('https://example.com/blog', html)).toBe('https://example.com/feed.xml');
+  });
+
+  it('extracts likely recent article links when no feed is present', () => {
+    const html = '<html><body><a href="/posts/a">A</a><a href="/posts/b">B</a><a href="/about">About</a></body></html>';
+    expect(extractRecentArticleLinksFromHtml('https://example.com', html)).toEqual([
+      'https://example.com/posts/a',
+      'https://example.com/posts/b',
+    ]);
   });
 });
 

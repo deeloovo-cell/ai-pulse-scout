@@ -1,4 +1,5 @@
 import { FeedAdapter } from '../adapters/feedAdapter.js';
+import { GenericWebAdapter } from '../adapters/genericWebAdapter.js';
 import { GitHubAdapter } from '../adapters/githubAdapter.js';
 import { YouTubeAdapter } from '../adapters/youtubeAdapter.js';
 import type { SourceAdapter } from '../adapters/types.js';
@@ -12,7 +13,12 @@ export async function runSourceCoverage(
   universe: SourceUniverseRecord[],
   options: RunSourceCoverageOptions = {},
 ): Promise<CoverageResult[]> {
-  const adapters = options.adapters ?? [new FeedAdapter(), new GitHubAdapter(), new YouTubeAdapter()];
+  const adapters = options.adapters ?? [
+    new FeedAdapter(),
+    new GitHubAdapter(),
+    new YouTubeAdapter(),
+    new GenericWebAdapter(),
+  ];
   const results: CoverageResult[] = [];
 
   for (const source of universe) {
