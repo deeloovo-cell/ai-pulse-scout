@@ -5,6 +5,7 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 ## Core AI Engineering & Agentic AI
 
 - https://www.llamaindex.ai/blog
+- https://www.langchain.com/blog
 - https://www.anthropic.com/engineering
 - https://huggingface.co/blog
 - https://www.latent.space/
