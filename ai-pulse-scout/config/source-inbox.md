@@ -99,14 +99,6 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 
 ### Social / Professional Profiles
 
-- https://www.facebook.com/yann.lecun
-- https://www.linkedin.com/in/yann-lecun-3a7410/
-- https://x.com/geoffreyhinton
-- https://www.linkedin.com/in/andrewyng/
-- https://x.com/hwchase17
-- https://x.com/jerryjliu0
-- https://x.com/gdb
-- https://x.com/sama
 
 ### Podcasts / Media
 
@@ -121,9 +113,7 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 - https://developer.nvidia.com/blog/
 - https://blogs.nvidia.com/blog/category/omniverse/
 - https://blogs.sw.siemens.com/
-- https://www.linkedin.com/in/tony-hemmelgarn-22945a6/
 - https://blog.3ds.com/
-- https://www.linkedin.com/in/bernardcharles/
 - https://www.ptc.com/en/blogs/authors/jim-heppelmann
 - https://www.ansys.com/blog
 - https://altair.com/blog
