@@ -112,6 +112,21 @@ tail -f data/logs/digest-$(date +%Y-%m-%d).log
 npm run schedule:uninstall
 ```
 
+### Source Universe Coverage
+
+Run this to validate how the raw inbox source universe is currently classified and traversed:
+
+```bash
+npm run coverage:sources
+```
+
+This command:
+- parses `config/source-inbox.md`
+- classifies every inbox URL
+- runs coverage validation across the full source universe
+- flags unreadable URLs for removal from the active source set
+- writes results to `data/output/source-coverage/latest.json`
+
 ### Timezone note
 
 launchd `StartCalendarInterval` fires on **host local time**. If the machine clock is set to Asia/Shanghai the job fires at 07:00 CST. No extra timezone configuration is required on a correctly-set machine.

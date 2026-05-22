@@ -1,7 +1,7 @@
 {
   "name": "ai-pulse-scout",
   "version": "0.1.0",
-  "description": "Config-driven AI news digest — fetches RSS, deduplicates, scores, renders HTML email, sends via SMTP",
+  "description": "Config-driven AI news digest \u2014 fetches RSS, deduplicates, scores, renders HTML email, sends via SMTP",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -14,7 +14,8 @@
     "test:watch": "vitest",
     "schedule:install": "bash scripts/install-schedule.sh",
     "schedule:uninstall": "bash scripts/uninstall-schedule.sh",
-    "schedule:status": "launchctl list com.ai-pulse-scout.daily 2>/dev/null || echo 'Not loaded'"
+    "schedule:status": "launchctl list com.ai-pulse-scout.daily 2>/dev/null || echo 'Not loaded'",
+    "coverage:sources": "tsx src/cli/coverage.ts"
   },
   "dependencies": {
     "date-fns": "^3.6.0",
