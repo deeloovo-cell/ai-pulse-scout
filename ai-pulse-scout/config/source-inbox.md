@@ -34,14 +34,9 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 
 ## YouTube Channels
 
-- https://www.youtube.com/@aiDotEngineer
-- https://www.youtube.com/@LatentSpacePod
 - https://www.youtube.com/@Deeplearningai
 - https://www.youtube.com/@IBMTechnology
 - https://www.youtube.com/@NVIDIAOmniverse
-- https://www.youtube.com/@siemens
-- https://www.youtube.com/@3DSDassaultSystemes
-- https://www.youtube.com/@ansys
 
 ## Podcasts
 
