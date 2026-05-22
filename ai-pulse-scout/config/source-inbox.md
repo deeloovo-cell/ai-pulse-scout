@@ -23,9 +23,6 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 
 ## YouTube Channels
 
-- https://www.youtube.com/@Deeplearningai
-- https://www.youtube.com/@IBMTechnology
-- https://www.youtube.com/@NVIDIAOmniverse
 
 ## Podcasts
 
@@ -46,8 +43,6 @@ Provided by 卢迪 on 2026-05-21. This is the full requested source universe for
 
 ## Open Source / Communities
 
-- https://github.com/langchain-ai/langchain
-- https://github.com/crewAIInc/crewAI
 
 ## AI Leaders / Influencers
 
