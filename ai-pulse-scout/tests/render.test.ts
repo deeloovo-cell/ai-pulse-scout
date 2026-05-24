@@ -49,6 +49,17 @@ describe('renderHtmlEmail', () => {
     expect(html).toContain('href="https://example.com/article"');
   });
 
+  it('prefers analyzed key insight over feed summary', () => {
+    const html = renderHtmlEmail({
+      items: [makeItem({ key_insight: 'This is the analyzed executive insight.' })],
+      date: new Date(),
+      subjectTemplate: 'AI Pulse Scout -- {date}',
+    });
+
+    expect(html).toContain('This is the analyzed executive insight.');
+    expect(html).not.toContain('New agentic AI framework for industrial use.');
+  });
+
   it('escapes HTML entities in title', () => {
     const item = makeItem({ title: 'Attack <script>alert(1)</script> & more' });
     const html = renderHtmlEmail({ items: [item], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
@@ -64,16 +75,11 @@ describe('renderHtmlEmail', () => {
     expect(html).toContain('#fff8f0');
   });
 
-  it('omits AAC section when aac_relevance is low', () => {
-    const item = makeItem({ relevance_scores: { ai_engineering: 0.8, industrial_ai: 0, cad_cae_cam: 0, executive_signal: 0.5, aac_relevance: 0.05, overall: 0.5 } });
-    const html = renderHtmlEmail({ items: [item], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
-    expect(html).not.toContain('Why it matters for AAC');
-  });
-
-  it('includes AAC section when aac_relevance is high', () => {
+  it('omits CIO and AAC commentary sections', () => {
     const item = makeItem({ relevance_scores: { ai_engineering: 0.8, industrial_ai: 0.4, cad_cae_cam: 0.3, executive_signal: 0.5, aac_relevance: 0.5, overall: 0.7 } });
     const html = renderHtmlEmail({ items: [item], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
-    expect(html).toContain('Why it matters for AAC');
+    expect(html).not.toContain('CIO / AI Lead');
+    expect(html).not.toContain('Why it matters for AAC');
   });
 
   it('renders empty digest gracefully', () => {

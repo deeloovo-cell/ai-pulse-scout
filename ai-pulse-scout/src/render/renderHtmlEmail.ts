@@ -50,13 +50,7 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
 
 function renderItem(item: NormalizedItem, index: number): string {
   const bgColor = ITEM_COLORS[index % ITEM_COLORS.length];
-  const summary = item.summary || item.content_text.slice(0, 250);
-  const aacSection = item.relevance_scores.aac_relevance > 0.2
-    ? `<p style="margin:8px 0 0 0;font-size:13px;color:#555;">
-        <strong>Why it matters for AAC:</strong>
-        ${escapeHtml(inferAacNote(item))}
-      </p>`
-    : '';
+  const summary = item.key_insight || item.summary || item.content_text.slice(0, 250);
 
   return `<tr>
     <td style="padding:16px 20px;background:${bgColor};border-bottom:1px solid #e0e0e0;">
@@ -66,10 +60,6 @@ function renderItem(item: NormalizedItem, index: number): string {
       <p style="margin:0 0 6px 0;font-size:13px;color:#333;line-height:1.5;">
         <strong>Key insight:</strong> ${escapeHtml(summary)}
       </p>
-      <p style="margin:8px 0 0 0;font-size:13px;color:#444;">
-        <strong>CIO / AI Lead:</strong> ${escapeHtml(inferCioNote(item))}
-      </p>
-      ${aacSection}
       <p style="margin:10px 0 0 0;font-size:12px;">
         <a href="${escapeHtml(item.item_url)}" style="color:#1a73e8;text-decoration:none;">
           ${escapeHtml(item.source_name)} &rarr;
@@ -78,22 +68,6 @@ function renderItem(item: NormalizedItem, index: number): string {
       </p>
     </td>
   </tr>`;
-}
-
-function inferCioNote(item: NormalizedItem): string {
-  const scores = item.relevance_scores;
-  if (scores.aac_relevance > 0.3) return 'Directly relevant to enterprise AI strategy and tooling decisions.';
-  if (scores.industrial_ai > 0.3) return 'Monitor for operational AI implications in industrial deployments.';
-  if (scores.ai_engineering > 0.5) return 'Key development in AI engineering — assess platform and architecture impact.';
-  if (scores.executive_signal > 0.4) return 'Watch for governance, compliance, or vendor strategy implications.';
-  return 'Stay informed on this development for AI leadership awareness.';
-}
-
-function inferAacNote(item: NormalizedItem): string {
-  const scores = item.relevance_scores;
-  if (scores.cad_cae_cam > 0.2) return 'Potential application in CAD/CAE/CAM workflows — evaluate fit for engineering tooling.';
-  if (scores.industrial_ai > 0.3) return 'Relevant to industrial AI deployment patterns applicable at AAC.';
-  return 'Connected to enterprise AI infrastructure decisions relevant to AAC Technologies.';
 }
 
 function formatPublished(date: Date | null): string {

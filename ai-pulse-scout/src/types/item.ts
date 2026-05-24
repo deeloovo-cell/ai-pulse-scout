@@ -30,6 +30,7 @@ export interface NormalizedItem {
   content_text: string;
   content_html?: string;
   summary: string;
+  key_insight?: string;
   tags: string[];
   content_type: ContentType;
   fingerprint: string;

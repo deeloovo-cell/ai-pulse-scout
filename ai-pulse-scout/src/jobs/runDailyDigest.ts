@@ -4,6 +4,7 @@ import { scoreItems } from '../filtering/scoreItem.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
+import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
 import { loadRunState, saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeWindowStart } from '../utils/time.js';
@@ -47,7 +48,7 @@ export async function runDailyDigest(
   logger.info(`After dedup: ${deduped.length} items`);
 
   const scored = scoreItems(deduped, config.scoring);
-  const selected = selectItems(scored, config.digest);
+  const selected = await enrichKeyInsights(selectItems(scored, config.digest));
   logger.info(`Selected: ${selected.length} items for digest`);
 
   const subject = buildSubject(config.email.subject_template, now);
