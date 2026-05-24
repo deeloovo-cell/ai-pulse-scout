@@ -1,6 +1,5 @@
 import { loadConfig } from '../config/loadConfig.js';
 import { fetchAllSources } from '../fetchers/rssFetcher.js';
-import { scoreItems } from '../filtering/scoreItem.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
@@ -58,8 +57,7 @@ export async function runBackfill(
     max_items: Math.max(config.digest.max_items, BACKFILL_MAX_ITEMS),
   };
 
-  const scored = scoreItems(deduped, config.scoring);
-  const selected = selectItems(scored, backfillDigestConfig);
+  const selected = selectItems(deduped, backfillDigestConfig);
   logger.info(`Selected: ${selected.length} items for backfill digest`);
 
   const baseSubject = buildSubject(config.email.subject_template, now);

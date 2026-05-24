@@ -1,6 +1,5 @@
 import { loadConfig } from '../config/loadConfig.js';
 import { fetchAllSources } from '../fetchers/rssFetcher.js';
-import { scoreItems } from '../filtering/scoreItem.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
@@ -47,8 +46,7 @@ export async function runDailyDigest(
   const deduped = dedupeItems(allItems, ledger);
   logger.info(`After dedup: ${deduped.length} items`);
 
-  const scored = scoreItems(deduped, config.scoring);
-  const selected = await enrichKeyInsights(selectItems(scored, config.digest));
+  const selected = await enrichKeyInsights(selectItems(deduped, config.digest));
   logger.info(`Selected: ${selected.length} items for digest`);
 
   const subject = buildSubject(config.email.subject_template, now);

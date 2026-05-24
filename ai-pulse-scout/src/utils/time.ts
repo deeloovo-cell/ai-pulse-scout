@@ -14,6 +14,6 @@ export function computeBackfillWindowStart(days: number): Date {
 }
 
 export function isWithinWindow(publishedAt: Date | null, windowStart: Date, now: Date): boolean {
-  if (!publishedAt) return true; // unknown publish time: include (ledger dedupes repeats)
+  if (!publishedAt) return false;
   return publishedAt >= windowStart && publishedAt <= now;
 }

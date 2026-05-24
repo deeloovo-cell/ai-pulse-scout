@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import yaml from 'js-yaml';
-import type { AppConfig, SourceConfig, DigestConfig, ScoringConfig, EmailConfig } from '../types/config.js';
+import type { AppConfig, SourceConfig, DigestConfig, EmailConfig } from '../types/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const CONFIG_DIR = join(__dirname, '../../config');
@@ -14,7 +14,7 @@ function loadYaml(filename: string): unknown {
 
 export function loadConfig(): AppConfig {
   const sourcesFile = loadYaml('sources.yaml') as { sources: SourceConfig[] };
-  const digestFile = loadYaml('digest.yaml') as { digest: DigestConfig; scoring: ScoringConfig };
+  const digestFile = loadYaml('digest.yaml') as { digest: DigestConfig };
   const emailFile = loadYaml('email.yaml') as { email: EmailConfig };
 
   const email = emailFile.email;
@@ -29,7 +29,6 @@ export function loadConfig(): AppConfig {
   return {
     sources: sourcesFile.sources.filter((s) => s.enabled !== false),
     digest: digestFile.digest,
-    scoring: digestFile.scoring,
     email,
   };
 }

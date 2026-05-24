@@ -1,6 +1,6 @@
 # AI Pulse Scout
 
-A portable TypeScript project that automatically collects AI news from a curated source list, scores and deduplicates items, renders a concise HTML executive digest, and sends it via SMTP.
+A portable TypeScript project that automatically collects recent AI updates from a curated source list, deduplicates items, uses GLM to generate concise key insights, renders an HTML executive digest, and sends it via SMTP.
 
 ## Quick Start
 
@@ -19,14 +19,14 @@ npm test               # Run test suite
 | File | Purpose |
 |------|---------|
 | `config/sources.yaml` | RSS/feed source list, grouped by category |
-| `config/digest.yaml` | Scoring keywords, max items, collection window |
+| `config/digest.yaml` | Max items and 24-hour collection window |
 | `config/email.yaml` | Recipient, subject template, sender address |
 
 ## CLI Commands
 
 | Command | Description |
 |---------|-------------|
-| `npm run preview` | Fetch, score, render → save HTML to `data/output/`, print subject |
+| `npm run preview` | Fetch, dedupe, analyze, render → save HTML to `data/output/`, print subject |
 | `npm run send-test` | Full pipeline including SMTP send |
 | `npm run backfill -- --days 7` | Preview a 7-day lookback digest (no email, no state changes) |
 | `npm run backfill -- --days 7 --send` | Send a 7-day backfill digest via SMTP (updates ledger, not `last_successful_run`) |
@@ -54,8 +54,8 @@ npm test               # Run test suite
 ## Architecture
 
 ```
-sources.yaml → rssFetcher → normalizeItem → dedupeItems → scoreItem
-  → selectItems → renderHtmlEmail → SmtpMailClient
+sources.yaml → rssFetcher → normalizeItem → dedupeItems
+  → selectItems → enrichKeyInsights → renderHtmlEmail → SmtpMailClient
 ```
 
 State is persisted after a successful send. If sending fails, `last_successful_run` is NOT updated, so the next run catches up automatically.

@@ -47,8 +47,8 @@ try {
     console.log('Preview complete — no email sent, no state updated.');
   }
   if (result.itemCount === 0) {
-    console.log('\n[!] No items scored above threshold.');
-    console.log('    Try lowering min_score in config/digest.yaml or check feed activity.');
+    console.log('\n[!] No items found in the backfill window.');
+    console.log('    Check feed activity or increase the --days lookback window.');
   }
 } catch (err) {
   const msg = err instanceof Error ? err.message : String(err);

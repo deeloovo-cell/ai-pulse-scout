@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeBackfillWindowStart } from '../src/utils/time.js';
+import { computeBackfillWindowStart, isWithinWindow } from '../src/utils/time.js';
 
 describe('computeBackfillWindowStart', () => {
   it('returns a date approximately N days before now', () => {
@@ -27,6 +27,17 @@ describe('computeBackfillWindowStart', () => {
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
     const w = computeBackfillWindowStart(1);
     expect(Math.abs(w.getTime() - oneDayAgo)).toBeLessThan(2000);
+  });
+});
+
+describe('isWithinWindow', () => {
+  it('requires a publish time inside the requested window', () => {
+    const windowStart = new Date('2026-05-20T00:00:00Z');
+    const now = new Date('2026-05-21T00:00:00Z');
+
+    expect(isWithinWindow(new Date('2026-05-20T12:00:00Z'), windowStart, now)).toBe(true);
+    expect(isWithinWindow(new Date('2026-05-19T23:59:59Z'), windowStart, now)).toBe(false);
+    expect(isWithinWindow(null, windowStart, now)).toBe(false);
   });
 });
 
