@@ -50,7 +50,7 @@ export function parseSourceInbox(markdown: string): ParsedInboxSource[] {
       return;
     }
 
-    const bulletUrl = line.match(/^[-*]\s+(https?:\/\/\S+)$/);
+    const bulletUrl = line.match(/^\s*[-*•]\s+(https?:\/\/\S+)$/);
     if (bulletUrl) {
       results.push({
         section,

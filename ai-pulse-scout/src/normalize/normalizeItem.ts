@@ -4,7 +4,12 @@ import type { NormalizedItem, ContentType } from '../types/item.js';
 import type { SourceConfig } from '../types/config.js';
 import { fingerprint } from './fingerprint.js';
 
-export function normalizeRssItem(raw: RssItem, source: SourceConfig): NormalizedItem {
+type ExtendedRssItem = RssItem & {
+  author?: string;
+  'content:encoded'?: string;
+};
+
+export function normalizeRssItem(raw: ExtendedRssItem, source: SourceConfig): NormalizedItem {
   const url = raw.link ?? raw.guid ?? '';
   const title = raw.title ?? '(untitled)';
   const publishedAt = parseDate(raw.pubDate ?? raw.isoDate ?? null);

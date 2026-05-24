@@ -92,7 +92,9 @@ describe('real source inbox coverage baseline', () => {
   it('parses all source inbox URLs into universe records', () => {
     const markdown = readFileSync('config/source-inbox.md', 'utf8');
     const universe = buildSourceUniverse(markdown);
-    expect(universe.length).toBe(42);
+    const sourceUrlCount = markdown.match(/https?:\/\/\S+/g)?.length ?? 0;
+    expect(universe.length).toBe(sourceUrlCount);
+    expect(universe.length).toBeGreaterThan(0);
   });
 });
 
@@ -145,8 +147,8 @@ describe('real inbox coverage summary', () => {
     const results = await runSourceCoverage(universe, { adapters: [fakeAdapter] });
     const summary = summarizeCoverage(results);
 
-    expect(summary.totalSources).toBe(42);
-    expect(summary.success + summary.empty + summary.remove + summary.failed).toBe(42);
+    expect(summary.totalSources).toBe(universe.length);
+    expect(summary.success + summary.empty + summary.remove + summary.failed).toBe(universe.length);
     expect(summary.success).toBe(0);
   });
 });

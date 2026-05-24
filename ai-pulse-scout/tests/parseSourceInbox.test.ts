@@ -28,6 +28,18 @@ describe('parseSourceInbox', () => {
       }),
     ]);
   });
+
+  it('extracts URLs from unicode bullet lists', () => {
+    const parsed = parseSourceInbox('• https://example.com/feed.xml\n');
+
+    expect(parsed).toEqual([
+      expect.objectContaining({
+        section: 'unknown',
+        subsection: null,
+        url: 'https://example.com/feed.xml',
+      }),
+    ]);
+  });
 });
 
 import { buildSourceUniverse } from '../src/inbox/buildSourceUniverse.js';

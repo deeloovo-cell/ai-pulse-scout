@@ -14,6 +14,9 @@ const smtpConfig = smtpConfigFromEnv();
 if (!smtpConfig.user || !smtpConfig.pass) {
   logger.warn('SMTP_USER or SMTP_PASS not set in .env — email send will fail.');
   logger.warn('Set credentials or use `npm run preview` to generate HTML only.');
+  if (!isDryRun) {
+    process.exit(1);
+  }
 }
 
 const mailClient = isDryRun ? null : new SmtpMailClient(smtpConfig);
@@ -31,6 +34,7 @@ try {
   } else if (isDryRun) {
     console.log('Dry run complete — no email sent, output saved.');
   }
+  process.exit(0);
 } catch (err) {
   const msg = err instanceof Error ? err.message : String(err);
   logger.error(`Send failed: ${msg}`);

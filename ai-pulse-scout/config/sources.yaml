@@ -1,895 +1,128 @@
-# AI Pulse Scout — Source Registry (Production)
-# Expanded from user-provided source universe (config/source-inbox.md) 2026-05-21
+# AI Pulse Scout -- Source Registry
+# Synced from config/source-inbox.md.
 #
-# Fields:
-#   name            Display name
-#   category        ai_engineering | industrial_ai | cad_cae_cam | newsletter | research
-#                   ai_news | data_science | individual_blog | open_source | podcast
-#                   consulting_strategy | social
-#   url             Feed URL (for enabled) or canonical site URL (for deferred)
-#   type            rss | atom | youtube | podcast | github
-#   enabled         true = fetch in v1 digest; false = deferred (default: true)
-#   coverage_status live | deferred_youtube | deferred_podcast | deferred_social
-#                   deferred_no_feed | deferred_github_watch
-#   notes           Why deferred or any fetch caveats
-#
-# ------- ENABLED SOURCES (live, v1) -------
+# Contract:
+#   - source-inbox.md is the raw source list maintained by the user.
+#   - sources.yaml is the production registry consumed by the digest pipeline.
+#   - URLs should stay aligned with source-inbox.md unless a source is explicitly
+#     deferred or replaced with a documented canonical feed URL.
 
 sources:
-
-  # ── Core AI Engineering & Agentic AI ──────────────────────────────────────
-
-  - name: "OpenAI Blog"
+  - name: "Anthropic News"
     category: ai_engineering
-    url: "https://openai.com/news/rss.xml"
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml"
     type: rss
     enabled: true
     coverage_status: live
-
-  - name: "Anthropic News"
-    category: ai_engineering
-    url: "https://www.anthropic.com/rss.xml"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 404 as of 2026-05-21. Anthropic may have removed public RSS. Check /news/rss.xml or /engineering/rss."
 
   - name: "LangChain Blog"
     category: ai_engineering
-    url: "https://blog.langchain.dev/rss/"
+    url: "https://www.langchain.com/blog/rss.xml"
     type: rss
     enabled: true
     coverage_status: live
 
-  - name: "LlamaIndex Blog"
+  - name: "Google Cloud AI Blog"
     category: ai_engineering
-    url: "https://www.llamaindex.ai/blog/rss"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "RSS returned HTTP 404 as of 2026-05-21. Feed URL unconfirmed; verify current path before re-enabling."
-
-  - name: "Hugging Face Blog"
-    category: ai_engineering
-    url: "https://huggingface.co/blog/feed.xml"
+    url: "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/"
     type: rss
     enabled: true
     coverage_status: live
 
-  - name: "Latent Space"
-    category: ai_engineering
-    url: "https://www.latent.space/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Substack. Also has podcast feed tracked separately."
-
-  - name: "Ben's Bites"
-    category: ai_engineering
-    url: "https://www.bensbites.com/feed"
+  - name: "Siemens Simcenter Blog"
+    category: industrial_ai
+    url: "https://blogs.sw.siemens.com/simcenter/feed/"
     type: rss
     enabled: true
     coverage_status: live
 
-  - name: "DeepLearning.AI The Batch"
-    category: ai_engineering
-    url: "https://www.deeplearning.ai/the-batch/rss.xml"
+  - name: "SOLIDWORKS Blog"
+    category: cad_cae_cam
+    url: "http://blogs.solidworks.com/solidworksblog/feed/"
     type: rss
     enabled: true
     coverage_status: live
 
-  # ── Newsletters (Substack / independent) ─────────────────────────────────
-
-  - name: "Import AI (Jack Clark)"
-    category: newsletter
-    url: "https://importai.substack.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "The Sequence (Jesus Rodriguez)"
-    category: newsletter
-    url: "https://thesequence.substack.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "SemiAnalysis (Dylan Patel)"
-    category: newsletter
-    url: "https://www.semianalysis.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Substack. Chip/model architecture deep dives; high executive signal."
-
-  - name: "AI Magazine by Sebastian Raschka"
-    category: newsletter
-    url: "https://magazine.sebastianraschka.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  # ── Research ──────────────────────────────────────────────────────────────
-
-  - name: "arXiv CS.AI (recent)"
+  - name: "Anthropic Research"
     category: research
-    url: "https://rss.arxiv.org/rss/cs.AI"
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml"
     type: rss
     enabled: true
     coverage_status: live
 
-  - name: "arXiv CS.LG (recent)"
+  - name: "OpenAI Developers"
+    category: ai_engineering
+    url: "https://developers.openai.com/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "Google AI Blog"
+    category: ai_engineering
+    url: "https://www.blog.google/technology/ai/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "Claude Updates"
+    category: ai_engineering
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "Simon Willison"
+    category: individual_blog
+    url: "http://feeds.simonwillison.net/swn-everything"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "Google Research Blog"
     category: research
-    url: "https://rss.arxiv.org/rss/cs.LG"
+    url: "https://research.google/blog/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "The CAD Hub"
+    category: cad_cae_cam
+    url: "https://thecadhub.com/blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+
+  - name: "OpenAI Blog"
+    category: ai_engineering
+    url: "https://blog.openai.com/rss/"
     type: rss
     enabled: true
     coverage_status: live
 
   - name: "Google DeepMind Blog"
     category: research
-    url: "https://deepmind.google/blog/rss.xml"
+    url: "https://deepmind.com/blog/feed/basic/"
     type: rss
     enabled: true
     coverage_status: live
 
-  - name: "BAIR Blog (Berkeley AI Research)"
-    category: research
-    url: "https://bair.berkeley.edu/blog/feed.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Stanford HAI News"
-    category: research
-    url: "https://hai.stanford.edu/news/rss.xml"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Feed returned malformed XML as of 2026-05-21. HTML attribute parsing error; site may serve HTML at this URL."
-
-  # ── Industrial AI / Manufacturing AI ─────────────────────────────────────
-
-  - name: "3DS (Dassault Systèmes) Blog"
-    category: industrial_ai
-    url: "https://blog.3ds.com/feed/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 404 as of 2026-05-21. 3DS blog may not expose a standard WordPress feed. Verify current feed URL."
-
-  - name: "IndustryWeek AI & IIoT"
-    category: industrial_ai
-    url: "https://www.industryweek.com/rss/technology-and-iiot"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 403 Forbidden as of 2026-05-21. Site blocks automated RSS fetching."
-
-  - name: "NVIDIA Developer Blog"
-    category: industrial_ai
-    url: "https://developer.nvidia.com/blog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Ansys Blog"
-    category: industrial_ai
-    url: "https://www.ansys.com/blog/rss"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "URL may need validation; Ansys uses a custom CMS."
-
-  - name: "Siemens SW Engineering Blog"
-    category: industrial_ai
-    url: "https://blogs.sw.siemens.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Rescale Blog (HPC / Cloud Simulation)"
-    category: industrial_ai
-    url: "https://rescale.com/blog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  # ── AI for CAD / CAE / CAM ───────────────────────────────────────────────
-
-  # (Most vendor product pages in this area lack RSS; see deferred section)
-
-  # ── AI News ───────────────────────────────────────────────────────────────
-
-  - name: "VentureBeat AI"
-    category: ai_news
-    url: "https://venturebeat.com/category/ai/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "MIT Technology Review AI"
-    category: ai_news
-    url: "https://www.technologyreview.com/topic/artificial-intelligence/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Artificial Intelligence News"
-    category: ai_news
-    url: "https://www.artificialintelligence-news.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "IEEE Spectrum AI"
-    category: ai_news
-    url: "https://spectrum.ieee.org/feeds/topic/artificial-intelligence.rss"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "InfoQ AI / ML / Data Engineering"
-    category: ai_news
-    url: "https://www.infoq.com/ai-ml-data-eng/rss/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 405 Method Not Allowed as of 2026-05-21. InfoQ blocks RSS GET requests from automated agents."
-
-  - name: "The New Stack — AI"
-    category: ai_news
-    url: "https://thenewstack.io/ai/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  # ── Data Science / AI Engineering Practice ───────────────────────────────
-
-  - name: "Towards Data Science"
-    category: data_science
-    url: "https://towardsdatascience.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "KDNuggets"
-    category: data_science
-    url: "https://www.kdnuggets.com/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Analytics Vidhya Blog"
-    category: data_science
-    url: "https://www.analyticsvidhya.com/blog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "O'Reilly Radar"
-    category: data_science
-    url: "https://www.oreilly.com/radar/feed/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 403 Forbidden as of 2026-05-21. O'Reilly blocks automated feed fetching."
-
-  # ── Individual Blogs (AI Leaders) ────────────────────────────────────────
-
-  - name: "Chip Huyen Blog"
-    category: individual_blog
-    url: "https://huyenchip.com/feed.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Simon Willison's Weblog"
-    category: individual_blog
-    url: "https://simonwillison.net/atom/everything/"
-    type: atom
-    enabled: true
-    coverage_status: live
-
-  - name: "Eugene Yan Blog"
-    category: individual_blog
-    url: "https://eugeneyan.com/rss.xml"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 404 as of 2026-05-21. Feed URL may have changed; verify /feed.xml or /atom.xml."
-
-  - name: "Lilian Weng (Lil'Log)"
-    category: individual_blog
-    url: "https://lilianweng.github.io/index.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Jay Alammar Blog"
-    category: individual_blog
-    url: "https://jalammar.github.io/feed.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "fast.ai Blog"
-    category: individual_blog
-    url: "https://www.fast.ai/atom.xml"
-    type: atom
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 404 as of 2026-05-21. fast.ai moved to a Quarto site; verify new feed URL."
-
-  - name: "Ben Evans"
-    category: individual_blog
-    url: "https://www.ben-evans.com/benedictevans/feed"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "HTTP 404 as of 2026-05-21. Squarespace feed path may have changed; verify /rss.xml or /feed."
-
-  # ── Open Source — GitHub Releases (Atom) ─────────────────────────────────
-
-  - name: "LangChain — GitHub Releases"
-    category: open_source
-    url: "https://github.com/langchain-ai/langchain/releases.atom"
-    type: atom
-    enabled: true
-    coverage_status: live
-    notes: "GitHub Atom release feed. Signals new LangChain versions."
-
-  - name: "LlamaIndex — GitHub Releases"
-    category: open_source
-    url: "https://github.com/run-llama/llama_index/releases.atom"
-    type: atom
-    enabled: true
-    coverage_status: live
-
-  - name: "CrewAI — GitHub Releases"
-    category: open_source
-    url: "https://github.com/crewAIInc/crewAI/releases.atom"
-    type: atom
-    enabled: true
-    coverage_status: live
-
-  - name: "AutoGen — GitHub Releases"
-    category: open_source
-    url: "https://github.com/microsoft/autogen/releases.atom"
-    type: atom
-    enabled: true
-    coverage_status: live
-
-  # ── Podcasts (RSS-fetchable) ──────────────────────────────────────────────
-
-  - name: "Practical AI (Changelog)"
-    category: podcast
-    url: "https://changelog.com/practicalai/feed"
-    type: podcast
-    enabled: true
-    coverage_status: live
-
-  - name: "TWIML AI Podcast"
-    category: podcast
-    url: "https://twimlai.com/feed/podcast"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "HTTP 404 as of 2026-05-21. Feed URL may have changed; verify current RSS on twimlai.com."
-
-  - name: "Lex Fridman Podcast"
-    category: podcast
-    url: "https://lexfridman.com/feed/podcast"
-    type: podcast
-    enabled: true
-    coverage_status: live
-
-  - name: "Talking Industrial Automation"
-    category: podcast
-    url: "https://talkingindustrialautomation.libsyn.com/rss"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "HTTP 404 as of 2026-05-21. Libsyn show may have moved or been renamed."
-
-  # ------- DEFERRED SOURCES -------
-  # These are disabled in v1. Reasons documented per entry.
-
-  # ── YouTube Channels (need channel IDs for RSS) ───────────────────────────
-
-  - name: "AI.Engineer YouTube"
-    category: ai_engineering
-    url: "https://www.youtube.com/@aiDotEngineer"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires resolving handle to channel_id. Blocked in v1."
-
-  - name: "Latent Space Pod YouTube"
-    category: ai_engineering
-    url: "https://www.youtube.com/@LatentSpacePod"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution. Audio covered via Latent Space feed."
-
-  - name: "DeepLearning.AI YouTube"
-    category: ai_engineering
-    url: "https://www.youtube.com/@Deeplearningai"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "IBM Technology YouTube"
-    category: ai_engineering
-    url: "https://www.youtube.com/@IBMTechnology"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "NVIDIA Omniverse YouTube"
-    category: industrial_ai
-    url: "https://www.youtube.com/@NVIDIAOmniverse"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "Siemens YouTube"
-    category: industrial_ai
-    url: "https://www.youtube.com/@siemens"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "Dassault Systèmes YouTube"
-    category: industrial_ai
-    url: "https://www.youtube.com/@3DSDassaultSystemes"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "Ansys YouTube"
-    category: industrial_ai
-    url: "https://www.youtube.com/@ansys"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "YouTube RSS requires channel_id resolution."
-
-  - name: "Lex Fridman YouTube"
-    category: individual_blog
-    url: "https://www.youtube.com/@lexfridman"
-    type: youtube
-    enabled: false
-    coverage_status: deferred_youtube
-    notes: "Podcast audio already covered via lexfridman.com/feed/podcast."
-
-  # ── Social Profiles (no API access in v1) ────────────────────────────────
-
-  - name: "Yann LeCun (LinkedIn)"
-    category: social
-    url: "https://www.linkedin.com/in/yann-lecun-3a7410/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "LinkedIn requires authenticated API. No public RSS."
-
-  - name: "Yann LeCun (Facebook)"
-    category: social
-    url: "https://www.facebook.com/yann.lecun"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "Facebook Graph API required. Deferred."
-
-  - name: "Andrew Ng (LinkedIn)"
-    category: social
-    url: "https://www.linkedin.com/in/andrewyng/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "LinkedIn requires authenticated API."
-
-  - name: "Geoffrey Hinton (X/Twitter)"
-    category: social
-    url: "https://x.com/geoffreyhinton"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "X API requires bearer token and is paid tier. Deferred."
-
-  - name: "Harrison Chase / @hwchase17 (X/Twitter)"
-    category: social
-    url: "https://x.com/hwchase17"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "X API required. Deferred."
-
-  - name: "Jerry Liu / @jerryjliu0 (X/Twitter)"
-    category: social
-    url: "https://x.com/jerryjliu0"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "X API required. Deferred."
-
-  - name: "Greg Brockman / @gdb (X/Twitter)"
-    category: social
-    url: "https://x.com/gdb"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "X API required. Deferred."
-
-  - name: "Sam Altman / @sama (X/Twitter)"
-    category: social
-    url: "https://x.com/sama"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "X API required. Deferred."
-
-  - name: "Tony Hemmelgarn / Siemens CEO (LinkedIn)"
-    category: social
-    url: "https://www.linkedin.com/in/tony-hemmelgarn-22945a6/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "LinkedIn requires authenticated API."
-
-  - name: "Bernard Charles / 3DS CEO (LinkedIn)"
-    category: social
-    url: "https://www.linkedin.com/in/bernardcharles/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_social
-    notes: "LinkedIn requires authenticated API."
-
-  # ── Individual Blogs / Sites Without RSS ─────────────────────────────────
-
-  - name: "Andrej Karpathy Blog"
-    category: individual_blog
-    url: "https://karpathy.ai/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No RSS feed. Static site; posts infrequently. Monitor manually."
-
-  - name: "Sam Altman Blog"
-    category: individual_blog
-    url: "https://blog.samaltman.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No reliable RSS feed. Posts irregularly."
-
-  - name: "Dario Amodei (anthropic.com)"
-    category: individual_blog
-    url: "https://www.darioamodei.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No RSS. Anthropic blog already covered via Anthropic News feed."
-
-  - name: "Dwarkesh Patel"
-    category: individual_blog
-    url: "https://www.dwarkesh.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Substack feed URL uncertain. Verify https://www.dwarkesh.com/feed before enabling."
-
-  - name: "Sebastian Raschka Blog (original)"
-    category: individual_blog
-    url: "https://sebastianraschka.com/blog/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Main blog now inactive; Substack magazine covered by AI Magazine by Sebastian Raschka source."
-
-  # ── Industrial AI / CAD-CAE — Vendor Pages Without RSS ───────────────────
-
-  - name: "NVIDIA Manufacturing Page"
-    category: industrial_ai
-    url: "https://www.nvidia.com/en-us/industries/manufacturing/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Marketing landing page. No RSS. NVIDIA Developer Blog covers engineering content."
-
-  - name: "Siemens AI Page"
-    category: industrial_ai
-    url: "https://www.siemens.com/global/en/products/automation/topic-areas/artificial-intelligence.html"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Product landing page without RSS. Siemens SW Blog covers engineering posts."
-
-  - name: "Altair AI"
+  - name: "Develop3D"
     category: cad_cae_cam
-    url: "https://altair.com/ai-powered-engineering"
+    url: "https://develop3d.com/feed/"
     type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Product page. Altair blog (altair.com/blog) may have RSS; not verified."
+    enabled: true
+    coverage_status: live
 
-  - name: "Hexagon Manufacturing Intelligence"
-    category: industrial_ai
-    url: "https://hexagon.com/industries/manufacturing-intelligence"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS feed found on product pages."
-
-  - name: "Manufacturing Leadership Council"
-    category: industrial_ai
-    url: "https://www.manufacturingleadershipcouncil.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS. Membership-gated content."
-
-  - name: "Autodesk Research"
-    category: cad_cae_cam
-    url: "https://www.autodesk.com/research"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "RSS URL not confirmed. Research publications page; check /research/feed or /rss."
-
-  - name: "Autodesk Research Publications"
-    category: cad_cae_cam
-    url: "https://www.research.autodesk.com/publications/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No RSS. Academic publication list."
-
-  - name: "Cadence AI"
-    category: cad_cae_cam
-    url: "https://www.cadence.com/en_US/home/tools/system-design-and-analysis/artificial-intelligence.html"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Product landing page. No RSS."
-
-  - name: "Synopsys AI"
-    category: cad_cae_cam
-    url: "https://www.synopsys.com/ai.html"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Product landing page. No RSS."
-
-  - name: "PTC Blogs"
-    category: industrial_ai
-    url: "https://www.ptc.com/en/blogs"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "PTC blogs may have RSS at /en/blogs/rss; not verified. Includes Jim Heppelmann content."
-
-  - name: "NVIDIA Keynotes / Events"
-    category: industrial_ai
-    url: "https://www.nvidia.com/en-us/events/keynote/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Events page. No RSS. Monitor GTC manually or via NVIDIA Developer Blog."
-
-  - name: "MIT CAD Lab"
-    category: cad_cae_cam
-    url: "https://cadlab.mit.edu/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS. Academic lab site."
-
-  # ── AI News Sites Without Confirmed RSS ─────────────────────────────────
-
-  - name: "AI Magazine"
-    category: ai_news
-    url: "https://aimagazine.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "RSS URL not confirmed. Check https://aimagazine.com/rss.xml."
-
-  - name: "Semafor AI"
-    category: ai_news
-    url: "https://www.semafor.com/hub/technology/artificial-intelligence"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No confirmed public RSS for this section."
-
-  - name: "Business Insider AI"
-    category: ai_news
-    url: "https://www.businessinsider.com/ai"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Likely paywalled. No confirmed open RSS."
-
-  # ── Data Science / MLOps Without Confirmed RSS ──────────────────────────
-
-  - name: "MLOps Community"
-    category: data_science
-    url: "https://mlops.community/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Community site. No confirmed public RSS feed."
-
-  - name: "Weights & Biases Articles"
-    category: data_science
-    url: "https://wandb.ai/site/articles"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No confirmed RSS. W&B publishes articles but no public feed found."
-
-  - name: "DataCamp Blog"
-    category: data_science
-    url: "https://www.datacamp.com/blog"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "RSS URL not confirmed. Check /blog/rss or /blog/feed."
-
-  # ── Consulting / Enterprise AI Strategy (no RSS) ─────────────────────────
-
-  - name: "McKinsey QuantumBlack Insights"
-    category: consulting_strategy
-    url: "https://www.mckinsey.com/capabilities/quantumblack/our-insights"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "McKinsey does not publish public RSS feeds."
-
-  - name: "BCG AI Insights"
-    category: consulting_strategy
-    url: "https://www.bcg.com/capabilities/artificial-intelligence"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS. BCG insights are JavaScript-rendered."
-
-  - name: "Accenture AI Insights"
-    category: consulting_strategy
-    url: "https://www.accenture.com/us-en/insights/artificial-intelligence-index"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS."
-
-  - name: "Deloitte AI Institute"
-    category: consulting_strategy
-    url: "https://www2.deloitte.com/us/en/pages/consulting/topics/ai-institute.html"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS."
-
-  - name: "PwC AI"
-    category: consulting_strategy
-    url: "https://www.pwc.com/gx/en/issues/artificial-intelligence.html"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS."
-
-  # ── Podcasts Without Confirmed RSS URLs ──────────────────────────────────
-
-  - name: "Cognitive Revolution (podcast)"
-    category: podcast
-    url: "https://www.cognitiverevolution.ai/"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "RSS URL not confirmed. Likely on Buzzsprout or Spotify. Verify before enabling."
-
-  - name: "Eye on AI (podcast)"
-    category: podcast
-    url: "https://www.eye-on.ai/"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "RSS URL not confirmed."
-
-  - name: "Augmentir Podcast"
-    category: podcast
-    url: "https://www.augmentir.com/podcast"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "No confirmed RSS. Niche industrial AI podcast."
-
-  - name: "The Digital Twin Podcast"
-    category: podcast
-    url: "https://thedigitaltwinpodcast.buzzsprout.com/"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "Buzzsprout feeds require numeric show ID: feeds.buzzsprout.com/XXXXXX.rss. Verify before enabling."
-
-  - name: "No Priors (podcast)"
-    category: podcast
-    url: "https://www.nopriors.com/"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "RSS URL not confirmed."
-
-  - name: "Latent Space Podcast (audio)"
-    category: podcast
-    url: "https://www.latent.space/podcast"
-    type: podcast
-    enabled: false
-    coverage_status: deferred_podcast
-    notes: "Blog feed already enabled (latent.space/feed). Podcast episode feed URL TBD."
-
-  # ── GitHub Repos Without Release Feeds ───────────────────────────────────
-
-  - name: "OpenAI Cookbook (GitHub)"
-    category: open_source
-    url: "https://github.com/openai/openai-cookbook"
-    type: github
-    enabled: false
-    coverage_status: deferred_github_watch
-    notes: "Reference/example repo. No versioned releases. Monitor commit activity manually."
-
-  # ── OpenAI / Anthropic Research (duplicate of blog feeds) ────────────────
-
-  - name: "OpenAI Research"
+  - name: "BAIR Blog"
     category: research
-    url: "https://openai.com/research/"
+    url: "http://bair.berkeley.edu/blog/feed.xml"
     type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "OpenAI Blog RSS (openai.com/news/rss.xml) already covers research announcements. Research page itself has no separate RSS."
+    enabled: true
+    coverage_status: live
 
-  - name: "Anthropic Research"
-    category: research
-    url: "https://www.anthropic.com/research"
+  - name: "Siemens NX Design Blog"
+    category: cad_cae_cam
+    url: "https://blogs.sw.siemens.com/nx-design/feed/"
     type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Anthropic News RSS already covers research. No separate research-only feed."
-
-  - name: "Papers With Code"
-    category: research
-    url: "https://paperswithcode.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS feed. Monitor via arXiv feeds which often include implementation links."
-
-  - name: "NVIDIA Research"
-    category: research
-    url: "https://research.nvidia.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "No public RSS. NVIDIA Developer Blog covers applied research."
-
-  - name: "Engineering.com"
-    category: industrial_ai
-    url: "https://www.engineering.com/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "RSS URL not confirmed for AI section specifically."
-
-  - name: "DeepMind Research Publications"
-    category: research
-    url: "https://deepmind.google/research/publications/"
-    type: rss
-    enabled: false
-    coverage_status: deferred_no_feed
-    notes: "Publications list page. No separate RSS. Google DeepMind Blog covers announcements."
+    enabled: true
+    coverage_status: live

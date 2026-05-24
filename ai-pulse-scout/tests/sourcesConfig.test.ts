@@ -7,6 +7,7 @@ import type { SourceConfig } from '../src/types/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sourcesYaml = join(__dirname, '../config/sources.yaml');
+const sourceInbox = join(__dirname, '../config/source-inbox.md');
 
 interface SourcesFile {
   sources: SourceConfig[];
@@ -27,6 +28,11 @@ const VALID_STATUSES = [
   'deferred_no_feed',
   'deferred_github_watch',
 ] as const;
+
+function loadInboxUrls(): string[] {
+  const raw = readFileSync(sourceInbox, 'utf8');
+  return [...raw.matchAll(/https?:\/\/\S+/g)].map((match) => match[0]);
+}
 
 describe('sources.yaml schema', () => {
   it('parses without error and has entries', () => {
@@ -75,16 +81,9 @@ describe('sources.yaml schema', () => {
     }
   });
 
-  it('has at least 30 enabled sources', () => {
+  it('matches the current source inbox URL list', () => {
     const sources = loadSources();
-    const enabled = sources.filter((s) => s.enabled !== false);
-    expect(enabled.length).toBeGreaterThanOrEqual(30);
-  });
-
-  it('has at least 20 deferred sources', () => {
-    const sources = loadSources();
-    const deferred = sources.filter((s) => s.enabled === false);
-    expect(deferred.length).toBeGreaterThanOrEqual(20);
+    expect(sources.map((source) => source.url)).toEqual(loadInboxUrls());
   });
 
   it('no two sources share the same url among enabled entries', () => {
@@ -102,18 +101,18 @@ describe('sources.yaml schema', () => {
     expect(cats.has('ai_engineering')).toBe(true);
     expect(cats.has('research')).toBe(true);
     expect(cats.has('industrial_ai')).toBe(true);
-    expect(cats.has('ai_news')).toBe(true);
-    expect(cats.has('open_source')).toBe(true);
+    expect(cats.has('cad_cae_cam')).toBe(true);
+    expect(cats.has('individual_blog')).toBe(true);
   });
 });
 
 describe('loadConfig source filtering', () => {
-  it('filters out disabled sources', () => {
+  it('keeps all current inbox-aligned sources enabled', () => {
     const all = loadSources();
     const enabled = all.filter((s) => s.enabled !== false);
     const disabled = all.filter((s) => s.enabled === false);
     expect(enabled.length).toBeGreaterThan(0);
-    expect(disabled.length).toBeGreaterThan(0);
+    expect(disabled.length).toBe(0);
     expect(enabled.length + disabled.length).toBe(all.length);
   });
 });
