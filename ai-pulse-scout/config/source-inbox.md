@@ -10,7 +10,7 @@
 •	http://feeds.simonwillison.net/swn-everything
 •	https://research.google/blog/rss/
 •	https://thecadhub.com/blog/feed/
-•	https://blog.openai.com/rss/
+•	https://openai.com/news/rss.xml
 •	https://deepmind.com/blog/feed/basic/
 •	https://develop3d.com/feed/
 •	http://bair.berkeley.edu/blog/feed.xml

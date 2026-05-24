@@ -94,7 +94,7 @@ sources:
 
   - name: "OpenAI Blog"
     category: ai_engineering
-    url: "https://blog.openai.com/rss/"
+    url: "https://openai.com/news/rss.xml"
     type: rss
     enabled: true
     coverage_status: live
