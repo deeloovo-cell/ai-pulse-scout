@@ -149,6 +149,7 @@ describe('real inbox coverage summary', () => {
 
     expect(summary.totalSources).toBe(universe.length);
     expect(summary.success + summary.empty + summary.remove + summary.failed).toBe(universe.length);
-    expect(summary.success).toBe(0);
+    expect(summary.success).toBe(1);
+    expect(summary.remove).toBeGreaterThan(0);
   });
 });

@@ -8,121 +8,741 @@
 #     deferred or replaced with a documented canonical feed URL.
 
 sources:
-  - name: "Anthropic News"
-    category: ai_engineering
-    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "LangChain Blog"
-    category: ai_engineering
-    url: "https://www.langchain.com/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Google Cloud AI Blog"
-    category: ai_engineering
-    url: "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Siemens Simcenter Blog"
-    category: industrial_ai
-    url: "https://blogs.sw.siemens.com/simcenter/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "SOLIDWORKS Blog"
-    category: cad_cae_cam
-    url: "http://blogs.solidworks.com/solidworksblog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Anthropic Research"
-    category: research
-    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "OpenAI Developers"
-    category: ai_engineering
-    url: "https://developers.openai.com/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Google AI Blog"
-    category: ai_engineering
-    url: "https://www.blog.google/technology/ai/rss/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Claude Updates"
-    category: ai_engineering
-    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Simon Willison"
-    category: individual_blog
-    url: "http://feeds.simonwillison.net/swn-everything"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Google Research Blog"
-    category: research
-    url: "https://research.google/blog/rss/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "The CAD Hub"
-    category: cad_cae_cam
-    url: "https://thecadhub.com/blog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "OpenAI Blog"
-    category: ai_engineering
-    url: "https://openai.com/news/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Google DeepMind Blog"
-    category: research
-    url: "https://deepmind.com/blog/feed/basic/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Develop3D"
-    category: cad_cae_cam
-    url: "https://develop3d.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "BAIR Blog"
-    category: research
-    url: "http://bair.berkeley.edu/blog/feed.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-
-  - name: "Siemens NX Design Blog"
-    category: cad_cae_cam
-    url: "https://blogs.sw.siemens.com/nx-design/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
+- name: Anthropic News
+  category: ai_engineering
+  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: LangChain Blog
+  category: ai_engineering
+  url: https://www.langchain.com/blog/rss.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Google Cloud AI Blog
+  category: ai_engineering
+  url: https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Siemens Simcenter Blog
+  category: industrial_ai
+  url: https://blogs.sw.siemens.com/simcenter/feed/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: SOLIDWORKS Blog
+  category: cad_cae_cam
+  url: http://blogs.solidworks.com/solidworksblog/feed/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Anthropic Research
+  category: research
+  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: OpenAI Developers
+  category: ai_engineering
+  url: https://developers.openai.com/rss.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Google AI Blog
+  category: ai_engineering
+  url: https://www.blog.google/technology/ai/rss/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Claude Updates
+  category: ai_engineering
+  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Simon Willison
+  category: individual_blog
+  url: http://feeds.simonwillison.net/swn-everything
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Google Research Blog
+  category: research
+  url: https://research.google/blog/rss/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: The CAD Hub
+  category: cad_cae_cam
+  url: https://thecadhub.com/blog/feed/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: OpenAI Blog
+  category: ai_engineering
+  url: https://openai.com/news/rss.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Google DeepMind Blog
+  category: research
+  url: https://deepmind.com/blog/feed/basic/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Develop3D
+  category: cad_cae_cam
+  url: https://develop3d.com/feed/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: BAIR Blog
+  category: research
+  url: http://bair.berkeley.edu/blog/feed.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: Siemens NX Design Blog
+  category: cad_cae_cam
+  url: https://blogs.sw.siemens.com/nx-design/feed/
+  type: rss
+  enabled: true
+  coverage_status: live
+- name: OpenAI News
+  category: ai_engineering
+  url: https://openai.com/news/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: OpenAI Research
+  category: ai_engineering
+  url: https://openai.com/research/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: OpenAI Docs Overview
+  category: ai_engineering
+  url: https://platform.openai.com/docs/overview
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: OpenAI Cookbook
+  category: ai_engineering
+  url: https://github.com/openai/openai-cookbook
+  type: github
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: OpenAI YouTube
+  category: ai_engineering
+  url: https://www.youtube.com/@OpenAI
+  type: youtube
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Anthropic News Page
+  category: ai_engineering
+  url: https://www.anthropic.com/news
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Anthropic Engineering
+  category: ai_engineering
+  url: https://www.anthropic.com/engineering
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Anthropic Docs
+  category: ai_engineering
+  url: https://docs.anthropic.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Anthropic YouTube
+  category: ai_engineering
+  url: https://www.youtube.com/@AnthropicAI
+  type: youtube
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google AI Blog Page
+  category: ai_engineering
+  url: https://blog.google/technology/ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google DeepMind Blog Page
+  category: ai_engineering
+  url: https://deepmind.google/discover/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google Developers AI
+  category: ai_engineering
+  url: https://developers.googleblog.com/en/search/?tag=AI
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google AI Dev
+  category: ai_engineering
+  url: https://ai.google.dev/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google DeepMind YouTube
+  category: ai_engineering
+  url: https://www.youtube.com/@GoogleDeepMind
+  type: youtube
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA Developer Blog
+  category: ai_engineering
+  url: https://developer.nvidia.com/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA Robotics
+  category: ai_engineering
+  url: https://developer.nvidia.com/robotics
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA Omniverse Blog
+  category: ai_engineering
+  url: https://blogs.nvidia.com/blog/category/omniverse/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA Isaac Sim
+  category: ai_engineering
+  url: https://developer.nvidia.com/isaac/sim
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA GTC
+  category: ai_engineering
+  url: https://www.nvidia.com/gtc/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: LangChain Blog
+  category: ai_engineering
+  url: https://blog.langchain.dev/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: LangGraph Docs
+  category: ai_engineering
+  url: https://langchain-ai.github.io/langgraph/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: LlamaIndex Blog
+  category: ai_engineering
+  url: https://www.llamaindex.ai/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: CrewAI Blog
+  category: ai_engineering
+  url: https://www.crewai.com/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: AutoGen Docs
+  category: ai_engineering
+  url: https://microsoft.github.io/autogen/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Hugging Face Blog
+  category: ai_engineering
+  url: https://huggingface.co/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Model Context Protocol
+  category: ai_engineering
+  url: https://modelcontextprotocol.io/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: LocalLLaMA
+  category: ai_engineering
+  url: https://www.reddit.com/r/LocalLLaMA/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Hacker News
+  category: ai_engineering
+  url: https://news.ycombinator.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Latent Space
+  category: ai_engineering
+  url: https://www.latent.space/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Ben’s Bites
+  category: ai_engineering
+  url: https://www.bensbites.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: The Batch
+  category: ai_engineering
+  url: https://www.deeplearning.ai/the-batch/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: The Robot Report
+  category: ai_engineering
+  url: https://www.therobotreport.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: IEEE Spectrum Robotics
+  category: ai_engineering
+  url: https://spectrum.ieee.org/robotics
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: ROS Blog
+  category: ai_engineering
+  url: https://www.ros.org/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Open Robotics Blog
+  category: ai_engineering
+  url: https://www.openrobotics.org/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: RoboHub
+  category: ai_engineering
+  url: https://robohub.org/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Siemens Software Blog
+  category: ai_engineering
+  url: https://blogs.sw.siemens.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Dassault Systèmes Blog
+  category: ai_engineering
+  url: https://blogs.3ds.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Ansys Blog
+  category: ai_engineering
+  url: https://www.ansys.com/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Hexagon Manufacturing Blog
+  category: ai_engineering
+  url: https://blog.manufacturing.hexagon.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Autodesk University AI
+  category: ai_engineering
+  url: https://www.autodesk.com/autodesk-university/article/AI
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: PTC Blogs
+  category: ai_engineering
+  url: https://www.ptc.com/en/blogs
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Siemens NX Design
+  category: ai_engineering
+  url: https://blogs.sw.siemens.com/nx-design/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: nTop Blog
+  category: ai_engineering
+  url: https://www.ntop.com/resources/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Machine Design AI
+  category: ai_engineering
+  url: https://www.machinedesign.com/automation-iiot/artificial-intelligence
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Manufacturing.net AI
+  category: ai_engineering
+  url: https://www.manufacturing.net/ai
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Smart Industry
+  category: ai_engineering
+  url: https://www.smartindustry.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: SAP Community AI/ML Blog
+  category: ai_engineering
+  url: https://community.sap.com/t5/artificial-intelligence-and-machine-learning-blog-posts/bg-p/ai-ml-blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: SAP AI
+  category: ai_engineering
+  url: https://www.sap.com/products/artificial-intelligence.html
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Microsoft Fabric Blog
+  category: ai_engineering
+  url: https://blog.fabric.microsoft.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Databricks Blog
+  category: ai_engineering
+  url: https://www.databricks.com/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Rockwell Automation Blogs
+  category: ai_engineering
+  url: https://www.rockwellautomation.com/en-us/company/news/blogs.html
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Siemens Manufacturing Blog
+  category: ai_engineering
+  url: https://blogs.sw.siemens.com/manufacturing/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: GE Digital Blog
+  category: ai_engineering
+  url: https://www.ge.com/digital/blog
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Tulip Blog
+  category: ai_engineering
+  url: https://tulip.co/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: HiveMQ Blog
+  category: ai_engineering
+  url: https://www.hivemq.com/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Future Tools News
+  category: ai_engineering
+  url: https://futuretools.io/news
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: There’s An AI For That Newsletter
+  category: ai_engineering
+  url: https://theresanaiforthat.com/newsletter/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Import AI Substack
+  category: ai_engineering
+  url: https://importai.substack.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: The Rundown AI
+  category: ai_engineering
+  url: https://www.therundown.ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: AlphaSignal
+  category: ai_engineering
+  url: https://alphasignal.ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Papers with Code
+  category: ai_engineering
+  url: https://paperswithcode.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Hugging Face Papers
+  category: ai_engineering
+  url: https://huggingface.co/papers
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: arXiv cs.AI Recent
+  category: ai_engineering
+  url: https://arxiv.org/list/cs.AI/recent
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Feedly
+  category: ai_engineering
+  url: https://feedly.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: RSSHub Docs
+  category: ai_engineering
+  url: https://docs.rsshub.app/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Firecrawl
+  category: ai_engineering
+  url: https://www.firecrawl.dev/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Apify
+  category: ai_engineering
+  url: https://apify.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: OpenAI Agents Python
+  category: ai_engineering
+  url: https://openai.github.io/openai-agents-python/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: CrewAI
+  category: ai_engineering
+  url: https://www.crewai.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: LanceDB
+  category: ai_engineering
+  url: https://lancedb.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Weaviate
+  category: ai_engineering
+  url: https://weaviate.io/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Qdrant
+  category: ai_engineering
+  url: https://qdrant.tech/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Superpower Daily
+  category: ai_engineering
+  url: https://www.superpowerdaily.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Import AI
+  category: ai_engineering
+  url: https://www.importai.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: The Neuron Daily
+  category: ai_engineering
+  url: https://www.theneurondaily.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Last Week in AI
+  category: ai_engineering
+  url: https://lastweekin.ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: AI News
+  category: ai_engineering
+  url: https://www.ainews.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: MarkTechPost
+  category: ai_engineering
+  url: https://www.marktechpost.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: VentureBeat AI
+  category: ai_engineering
+  url: https://venturebeat.com/ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: TechCrunch AI
+  category: ai_engineering
+  url: https://techcrunch.com/category/artificial-intelligence/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: The Information AI
+  category: ai_engineering
+  url: https://www.theinformation.com/ai
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: IEEE Spectrum AI
+  category: ai_engineering
+  url: https://spectrum.ieee.org/artificial-intelligence
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: r/MachineLearning
+  category: ai_engineering
+  url: https://www.reddit.com/r/MachineLearning/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: r/artificial
+  category: ai_engineering
+  url: https://www.reddit.com/r/artificial/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: SemiAnalysis
+  category: ai_engineering
+  url: https://www.semianalysis.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Tom’s Hardware AI
+  category: ai_engineering
+  url: https://www.tomshardware.com/tag/artificial-intelligence
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Analytics India Magazine
+  category: ai_engineering
+  url: https://analyticsindiamag.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Unite.AI
+  category: ai_engineering
+  url: https://www.unite.ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Towards Data Science
+  category: ai_engineering
+  url: https://towardsdatascience.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: AI in Plain English
+  category: ai_engineering
+  url: https://medium.com/artificial-intelligence-in-plain-english
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: KDnuggets
+  category: ai_engineering
+  url: https://www.kdnuggets.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA AI Blog
+  category: ai_engineering
+  url: https://blogs.nvidia.com/blog/category/ai/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: NVIDIA Robotics Blog
+  category: ai_engineering
+  url: https://blogs.nvidia.com/blog/category/robotics/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Google Research Robotics
+  category: ai_engineering
+  url: https://research.google/blog/topics/robotics/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Boston Dynamics Blog
+  category: ai_engineering
+  url: https://bostondynamics.com/blog/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Automate Robotics
+  category: ai_engineering
+  url: https://www.automate.org/robotics
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Robotics Business Review
+  category: ai_engineering
+  url: https://www.roboticsbusinessreview.com/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: IndustryWeek AI
+  category: ai_engineering
+  url: https://www.industryweek.com/technology-and-iiot/artificial-intelligence
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Control Engineering AI
+  category: ai_engineering
+  url: https://www.controleng.com/artificial-intelligence/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Automation World AI/ML
+  category: ai_engineering
+  url: https://www.automationworld.com/ai-machine-learning
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: SAP News AI
+  category: ai_engineering
+  url: https://news.sap.com/topics/artificial-intelligence/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Azure AI/ML Blog
+  category: ai_engineering
+  url: https://azure.microsoft.com/en-us/blog/topics/ai-machine-learning/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Siemens Opcenter Blog
+  category: ai_engineering
+  url: https://blogs.sw.siemens.com/opcenter/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: Plant Engineering AI in Manufacturing
+  category: ai_engineering
+  url: https://www.plantengineering.com/ai-in-manufacturing/
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed
+- name: IoT World Today AI
+  category: ai_engineering
+  url: https://www.iotworldtoday.com/artificial-intelligence
+  type: rss
+  enabled: false
+  coverage_status: deferred_no_feed

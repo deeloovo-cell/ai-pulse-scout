@@ -86,6 +86,17 @@ describe('sources.yaml schema', () => {
     expect(sources.map((source) => source.url)).toEqual(loadInboxUrls());
   });
 
+  it('keeps deferred inbox sources in the registry while only enabling live ones', () => {
+    const sources = loadSources();
+    const enabled = sources.filter((s) => s.enabled !== false);
+    const deferred = sources.filter((s) => s.enabled === false);
+
+    expect(enabled.length).toBeGreaterThan(0);
+    expect(deferred.length).toBeGreaterThan(0);
+    expect(enabled.every((s) => s.coverage_status === 'live')).toBe(true);
+    expect(deferred.every((s) => s.coverage_status && s.coverage_status !== 'live')).toBe(true);
+  });
+
   it('no two sources share the same url among enabled entries', () => {
     const sources = loadSources();
     const enabled = sources.filter((s) => s.enabled !== false);
@@ -107,12 +118,13 @@ describe('sources.yaml schema', () => {
 });
 
 describe('loadConfig source filtering', () => {
-  it('keeps all current inbox-aligned sources enabled', () => {
+  it('keeps only live sources enabled while preserving deferred entries in the registry', () => {
     const all = loadSources();
     const enabled = all.filter((s) => s.enabled !== false);
     const disabled = all.filter((s) => s.enabled === false);
     expect(enabled.length).toBeGreaterThan(0);
-    expect(disabled.length).toBe(0);
+    expect(disabled.length).toBeGreaterThan(0);
     expect(enabled.length + disabled.length).toBe(all.length);
+    expect(enabled.every((s) => s.coverage_status === 'live')).toBe(true);
   });
 });
