@@ -1,23 +1,4 @@
-export type SourceSection =
-  | 'core_ai_engineering'
-  | 'industrial_ai'
-  | 'cad_cae_cam'
-  | 'youtube_channels'
-  | 'podcasts'
-  | 'rss_newsletters'
-  | 'research_sources'
-  | 'open_source_communities'
-  | 'ai_leaders_blogs'
-  | 'ai_leaders_social'
-  | 'ai_leaders_media'
-  | 'enterprise_industrial_ai_leaders'
-  | 'academic_research_leaders'
-  | 'third_party_ai_news'
-  | 'data_science_ai_engineering'
-  | 'consulting_enterprise_ai'
-  | 'industrial_engineering_ai'
-  | 'ai_research_reports'
-  | 'unknown';
+export type SourceSection = 'rss' | 'webpage' | 'youtube' | 'community' | 'docs' | 'papers';
 
 export type SourceKind =
   | 'feed'
@@ -50,6 +31,13 @@ export interface ParsedInboxSource {
   line: number;
 }
 
+export interface ParsedSourceInbox {
+  sections: Record<SourceSection, string[]>;
+  allUrls: string[];
+  categoryByUrl: Record<string, SourceSection>;
+  entries: ParsedInboxSource[];
+}
+
 export interface ClassifiedSource {
   kind: SourceKind;
   strategy: FetchStrategy;
@@ -59,6 +47,7 @@ export interface ClassifiedSource {
 }
 
 export interface SourceUniverseRecord extends ParsedInboxSource {
+  category: SourceSection;
   classification: ClassifiedSource;
 }
 
