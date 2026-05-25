@@ -15,4 +15,3 @@
 •	https://develop3d.com/feed/
 •	http://bair.berkeley.edu/blog/feed.xml
 •	https://blogs.sw.siemens.com/nx-design/feed/
-•	https://feedly.com/
