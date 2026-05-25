@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeBackfillWindowStart, isWithinWindow } from '../src/utils/time.js';
+import { computeBackfillWindowStart, computeDailyCutoffWindow, isWithinWindow } from '../src/utils/time.js';
 
 describe('computeBackfillWindowStart', () => {
   it('returns a date approximately N days before now', () => {
@@ -38,6 +38,17 @@ describe('isWithinWindow', () => {
     expect(isWithinWindow(new Date('2026-05-20T12:00:00Z'), windowStart, now)).toBe(true);
     expect(isWithinWindow(new Date('2026-05-19T23:59:59Z'), windowStart, now)).toBe(false);
     expect(isWithinWindow(null, windowStart, now)).toBe(false);
+  });
+});
+
+describe('daily cutoff isolation', () => {
+  it('keeps backfill independent from the daily cutoff window helper', () => {
+    const daily = computeDailyCutoffWindow(new Date('2026-05-25T23:20:32.207Z'));
+    const backfill = computeBackfillWindowStart(7);
+
+    expect(daily.windowStart.toISOString()).toBe('2026-05-24T23:00:00.000Z');
+    expect(daily.windowEnd.toISOString()).toBe('2026-05-25T23:00:00.000Z');
+    expect(backfill.getTime()).toBeLessThan(Date.now());
   });
 });
 

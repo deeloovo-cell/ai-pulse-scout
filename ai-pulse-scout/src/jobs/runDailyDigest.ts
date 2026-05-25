@@ -6,7 +6,7 @@ import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
 import { loadRunState, saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
-import { computeWindowStart } from '../utils/time.js';
+import { computeDailyCutoffWindow } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
 import type { MailClient } from '../mail/MailClient.js';
 import type { NormalizedItem } from '../types/item.js';
@@ -33,12 +33,11 @@ export async function runDailyDigest(
   const runState = loadRunState();
   const now = new Date();
 
-  const lastRun = runState.last_successful_run ? new Date(runState.last_successful_run) : null;
-  const windowStart = computeWindowStart(lastRun, config.digest.collection_window_hours, config.digest.safety_buffer_hours);
+  const { windowStart, windowEnd } = computeDailyCutoffWindow(now);
 
-  logger.info(`Collection window: ${windowStart.toISOString()} → ${now.toISOString()}`);
+  logger.info(`Collection window: ${windowStart.toISOString()} → ${windowEnd.toISOString()}`);
 
-  const fetchResults = await fetchAllSources(config.sources, windowStart, now);
+  const fetchResults = await fetchAllSources(config.sources, windowStart, windowEnd);
   const allItems = fetchResults.flatMap((r) => r.items);
   logger.info(`Total fetched: ${allItems.length} items`);
 
