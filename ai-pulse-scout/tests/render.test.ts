@@ -21,6 +21,7 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
     relevance_scores: { ai_engineering: 0.8, industrial_ai: 0.3, cad_cae_cam: 0, executive_signal: 0.5, aac_relevance: 0.1, overall: 0.6 },
     decision: 'include',
     decision_reason: 'score=0.60',
+    primary_topic: 'AI Developer Tools & Agents',
     ...overrides,
   };
 }
@@ -80,6 +81,32 @@ describe('renderHtmlEmail', () => {
     const html = renderHtmlEmail({ items: [item], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
     expect(html).not.toContain('CIO / AI Lead');
     expect(html).not.toContain('Why it matters for AAC');
+  });
+
+  it('renders topic headings before grouped items', () => {
+    const html = renderHtmlEmail({
+      items: [
+        makeItem({
+          id: 'frontier',
+          item_url: 'https://example.com/frontier',
+          fingerprint: 'frontier-fp',
+          primary_topic: 'Frontier Model Labs',
+          title: 'Model release',
+        }),
+        makeItem({
+          id: 'tools',
+          item_url: 'https://example.com/tools',
+          fingerprint: 'tools-fp',
+          primary_topic: 'AI Developer Tools & Agents',
+          title: 'Agent framework update',
+        }),
+      ],
+      date: new Date(),
+      subjectTemplate: 'AI Pulse Scout -- {date}',
+    });
+
+    expect(html).toContain('Frontier Model Labs');
+    expect(html).toContain('AI Developer Tools &amp; Agents');
   });
 
   it('renders empty digest gracefully', () => {

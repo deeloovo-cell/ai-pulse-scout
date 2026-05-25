@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import type { NormalizedItem, ContentType } from '../types/item.js';
 import type { SourceConfig } from '../types/config.js';
 import { fingerprint } from './fingerprint.js';
+import { inferPrimaryTopic } from '../topics/inferPrimaryTopic.js';
 
 type ExtendedRssItem = RssItem & {
   author?: string;
@@ -42,6 +43,11 @@ export function normalizeRssItem(raw: ExtendedRssItem, source: SourceConfig): No
     },
     decision: 'pending',
     decision_reason: '',
+    primary_topic: inferPrimaryTopic({
+      sourceUrl: source.url,
+      title,
+      content: contentText,
+    }),
   };
 }
 

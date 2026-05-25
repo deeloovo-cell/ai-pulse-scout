@@ -1,4 +1,5 @@
 import type { NormalizedItem } from '../types/item.js';
+import { DIGEST_TOPICS } from '../topics/topicOrder.js';
 import { formatDigestDate } from '../utils/time.js';
 
 // Alternating item background colors (Gmail-safe, readable)
@@ -18,9 +19,14 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
   const { items, date, subjectTemplate } = options;
   const subject = buildSubject(subjectTemplate, date);
 
-  const itemsHtml = items
-    .map((item, index) => renderItem(item, index))
-    .join('\n');
+  const groupedItems = DIGEST_TOPICS.flatMap((topic) => {
+    const topicItems = items.filter((item) => item.primary_topic === topic);
+    if (topicItems.length === 0) return [];
+
+    return [renderTopicHeading(topic), ...topicItems.map((item, index) => renderItem(item, index))];
+  });
+
+  const itemsHtml = groupedItems.join('\n');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -46,6 +52,14 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
 </table>
 </body>
 </html>`;
+}
+
+function renderTopicHeading(topic: string): string {
+  return `<tr>
+    <td style="padding:18px 20px 10px 20px;background:#ffffff;border-bottom:1px solid #d7e3f4;">
+      <h2 style="margin:0;font-size:18px;color:#1a1a1a;font-weight:bold;">${escapeHtml(topic)}</h2>
+    </td>
+  </tr>`;
 }
 
 function renderItem(item: NormalizedItem, index: number): string {

@@ -17,6 +17,16 @@ export interface RelevanceScores {
   overall: number;
 }
 
+export type DigestTopic =
+  | 'Frontier Model Labs'
+  | 'AI Developer Tools & Agents'
+  | 'Research & Papers'
+  | 'Robotics & Embodied AI'
+  | 'Industrial / Manufacturing AI'
+  | 'AI Products & Platforms'
+  | 'Community & Market Signals'
+  | 'AI News Roundup';
+
 export interface NormalizedItem {
   id: string;
   source_name: string;
@@ -37,4 +47,5 @@ export interface NormalizedItem {
   relevance_scores: RelevanceScores;
   decision: ItemDecision;
   decision_reason: string;
+  primary_topic: DigestTopic;
 }
