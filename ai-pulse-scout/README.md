@@ -1,6 +1,6 @@
 # AI Pulse Scout
 
-A portable TypeScript project that automatically collects recent AI updates from a curated source list, deduplicates items, uses GLM to generate concise key insights, renders an HTML executive digest, and sends it via SMTP.
+A portable TypeScript project that automatically collects recent AI updates from a curated source list, deduplicates items, uses DeepSeek to generate concise key insights, renders an HTML executive digest, and sends it via SMTP.
 
 ## Quick Start
 

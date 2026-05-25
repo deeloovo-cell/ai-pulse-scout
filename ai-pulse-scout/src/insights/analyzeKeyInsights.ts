@@ -1,8 +1,8 @@
 import type { NormalizedItem } from '../types/item.js';
 import { logger } from '../utils/logger.js';
 
-const DEFAULT_GLM_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4/';
-const DEFAULT_MODEL = 'GLM-5.1';
+const DEFAULT_DEEPSEEK_BASE_URL = 'https://aigw.aac.tech/v1';
+const DEFAULT_MODEL = 'deepseek-v3.2';
 const MAX_ARTICLE_CHARS = 12000;
 const MAX_CONTEXT_CHARS = 14000;
 const MAX_INSIGHT_WORDS = 100;
@@ -30,16 +30,19 @@ export async function enrichKeyInsights(
   items: NormalizedItem[],
   options: KeyInsightOptions = {},
 ): Promise<NormalizedItem[]> {
-  const apiKey = options.apiKey ?? process.env.GLM_API_KEY;
+  const apiKey = options.apiKey ?? process.env.DEEPSEEK_API_KEY ?? process.env.GLM_API_KEY;
   if (!apiKey) {
-    logger.info('GLM_API_KEY not set -- using feed excerpts as key insights.');
+    logger.info('DEEPSEEK_API_KEY not set (and GLM_API_KEY fallback missing) -- using feed excerpts as key insights.');
     return items;
   }
 
-  const model = options.model ?? process.env.GLM_MODEL ?? DEFAULT_MODEL;
-  const baseUrl = options.baseUrl ?? process.env.GLM_BASE_URL ?? DEFAULT_GLM_BASE_URL;
+  const model = options.model ?? process.env.DEEPSEEK_MODEL ?? process.env.GLM_MODEL ?? DEFAULT_MODEL;
+  const baseUrl =
+    options.baseUrl ?? process.env.DEEPSEEK_BASE_URL ?? process.env.GLM_BASE_URL ?? DEFAULT_DEEPSEEK_BASE_URL;
   const endpoint = options.endpoint ?? buildChatCompletionsEndpoint(baseUrl);
-  const fetchFullPosts = options.fetchFullPosts ?? process.env.GLM_FETCH_FULL_POSTS !== 'false';
+  const fetchFullPosts =
+    options.fetchFullPosts ??
+    (process.env.DEEPSEEK_FETCH_FULL_POSTS ?? process.env.GLM_FETCH_FULL_POSTS) !== 'false';
 
   const enriched: NormalizedItem[] = [];
   for (const item of items) {
@@ -55,7 +58,7 @@ export async function enrichKeyInsights(
       enriched.push(keyInsight ? { ...item, key_insight: keyInsight } : item);
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      logger.warn(`Key insight analysis failed for "${item.title}": ${message}`);
+      logger.warn(`DeepSeek key insight analysis failed for "${item.title}": ${message}`);
       enriched.push(item);
     }
   }
@@ -102,7 +105,7 @@ async function generateKeyInsight(options: {
 
   const payload = (await response.json()) as ChatCompletionsResult;
   if (!response.ok) {
-    throw new Error(payload.error?.message ?? `GLM request failed with HTTP ${response.status}`);
+    throw new Error(payload.error?.message ?? `DeepSeek request failed with HTTP ${response.status}`);
   }
 
   return cleanInsight(extractOutputText(payload));

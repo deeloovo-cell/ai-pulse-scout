@@ -37,13 +37,70 @@ describe('enrichKeyInsights', () => {
     vi.unstubAllGlobals();
   });
 
+  it('prefers DEEPSEEK env vars and falls back to GLM env vars', async () => {
+    const originalEnv = { ...process.env };
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [
+          {
+            message: {
+              content: 'DeepSeek-compatible insight.',
+            },
+          },
+        ],
+      }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    process.env.DEEPSEEK_API_KEY = 'deepseek-key';
+    process.env.DEEPSEEK_BASE_URL = 'https://aigw.aac.tech/v1';
+    process.env.DEEPSEEK_MODEL = 'deepseek-v3.2';
+    delete process.env.GLM_API_KEY;
+    delete process.env.GLM_BASE_URL;
+    delete process.env.GLM_MODEL;
+
+    const [deepseekItem] = await enrichKeyInsights([makeItem()], {
+      fetchFullPosts: false,
+    });
+
+    expect(deepseekItem.key_insight).toBe('DeepSeek-compatible insight.');
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      'https://aigw.aac.tech/v1/chat/completions',
+      expect.objectContaining({
+        body: expect.stringContaining('"model":"deepseek-v3.2"'),
+      }),
+    );
+
+    delete process.env.DEEPSEEK_API_KEY;
+    delete process.env.DEEPSEEK_BASE_URL;
+    delete process.env.DEEPSEEK_MODEL;
+    process.env.GLM_API_KEY = 'glm-fallback-key';
+    process.env.GLM_BASE_URL = 'https://fallback.example/v1';
+    process.env.GLM_MODEL = 'fallback-model';
+
+    const [fallbackItem] = await enrichKeyInsights([makeItem()], {
+      fetchFullPosts: false,
+    });
+
+    expect(fallbackItem.key_insight).toBe('DeepSeek-compatible insight.');
+    expect(fetchMock).toHaveBeenLastCalledWith(
+      'https://fallback.example/v1/chat/completions',
+      expect.objectContaining({
+        body: expect.stringContaining('"model":"fallback-model"'),
+      }),
+    );
+
+    process.env = originalEnv;
+  });
+
   it('returns original items when no API key is configured', async () => {
     const items = [makeItem()];
 
     await expect(enrichKeyInsights(items, { apiKey: '' })).resolves.toEqual(items);
   });
 
-  it('adds key insight from GLM chat completion response', async () => {
+  it('adds key insight from DeepSeek chat completion response', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
@@ -63,21 +120,21 @@ describe('enrichKeyInsights', () => {
 
     const [item] = await enrichKeyInsights([makeItem()], {
       apiKey: 'test-key',
-      baseUrl: 'https://open.bigmodel.cn/api/paas/v4/',
-      model: 'GLM-5.1',
+      baseUrl: 'https://aigw.aac.tech/v1',
+      model: 'deepseek-v3.2',
       fetchFullPosts: false,
     });
 
     expect(item.key_insight).toBe('The real insight is that production agent cost control is now an architecture concern.');
     expect(fetchMock).toHaveBeenCalledWith(
-      'https://open.bigmodel.cn/api/paas/v4/chat/completions',
+      'https://aigw.aac.tech/v1/chat/completions',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({
           Authorization: 'Bearer test-key',
           'Content-Type': 'application/json',
         }),
-        body: expect.stringContaining('"model":"GLM-5.1"'),
+        body: expect.stringContaining('"model":"deepseek-v3.2"'),
       }),
     );
     const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
@@ -87,7 +144,7 @@ describe('enrichKeyInsights', () => {
     expect(body.messages[1].content).toContain('100 words or fewer');
   });
 
-  it('falls back to original item when GLM request fails', async () => {
+  it('falls back to original item when DeepSeek request fails', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
