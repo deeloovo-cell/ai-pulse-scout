@@ -1,7 +1,17 @@
 •	https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
 •	https://www.langchain.com/blog/rss.xml
+•	https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/
+•	https://blogs.sw.siemens.com/simcenter/feed/
+•	http://blogs.solidworks.com/solidworksblog/feed/
 •	https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml
 •	https://developers.openai.com/rss.xml
+•	https://www.blog.google/technology/ai/rss/
+•	https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml
 •	http://feeds.simonwillison.net/swn-everything
 •	https://research.google/blog/rss/
 •	https://thecadhub.com/blog/feed/
+•	https://openai.com/news/rss.xml
+•	https://deepmind.com/blog/feed/basic/
+•	https://develop3d.com/feed/
+•	http://bair.berkeley.edu/blog/feed.xml
+•	https://blogs.sw.siemens.com/nx-design/feed/
