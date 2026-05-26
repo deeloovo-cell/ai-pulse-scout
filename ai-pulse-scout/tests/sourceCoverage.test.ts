@@ -136,10 +136,11 @@ describe('real inbox coverage summary', () => {
   it('accounts for every source in the coverage summary', async () => {
     const markdown = readFileSync('config/source-inbox.md', 'utf8');
     const universe = buildSourceUniverse(markdown);
+    const handledSource = universe[0]!;
     const fakeAdapter = {
-      canHandle: vi.fn().mockImplementation((source: SourceUniverseRecord) => source.url === 'https://blog.langchain.dev/'),
+      canHandle: vi.fn().mockImplementation((source: SourceUniverseRecord) => source.url === handledSource.url),
       run: vi.fn().mockResolvedValue({
-        source: universe.find((s) => s.url === 'https://blog.langchain.dev/')!,
+        source: handledSource,
         status: 'success',
         discoveredCount: 1,
       }),

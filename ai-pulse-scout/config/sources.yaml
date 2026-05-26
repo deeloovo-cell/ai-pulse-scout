@@ -141,3 +141,66 @@ sources:
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
+
+- name: Beehiiv Feed
+  category: ai_engineering
+  url: https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: Machine Learning Mastery
+  category: ai_engineering
+  url: http://feeds.feedburner.com/MachineLearningMastery
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: MIT News Computers
+  category: research
+  url: http://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: Springer AI Review
+  category: research
+  url: http://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10462&channel-name=Artificial%20Intelligence%20Review
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: SolidSmack
+  category: cad_cae_cam
+  url: http://feeds.feedburner.com/solidsmack
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: MIT News AI
+  category: research
+  url: http://news.mit.edu/rss/topic/artificial-intelligence2
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: ScienceDaily AI
+  category: research
+  url: http://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: Rhino3D Blog
+  category: cad_cae_cam
+  url: http://blog.rhino3d.com/feeds/posts/default
+  type: rss
+  enabled: true
+  coverage_status: live
+
+- name: NVIDIA Blog Feed
+  category: ai_engineering
+  url: http://feeds.feedburner.com/nvidiablog
+  type: rss
+  enabled: true
+  coverage_status: live

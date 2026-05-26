@@ -17,3 +17,12 @@
 •	https://blogs.sw.siemens.com/nx-design/feed/
 •	https://feedly.com/
 •	https://docs.rsshub.app/
+•	https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml
+•	http://feeds.feedburner.com/MachineLearningMastery
+•	http://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml
+•	http://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10462&channel-name=Artificial%20Intelligence%20Review
+•	http://feeds.feedburner.com/solidsmack
+•	http://news.mit.edu/rss/topic/artificial-intelligence2
+•	http://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml
+•	http://blog.rhino3d.com/feeds/posts/default
+•	http://feeds.feedburner.com/nvidiablog
