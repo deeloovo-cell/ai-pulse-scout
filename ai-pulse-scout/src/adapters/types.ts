@@ -1,6 +1,11 @@
-import type { CoverageResult, SourceUniverseRecord } from '../inbox/types.js';
+import type { SourceConfig } from '../types/config.js';
+import type { SourceIngestionResult } from '../ingest/types.js';
 
-export interface SourceAdapter {
-  canHandle(source: SourceUniverseRecord): boolean;
-  run(source: SourceUniverseRecord): Promise<CoverageResult>;
+export interface ProductionSourceAdapter {
+  canHandle(source: SourceConfig): boolean;
+  ingest(input: {
+    source: SourceConfig;
+    windowStart: Date;
+    windowEnd: Date;
+  }): Promise<SourceIngestionResult>;
 }
