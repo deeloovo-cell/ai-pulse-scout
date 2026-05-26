@@ -23,15 +23,12 @@
 •	https://www.anthropic.com/news
 •	https://www.anthropic.com/engineering
 •	https://docs.anthropic.com/
-•	https://www.youtube.com/@AnthropicAI
 •	https://blog.google/technology/ai/
 •	https://deepmind.google/discover/blog/
 •	https://developers.googleblog.com/en/search/?tag=AI
 •	https://ai.google.dev/
 •	https://www.youtube.com/@GoogleDeepMind
 •	https://developer.nvidia.com/blog/
-•	https://developer.nvidia.com/robotics
-•	https://blogs.nvidia.com/blog/category/omniverse/
 •	https://developer.nvidia.com/isaac/sim
 •	https://www.nvidia.com/gtc/
 •	https://blog.langchain.dev/
@@ -62,13 +59,10 @@
 •	https://www.machinedesign.com/automation-iiot/artificial-intelligence
 •	https://www.manufacturing.net/ai
 •	https://www.smartindustry.com/
-•	https://community.sap.com/t5/artificial-intelligence-and-machine-learning-blog-posts/bg-p/ai-ml-blog
 •	https://www.sap.com/products/artificial-intelligence.html
 •	https://blog.fabric.microsoft.com/
 •	https://www.databricks.com/blog
 •	https://www.rockwellautomation.com/en-us/company/news/blogs.html
-•	https://blogs.sw.siemens.com/manufacturing/
-•	https://www.ge.com/digital/blog
 •	https://tulip.co/blog/
 •	https://www.hivemq.com/blog/
 •	https://futuretools.io/news
@@ -107,9 +101,7 @@
 •	https://towardsdatascience.com/
 •	https://medium.com/artificial-intelligence-in-plain-english
 •	https://www.kdnuggets.com/
-•	https://blogs.nvidia.com/blog/category/ai/
 •	https://blogs.nvidia.com/blog/category/robotics/
-•	https://research.google/blog/topics/robotics/
 •	https://bostondynamics.com/blog/
 •	https://www.automate.org/robotics
 •	https://www.roboticsbusinessreview.com/
@@ -117,7 +109,5 @@
 •	https://www.controleng.com/artificial-intelligence/
 •	https://www.automationworld.com/ai-machine-learning
 •	https://news.sap.com/topics/artificial-intelligence/
-•	https://azure.microsoft.com/en-us/blog/topics/ai-machine-learning/
 •	https://blogs.sw.siemens.com/opcenter/
-•	https://www.plantengineering.com/ai-in-manufacturing/
 •	https://www.iotworldtoday.com/artificial-intelligence
