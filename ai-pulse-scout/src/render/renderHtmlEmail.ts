@@ -64,7 +64,10 @@ function renderTopicHeading(topic: string): string {
 
 function renderItem(item: NormalizedItem, index: number): string {
   const bgColor = ITEM_COLORS[index % ITEM_COLORS.length];
-  const summary = item.key_insight || item.summary || item.content_text.slice(0, 250);
+  const summary = getReadableSummary(item);
+  const linkLabel = item.rawMetadata?.extractionLevel === 'link_only'
+    ? `Read source (${escapeHtml(item.source_name)}) &rarr;`
+    : `${escapeHtml(item.source_name)} &rarr;`;
 
   return `<tr>
     <td style="padding:16px 20px;background:${bgColor};border-bottom:1px solid #e0e0e0;">
@@ -76,12 +79,23 @@ function renderItem(item: NormalizedItem, index: number): string {
       </p>
       <p style="margin:10px 0 0 0;font-size:12px;">
         <a href="${escapeHtml(item.item_url)}" style="color:#1a73e8;text-decoration:none;">
-          ${escapeHtml(item.source_name)} &rarr;
+          ${linkLabel}
         </a>
         &nbsp;<span style="color:#999;font-size:11px;">${formatPublished(item.published_at)}</span>
       </p>
     </td>
   </tr>`;
+}
+
+function getReadableSummary(item: NormalizedItem): string {
+  const summary = item.key_insight || item.summary || item.content_text.slice(0, 250);
+  if (summary) return summary;
+
+  if (item.rawMetadata?.extractionLevel === 'link_only') {
+    return 'Direct article extraction was incomplete, but the source link still looks relevant and is included for review.';
+  }
+
+  return 'Open the source for the full item.';
 }
 
 function formatPublished(date: Date | null): string {
