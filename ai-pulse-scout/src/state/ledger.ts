@@ -8,6 +8,7 @@ const LEDGER_PATH = join(__dirname, '../../data/state/sent_ledger.jsonl');
 
 export interface LedgerEntry {
   fingerprint: string;
+  stableIdentity?: string;
   url: string;
   title: string;
   sent_at: string;
@@ -26,6 +27,7 @@ export function loadLedger(): Set<string> {
   for (const line of lines) {
     try {
       const entry = JSON.parse(line) as LedgerEntry;
+      if (entry.stableIdentity) seen.add(entry.stableIdentity);
       seen.add(entry.fingerprint);
       seen.add(normalizeUrl(entry.url));
     } catch {
@@ -41,6 +43,7 @@ export function appendToLedger(items: NormalizedItem[]): void {
   for (const item of items) {
     const entry: LedgerEntry = {
       fingerprint: item.fingerprint,
+      stableIdentity: item.stableIdentity,
       url: item.item_url,
       title: item.title,
       sent_at: now,
@@ -50,7 +53,7 @@ export function appendToLedger(items: NormalizedItem[]): void {
 }
 
 export function isInLedger(item: NormalizedItem, seen: Set<string>): boolean {
-  return seen.has(item.fingerprint) || seen.has(normalizeUrl(item.item_url));
+  return seen.has(item.stableIdentity ?? item.fingerprint) || seen.has(item.fingerprint) || seen.has(normalizeUrl(item.item_url));
 }
 
 function normalizeUrl(url: string): string {

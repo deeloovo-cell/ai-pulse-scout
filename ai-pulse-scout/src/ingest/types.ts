@@ -1,4 +1,5 @@
 import type { SourceConfig } from '../types/config.js';
+import type { ContentType, DigestTopic, ItemDecision, RelevanceScores } from '../types/item.js';
 
 export type PublishedAtConfidence = 'exact' | 'inferred' | 'weak' | 'unknown';
 export type ProductionSupportStatus =
@@ -31,6 +32,26 @@ export interface IngestedItem {
   stableIdentity: string;
   topicHints: string[];
   rawMetadata: Record<string, unknown>;
+
+  id: string;
+  source_name: string;
+  source_category: string;
+  source_url: string;
+  item_url: string;
+  published_at: Date | null;
+  fetched_at: Date;
+  author: string;
+  content_text: string;
+  content_html?: string;
+  summary: string;
+  key_insight?: string;
+  tags: string[];
+  content_type: ContentType;
+  fingerprint: string;
+  relevance_scores: RelevanceScores;
+  decision: ItemDecision;
+  decision_reason: string;
+  primary_topic: DigestTopic;
 }
 
 export interface SourceIngestionResult {

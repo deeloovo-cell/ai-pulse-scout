@@ -1,10 +1,9 @@
 import { loadConfig } from '../config/loadConfig.js';
-import { fetchAllSources } from '../fetchers/rssFetcher.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
-import { loadRunState, saveSuccessfulRun } from '../state/runState.js';
+import { saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
@@ -13,6 +12,14 @@ import type { NormalizedItem } from '../types/item.js';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { ingestAllSources } from '../ingest/ingestAllSources.js';
+import { FeedAdapter } from '../adapters/feedAdapter.js';
+import { GenericWebAdapter } from '../adapters/genericWebAdapter.js';
+import { YouTubeAdapter } from '../adapters/youtubeAdapter.js';
+import { GitHubAdapter } from '../adapters/githubAdapter.js';
+import { DocsAdapter } from '../adapters/docsAdapter.js';
+import { CommunityAdapter } from '../adapters/communityAdapter.js';
+import { PapersAdapter } from '../adapters/papersAdapter.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, '../../data/output');
@@ -22,24 +29,38 @@ export interface DigestRunResult {
   html: string;
   items: NormalizedItem[];
   itemCount: number;
+  totalFetched: number;
   outputPath: string;
 }
 
 export async function runDailyDigest(
-  mailClient: MailClient | null,
-  sendEmail: boolean,
+  mailClient: MailClient | null = null,
+  sendEmail = false,
 ): Promise<DigestRunResult> {
   const config = loadConfig();
-  const runState = loadRunState();
   const now = new Date();
 
   const { windowStart, windowEnd } = computeDailyCutoffWindow(now);
 
   logger.info(`Collection window: ${windowStart.toISOString()} → ${windowEnd.toISOString()}`);
 
-  const fetchResults = await fetchAllSources(config.sources, windowStart, windowEnd);
-  const allItems = fetchResults.flatMap((r) => r.items);
-  logger.info(`Total fetched: ${allItems.length} items`);
+  const ingestion = await ingestAllSources({
+    sources: config.sources,
+    windowStart,
+    windowEnd,
+    adapters: [
+      new FeedAdapter(),
+      new GenericWebAdapter(),
+      new YouTubeAdapter(),
+      new GitHubAdapter(),
+      new DocsAdapter(),
+      new CommunityAdapter(),
+      new PapersAdapter(),
+    ],
+  });
+  const allItems = ingestion.items;
+  logger.info(`Unified ingestion fetched ${allItems.length} items across ${ingestion.summary.totalSources} sources`);
+  logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
 
   const ledger = loadLedger();
   const deduped = dedupeItems(allItems, ledger);
@@ -51,7 +72,6 @@ export async function runDailyDigest(
   const subject = buildSubject(config.email.subject_template, now);
   const html = renderHtmlEmail({ items: selected, date: now, subjectTemplate: config.email.subject_template });
 
-  // Save artifact
   if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
   const datePart = now.toISOString().slice(0, 10);
   const outputPath = join(OUTPUT_DIR, `digest-${datePart}.html`);
@@ -73,5 +93,5 @@ export async function runDailyDigest(
     logger.info('No digest items selected — skipping email send and state update.');
   }
 
-  return { subject, html, items: selected, itemCount: selected.length, outputPath };
+  return { subject, html, items: selected, itemCount: selected.length, totalFetched: allItems.length, outputPath };
 }

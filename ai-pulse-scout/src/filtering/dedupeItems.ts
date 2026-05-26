@@ -10,12 +10,15 @@ export function dedupeItems(items: NormalizedItem[], ledgerSeen: Set<string>): N
   const result: NormalizedItem[] = [];
 
   for (const item of items) {
-    if (isInLedger(item, ledgerSeen)) continue;
-    if (seenInBatch.has(item.fingerprint)) continue;
-    if (item.item_url && seenInBatch.has(item.item_url.trim().toLowerCase())) continue;
+    const stableKey = item.stableIdentity ?? item.fingerprint;
+    const urlKey = item.item_url ? item.item_url.trim().toLowerCase() : '';
 
-    seenInBatch.add(item.fingerprint);
-    if (item.item_url) seenInBatch.add(item.item_url.trim().toLowerCase());
+    if (isInLedger(item, ledgerSeen)) continue;
+    if (stableKey && seenInBatch.has(stableKey)) continue;
+    if (urlKey && seenInBatch.has(urlKey)) continue;
+
+    if (stableKey) seenInBatch.add(stableKey);
+    if (urlKey) seenInBatch.add(urlKey);
     result.push(item);
   }
 

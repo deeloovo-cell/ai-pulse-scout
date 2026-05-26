@@ -1,4 +1,13 @@
-export type SourceType = 'rss' | 'atom' | 'youtube' | 'podcast' | 'github';
+export type SourceType =
+  | 'rss'
+  | 'atom'
+  | 'youtube'
+  | 'podcast'
+  | 'github'
+  | 'webpage'
+  | 'docs'
+  | 'community'
+  | 'papers';
 
 export type CoverageStatus =
   | 'live'

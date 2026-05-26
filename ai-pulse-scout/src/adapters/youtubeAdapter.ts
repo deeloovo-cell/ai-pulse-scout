@@ -1,7 +1,7 @@
-import type { SourceAdapter } from './types.js';
-import type { FetchStrategy, SourceUniverseRecord } from '../inbox/types.js';
-import { fetchRssSource } from '../fetchers/rssFetcher.js';
+import { FeedAdapter } from './feedAdapter.js';
 import type { SourceConfig } from '../types/config.js';
+import type { ProductionSourceAdapter } from './types.js';
+import type { FetchStrategy } from '../inbox/types.js';
 
 interface ResolvedYouTubeSource {
   url: string;
@@ -33,51 +33,56 @@ export function resolveYouTubeSource(rawUrl: string): ResolvedYouTubeSource | nu
   };
 }
 
-function toSourceConfig(source: SourceUniverseRecord): SourceConfig | null {
-  const resolved = resolveYouTubeSource(source.url);
-  if (!resolved) return null;
-  return {
-    name: source.label ?? source.url,
-    category: source.section,
-    url: resolved.url,
-    type: 'rss',
-    enabled: true,
-  } as SourceConfig;
-}
-
-export class YouTubeAdapter implements SourceAdapter {
-  canHandle(source: SourceUniverseRecord): boolean {
-    return canUseYouTubeAdapter(source.classification.strategy) || resolveYouTubeSource(source.url) !== null;
+export class YouTubeAdapter implements ProductionSourceAdapter {
+  canHandle(source: SourceConfig): boolean {
+    return source.type === 'youtube' || resolveYouTubeSource(source.url) !== null;
   }
 
-  async run(source: SourceUniverseRecord) {
-    const config = toSourceConfig(source);
-    if (!config) {
+  async ingest({ source, windowStart, windowEnd }: { source: SourceConfig; windowStart: Date; windowEnd: Date; }) {
+    const resolved = resolveYouTubeSource(source.url);
+    if (!resolved) {
       return {
         source,
-        status: 'failed',
-        discoveredCount: 0,
-        error: 'Unable to resolve YouTube channel feed',
-      } as const;
+        status: 'broken' as const,
+        items: [],
+        diagnostics: {
+          attempted: 0,
+          normalized: 0,
+          dropped: 0,
+          adapterType: 'youtube',
+          reason: 'Unable to resolve YouTube channel feed',
+        },
+      };
     }
 
-    const now = new Date();
-    const windowStart = new Date(now.getTime() - 48 * 60 * 60 * 1000);
-    const result = await fetchRssSource(config, windowStart, now);
-
-    if (result.error) {
-      return {
-        source,
-        status: 'failed',
-        discoveredCount: 0,
-        error: result.error,
-      } as const;
-    }
+    const feedAdapter = new FeedAdapter();
+    const result = await feedAdapter.ingest({
+      source: { ...source, url: resolved.url, type: 'rss' },
+      windowStart,
+      windowEnd,
+    });
 
     return {
+      ...result,
       source,
-      status: result.items.length > 0 ? 'success' : 'empty',
-      discoveredCount: result.items.length,
-    } as const;
+      items: result.items.map((item) => ({
+        ...item,
+        sourceType: 'youtube',
+        sourceUrl: source.url,
+        sourceName: source.name,
+        source_name: source.name,
+        source_url: source.url,
+        content_type: 'video',
+        rawMetadata: {
+          ...item.rawMetadata,
+          adapterType: 'youtube',
+          resolvedFeedUrl: resolved.url,
+        },
+      })),
+      diagnostics: {
+        ...result.diagnostics,
+        adapterType: 'youtube',
+      },
+    };
   }
 }
