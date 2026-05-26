@@ -158,12 +158,6 @@ sources:
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
-- name: Anthropic YouTube
-  category: ai_engineering
-  url: https://www.youtube.com/@AnthropicAI
-  type: youtube
-  enabled: true
-  coverage_status: deferred_no_feed
 - name: Google AI Blog Page
   category: ai_engineering
   url: https://blog.google/technology/ai/
@@ -197,18 +191,6 @@ sources:
 - name: NVIDIA Developer Blog
   category: ai_engineering
   url: https://developer.nvidia.com/blog/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: NVIDIA Robotics
-  category: ai_engineering
-  url: https://developer.nvidia.com/robotics
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: NVIDIA Omniverse Blog
-  category: ai_engineering
-  url: https://blogs.nvidia.com/blog/category/omniverse/
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
@@ -392,12 +374,6 @@ sources:
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
-- name: SAP Community AI/ML Blog
-  category: ai_engineering
-  url: https://community.sap.com/t5/artificial-intelligence-and-machine-learning-blog-posts/bg-p/ai-ml-blog
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
 - name: SAP AI
   category: ai_engineering
   url: https://www.sap.com/products/artificial-intelligence.html
@@ -419,18 +395,6 @@ sources:
 - name: Rockwell Automation Blogs
   category: ai_engineering
   url: https://www.rockwellautomation.com/en-us/company/news/blogs.html
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: Siemens Manufacturing Blog
-  category: ai_engineering
-  url: https://blogs.sw.siemens.com/manufacturing/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: GE Digital Blog
-  category: ai_engineering
-  url: https://www.ge.com/digital/blog
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
@@ -662,21 +626,9 @@ sources:
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
-- name: NVIDIA AI Blog
-  category: ai_engineering
-  url: https://blogs.nvidia.com/blog/category/ai/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
 - name: NVIDIA Robotics Blog
   category: ai_engineering
   url: https://blogs.nvidia.com/blog/category/robotics/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: Google Research Robotics
-  category: ai_engineering
-  url: https://research.google/blog/topics/robotics/
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
@@ -722,21 +674,9 @@ sources:
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
-- name: Azure AI/ML Blog
-  category: ai_engineering
-  url: https://azure.microsoft.com/en-us/blog/topics/ai-machine-learning/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
 - name: Siemens Opcenter Blog
   category: ai_engineering
   url: https://blogs.sw.siemens.com/opcenter/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-- name: Plant Engineering AI in Manufacturing
-  category: ai_engineering
-  url: https://www.plantengineering.com/ai-in-manufacturing/
   type: rss
   enabled: true
   coverage_status: deferred_no_feed
