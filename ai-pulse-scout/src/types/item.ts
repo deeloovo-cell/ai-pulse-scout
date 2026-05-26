@@ -1,5 +1,5 @@
 import type { DigestTopic } from '../topics/topicOrder.js';
-import type { IngestedItem as CoreIngestedItem } from '../ingest/types.js';
+import type { IngestedItem as CoreIngestedItem, WebpageExtractionMetadata } from '../ingest/types.js';
 
 export type ContentType =
   | 'article'
@@ -21,6 +21,7 @@ export interface RelevanceScores {
 }
 
 export interface NormalizedItem extends CoreIngestedItem {
+  rawMetadata: CoreIngestedItem['rawMetadata'] & WebpageExtractionMetadata;
   id: string;
   source_name: string;
   source_category: string;

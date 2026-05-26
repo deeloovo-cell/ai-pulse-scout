@@ -1,7 +1,34 @@
 import type { SourceConfig } from '../types/config.js';
 import type { ContentType, DigestTopic, ItemDecision, RelevanceScores } from '../types/item.js';
 
-export type PublishedAtConfidence = 'exact' | 'inferred' | 'weak' | 'unknown';
+export type PublishedAtConfidence =
+  | 'exact'
+  | 'inferred'
+  | 'weak'
+  | 'unknown'
+  | 'derived'
+  | 'fallback_discovered_at';
+
+export type WebpageExtractionLevel = 'article_full' | 'article_partial' | 'link_only';
+export type WebpageCandidateOrigin =
+  | 'feed_auto_discovery'
+  | 'entry_page_direct_article'
+  | 'listing_page_candidate'
+  | 'listing_page_upgraded_detail';
+export type WebpageDegradeReason =
+  | 'detail_fetch_failed'
+  | 'content_extraction_failed'
+  | 'missing_published_at'
+  | 'insufficient_article_signals'
+  | 'listing_only_candidate';
+
+export interface WebpageExtractionMetadata {
+  extractionLevel?: WebpageExtractionLevel;
+  candidateOrigin?: WebpageCandidateOrigin;
+  degradeReason?: WebpageDegradeReason | null;
+  publishedAtConfidence?: PublishedAtConfidence;
+}
+
 export type ProductionSupportStatus =
   | 'production_supported'
   | 'partial_supported'
@@ -31,7 +58,7 @@ export interface IngestedItem {
   summaryMaterial: string;
   stableIdentity: string;
   topicHints: string[];
-  rawMetadata: Record<string, unknown>;
+  rawMetadata: Record<string, unknown> & WebpageExtractionMetadata;
 
   id: string;
   source_name: string;
