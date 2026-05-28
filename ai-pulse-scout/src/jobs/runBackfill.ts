@@ -3,6 +3,8 @@ import { fetchAllSources } from '../fetchers/rssFetcher.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
+import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
+import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeBackfillWindowStart } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
@@ -57,12 +59,18 @@ export async function runBackfill(
     max_items: Math.max(config.digest.max_items, BACKFILL_MAX_ITEMS),
   };
 
-  const selected = selectItems(deduped, backfillDigestConfig);
+  const selected = await enrichKeyInsights(selectItems(deduped, backfillDigestConfig));
   logger.info(`Selected: ${selected.length} items for backfill digest`);
 
-  const baseSubject = buildSubject(config.email.subject_template, now);
+  const executiveBrief = await generateExecutiveBrief(selected);
+  const baseSubject = buildSubject(config.email.subject_template, now, selected.length);
   const subject = `[BACKFILL ${options.days}d] ${baseSubject}`;
-  const html = renderHtmlEmail({ items: selected, date: now, subjectTemplate: config.email.subject_template });
+  const html = renderHtmlEmail({
+    items: selected,
+    date: now,
+    subjectTemplate: config.email.subject_template,
+    executiveBrief,
+  });
 
   if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
   const datePart = now.toISOString().slice(0, 10);

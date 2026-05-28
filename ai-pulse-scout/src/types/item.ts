@@ -1,4 +1,5 @@
 import type { DigestTopic } from '../topics/topicOrder.js';
+import type { ExecutiveInsight } from './executive.js';
 import type { IngestedItem as CoreIngestedItem, WebpageExtractionMetadata } from '../ingest/types.js';
 
 export type ContentType =
@@ -34,6 +35,7 @@ export interface NormalizedItem extends CoreIngestedItem {
   content_html?: string;
   summary: string;
   key_insight?: string;
+  executive_insight?: ExecutiveInsight;
   tags: string[];
   content_type: ContentType;
   fingerprint: string;

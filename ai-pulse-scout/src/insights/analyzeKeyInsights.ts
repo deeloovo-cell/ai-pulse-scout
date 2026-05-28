@@ -1,28 +1,30 @@
 import type { NormalizedItem } from '../types/item.js';
 import { logger } from '../utils/logger.js';
+import { requestChatCompletion, resolveLlmClient } from './chatCompletions.js';
+import {
+  defaultExecutiveInsight,
+  parseExecutiveInsightResponse,
+} from './parseExecutiveInsight.js';
 
-const DEFAULT_DEEPSEEK_BASE_URL = 'https://aigw.aac.tech/v1';
-const DEFAULT_MODEL = 'deepseek-v3.2';
 const MAX_ARTICLE_CHARS = 12000;
 const MAX_CONTEXT_CHARS = 14000;
-const MAX_INSIGHT_WORDS = 100;
 
-interface ChatCompletionsResult {
-  choices?: Array<{
-    message?: {
-      content?: string;
-    };
-  }>;
-  error?: {
-    message?: string;
-  };
+const ITEM_SYSTEM_PROMPT = `You analyze AI and engineering signals for a CIO and Chief AI Officer at a high-tech manufacturing company.
+Return ONLY valid JSON:
+{
+  "why_it_matters": "80-120 words, concrete, no hype — what changed and why it matters for manufacturing growth",
+  "growth_lever": "Efficiency|Quality|Revenue|Speed|Risk",
+  "applies_to": ["Design|Process|Shop floor|Supply chain|R&D"],
+  "action": "Monitor|Evaluate pilot|Engage partner",
+  "manufacturing_relevance": "High|Medium|Low"
 }
+Include manufacturing_relevance for research papers; omit for product/news posts.
+Focus on robotics, physical AI, CAD/CAM, sim-to-real, enterprise AI, and manufacturing AI when relevant.`;
 
 export interface KeyInsightOptions {
   apiKey?: string;
   model?: string;
   baseUrl?: string;
-  endpoint?: string;
   fetchFullPosts?: boolean;
 }
 
@@ -30,16 +32,12 @@ export async function enrichKeyInsights(
   items: NormalizedItem[],
   options: KeyInsightOptions = {},
 ): Promise<NormalizedItem[]> {
-  const apiKey = options.apiKey ?? process.env.DEEPSEEK_API_KEY ?? process.env.GLM_API_KEY;
-  if (!apiKey) {
+  const client = resolveLlmClient(options);
+  if (!client) {
     logger.info('DEEPSEEK_API_KEY not set (and GLM_API_KEY fallback missing) -- using feed excerpts as key insights.');
-    return items;
+    return items.map((item) => attachFallbackInsight(item));
   }
 
-  const model = options.model ?? process.env.DEEPSEEK_MODEL ?? process.env.GLM_MODEL ?? DEFAULT_MODEL;
-  const baseUrl =
-    options.baseUrl ?? process.env.DEEPSEEK_BASE_URL ?? process.env.GLM_BASE_URL ?? DEFAULT_DEEPSEEK_BASE_URL;
-  const endpoint = options.endpoint ?? buildChatCompletionsEndpoint(baseUrl);
   const fetchFullPosts =
     options.fetchFullPosts ??
     (process.env.DEEPSEEK_FETCH_FULL_POSTS ?? process.env.GLM_FETCH_FULL_POSTS) !== 'false';
@@ -48,67 +46,69 @@ export async function enrichKeyInsights(
   for (const item of items) {
     try {
       const articleText = fetchFullPosts ? await fetchArticleText(item.item_url) : null;
-      const keyInsight = await generateKeyInsight({
-        item,
-        articleText,
-        apiKey,
-        model,
-        endpoint,
-      });
-      enriched.push(keyInsight ? { ...item, key_insight: keyInsight } : item);
+      const raw = await requestChatCompletion(
+        client,
+        [
+          { role: 'system', content: ITEM_SYSTEM_PROMPT },
+          {
+            role: 'user',
+            content: `Analyze this item for the daily manufacturing AI digest.\n\n${buildArticleContext(item, articleText)}`,
+          },
+        ],
+        900,
+      );
+      enriched.push(applyInsightResponse(item, raw));
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      logger.warn(`DeepSeek key insight analysis failed for "${item.title}": ${message}`);
-      enriched.push(item);
+      logger.warn(`Executive insight analysis failed for "${item.title}": ${message}`);
+      enriched.push(attachFallbackInsight(item));
     }
   }
 
   return enriched;
 }
 
-async function generateKeyInsight(options: {
-  item: NormalizedItem;
-  articleText: string | null;
-  apiKey: string;
-  model: string;
-  endpoint: string;
-}): Promise<string | null> {
-  const { item, articleText, apiKey, model, endpoint } = options;
-  const context = buildArticleContext(item, articleText);
-
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        {
-          role: 'system',
-          content:
-            'You analyze AI and engineering posts for a CIO. Return one concrete key insight in English. Focus on what actually changed, why it matters, and avoid generic filler.',
-        },
-        {
-          role: 'user',
-          content: `Analyze this post and write one executive-ready key insight for a daily digest. Keep it focused, concrete, and ${MAX_INSIGHT_WORDS} words or fewer.\n\n${context}`,
-        },
-      ],
-      thinking: {
-        type: 'disabled',
-      },
-      max_tokens: 800,
-      temperature: 0.2,
-    }),
-  });
-
-  const payload = (await response.json()) as ChatCompletionsResult;
-  if (!response.ok) {
-    throw new Error(payload.error?.message ?? `DeepSeek request failed with HTTP ${response.status}`);
+function applyInsightResponse(item: NormalizedItem, raw: string): NormalizedItem {
+  const parsed = parseExecutiveInsightResponse(raw);
+  if (parsed) {
+    return {
+      ...item,
+      executive_insight: parsed,
+      key_insight: parsed.why_it_matters,
+    };
   }
 
-  return cleanInsight(extractOutputText(payload));
+  const plain = cleanPlainInsight(raw);
+  if (plain) {
+    const fallback = defaultExecutiveInsight(plain, isPaperItem(item));
+    return { ...item, executive_insight: fallback, key_insight: plain };
+  }
+
+  return attachFallbackInsight(item);
+}
+
+function attachFallbackInsight(item: NormalizedItem): NormalizedItem {
+  const text =
+    item.summary ||
+    item.content_text.slice(0, 250) ||
+    (item.rawMetadata?.extractionLevel === 'link_only'
+      ? 'Source link retained for manual review; automated extraction was incomplete.'
+      : 'Open the source for full details.');
+
+  const insight = defaultExecutiveInsight(text, isPaperItem(item));
+  return {
+    ...item,
+    executive_insight: insight,
+    key_insight: insight.why_it_matters,
+  };
+}
+
+function isPaperItem(item: NormalizedItem): boolean {
+  return (
+    item.content_type === 'research' ||
+    /arxiv\.org/i.test(item.item_url) ||
+    /arxiv\.org/i.test(item.source_url)
+  );
 }
 
 function buildArticleContext(item: NormalizedItem, articleText: string | null): string {
@@ -117,21 +117,14 @@ function buildArticleContext(item: NormalizedItem, articleText: string | null): 
     `Title: ${item.title}`,
     `Source: ${item.source_name}`,
     `Category: ${item.source_category}`,
+    `Primary topic: ${item.primary_topic}`,
     `URL: ${item.item_url}`,
     `Existing feed summary: ${item.summary}`,
     `Post text:\n${text.slice(0, MAX_CONTEXT_CHARS)}`,
   ].join('\n\n');
 }
 
-function extractOutputText(payload: ChatCompletionsResult): string {
-  return payload.choices?.[0]?.message?.content ?? '';
-}
-
-function buildChatCompletionsEndpoint(baseUrl: string): string {
-  return `${baseUrl.replace(/\/+$/, '')}/chat/completions`;
-}
-
-function cleanInsight(raw: string): string | null {
+function cleanPlainInsight(raw: string): string | null {
   const cleaned = raw
     .replace(/^["'\s]+|["'\s]+$/g, '')
     .replace(/\s+/g, ' ')

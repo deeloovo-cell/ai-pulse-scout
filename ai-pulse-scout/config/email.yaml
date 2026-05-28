@@ -5,11 +5,11 @@ email:
   to: "deeloovo@gmail.com"
 
   # Sender display name and address (must match SMTP credentials)
-  from_name: "AI Pulse Scout"
+  from_name: "Manufacturing AI Pulse"
   from_address: ""  # Override with SMTP_USER from .env
 
-  # Subject format — {date} is replaced with MM-DD-YYYY
-  subject_template: "AI Pulse Scout -- {date}"
+  # Subject format — {date} = MM-DD-YYYY, {count} = item count
+  subject_template: "Manufacturing AI Pulse — {date} | {count} signals"
 
   # Reply-to address (optional)
   reply_to: ""

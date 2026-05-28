@@ -81,20 +81,45 @@ describe('sources.yaml schema', () => {
     }
   });
 
-  it('matches the current source inbox URL list', () => {
+  it('expands the arXiv inbox entry into canonical AI-category RSS feeds', () => {
     const sources = loadSources();
-    expect(sources.map((source) => source.url)).toEqual(loadInboxUrls());
+    const inboxUrls = loadInboxUrls();
+
+    expect(inboxUrls).toEqual(['https://arxiv.org/']);
+    expect(sources.every((s) => s.url.startsWith('https://arxiv.org/rss/'))).toBe(true);
+    expect(sources.every((s) => s.notes?.includes('https://arxiv.org/'))).toBe(true);
   });
 
-  it('keeps deferred inbox sources in the registry while only enabling live ones', () => {
-    const sources = loadSources();
-    const enabled = sources.filter((s) => s.enabled !== false);
-    const deferred = sources.filter((s) => s.enabled === false);
+  it('covers core AI arXiv categories', () => {
+    const categories = loadSources().map((s) => s.url.replace('https://arxiv.org/rss/', ''));
+    for (const expected of [
+      'cs.AI',
+      'cs.LG',
+      'cs.CL',
+      'cs.CV',
+      'cs.NE',
+      'cs.MA',
+      'cs.IR',
+      'cs.RO',
+      'cs.HC',
+      'cs.SI',
+      'stat.ML',
+    ]) {
+      expect(categories, `missing ${expected}`).toContain(expected);
+    }
+  });
 
-    expect(enabled.length).toBeGreaterThan(0);
-    expect(deferred.length).toBeGreaterThan(0);
-    expect(enabled.every((s) => s.coverage_status === 'live')).toBe(true);
-    expect(deferred.every((s) => s.coverage_status && s.coverage_status !== 'live')).toBe(true);
+  it('covers robotics, physical AI, CAD/CAM, sim-to-real, and manufacturing categories', () => {
+    const categories = loadSources().map((s) => s.url.replace('https://arxiv.org/rss/', ''));
+    for (const expected of ['cs.RO', 'cs.CE', 'cs.CG', 'cs.GR', 'cs.SY', 'eess.IV']) {
+      expect(categories, `missing ${expected}`).toContain(expected);
+    }
+  });
+
+  it('includes partial enterprise AI coverage categories', () => {
+    const categories = loadSources().map((s) => s.url.replace('https://arxiv.org/rss/', ''));
+    expect(categories).toContain('cs.CY');
+    expect(categories).toContain('cs.SE');
   });
 
   it('no two sources share the same url among enabled entries', () => {
@@ -105,26 +130,20 @@ describe('sources.yaml schema', () => {
     expect(unique.size).toBe(urls.length);
   });
 
-  it('enabled sources cover expected categories', () => {
+  it('enabled sources are research papers from arXiv', () => {
     const sources = loadSources();
     const enabled = sources.filter((s) => s.enabled !== false);
     const cats = new Set(enabled.map((s) => s.category));
-    expect(cats.has('ai_engineering')).toBe(true);
-    expect(cats.has('research')).toBe(true);
-    expect(cats.has('industrial_ai')).toBe(true);
-    expect(cats.has('cad_cae_cam')).toBe(true);
-    expect(cats.has('individual_blog')).toBe(true);
+    expect(cats).toEqual(new Set(['research']));
+    expect(enabled.every((s) => s.type === 'rss')).toBe(true);
   });
 });
 
 describe('loadConfig source filtering', () => {
-  it('keeps only live sources enabled while preserving deferred entries in the registry', () => {
+  it('loads all enabled arXiv RSS sources for digest runs', () => {
     const all = loadSources();
     const enabled = all.filter((s) => s.enabled !== false);
-    const disabled = all.filter((s) => s.enabled === false);
-    expect(enabled.length).toBeGreaterThan(0);
-    expect(disabled.length).toBeGreaterThan(0);
-    expect(enabled.length + disabled.length).toBe(all.length);
+    expect(enabled.length).toBe(all.length);
     expect(enabled.every((s) => s.coverage_status === 'live')).toBe(true);
   });
 });

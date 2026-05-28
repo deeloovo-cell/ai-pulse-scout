@@ -2,7 +2,7 @@
 
 digest:
   # Max recent posts to include in each digest.
-  max_items: 12
+  max_items: 18
 
   # Fetch posts published in the last 24 hours.
   collection_window_hours: 24

@@ -4,203 +4,162 @@
 # Contract:
 #   - source-inbox.md is the raw source list maintained by the user.
 #   - sources.yaml is the production registry consumed by the digest pipeline.
-#   - URLs should stay aligned with source-inbox.md unless a source is explicitly
-#     deferred or replaced with a documented canonical feed URL.
+#   - Inbox entry https://arxiv.org/ expands to canonical RSS feeds per AI-related
+#     arXiv category (Computer Science + stat.ML + industrial/physical AI).
+#     See https://arxiv.org/ and https://arxiv.org/category_taxonomy
+#
+# Topic coverage (no single arXiv label for enterprise / sim-to-real):
+#   robotics          -> cs.RO
+#   physical AI       -> cs.RO, cs.SY, eess.IV, cs.CV
+#   CAD/CAM           -> cs.CE, cs.CG, cs.GR
+#   sim-to-real       -> cs.RO, cs.SY, cs.LG, cs.CE
+#   manufacturing AI  -> cs.CE
+#   enterprise AI     -> cs.CY, cs.SE (partial; org/policy & software systems)
 
 sources:
 
-- name: Anthropic News
-  category: ai_engineering
-  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: LangChain Blog
-  category: ai_engineering
-  url: https://www.langchain.com/blog/rss.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Google Cloud AI Blog
-  category: ai_engineering
-  url: https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Siemens Simcenter Blog
-  category: industrial_ai
-  url: https://blogs.sw.siemens.com/simcenter/feed/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: SOLIDWORKS Blog
-  category: cad_cae_cam
-  url: http://blogs.solidworks.com/solidworksblog/feed/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Anthropic Research
+- name: arXiv cs.AI
   category: research
-  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml
+  url: https://arxiv.org/rss/cs.AI
   type: rss
   enabled: true
   coverage_status: live
+  notes: Artificial Intelligence — from inbox https://arxiv.org/
 
-- name: OpenAI Developers
-  category: ai_engineering
-  url: https://developers.openai.com/rss.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Google AI Blog
-  category: ai_engineering
-  url: https://www.blog.google/technology/ai/rss/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Claude Updates
-  category: ai_engineering
-  url: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Simon Willison
-  category: individual_blog
-  url: http://feeds.simonwillison.net/swn-everything
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Google Research Blog
+- name: arXiv cs.LG
   category: research
-  url: https://research.google/blog/rss/
+  url: https://arxiv.org/rss/cs.LG
   type: rss
   enabled: true
   coverage_status: live
+  notes: Machine Learning — from inbox https://arxiv.org/
 
-- name: The CAD Hub
-  category: cad_cae_cam
-  url: https://thecadhub.com/blog/feed/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: OpenAI Blog
-  category: ai_engineering
-  url: https://openai.com/news/rss.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Google DeepMind Blog
+- name: arXiv cs.CL
   category: research
-  url: https://deepmind.com/blog/feed/basic/
+  url: https://arxiv.org/rss/cs.CL
   type: rss
   enabled: true
   coverage_status: live
+  notes: Computation and Language (NLP) — from inbox https://arxiv.org/
 
-- name: Develop3D
-  category: cad_cae_cam
-  url: https://develop3d.com/feed/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: BAIR Blog
+- name: arXiv cs.CV
   category: research
-  url: http://bair.berkeley.edu/blog/feed.xml
+  url: https://arxiv.org/rss/cs.CV
   type: rss
   enabled: true
   coverage_status: live
+  notes: Computer Vision and Pattern Recognition — from inbox https://arxiv.org/
 
-- name: Siemens NX Design Blog
-  category: cad_cae_cam
-  url: https://blogs.sw.siemens.com/nx-design/feed/
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Feedly
-  category: ai_engineering
-  url: https://feedly.com/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-
-- name: RSSHub Docs
-  category: ai_engineering
-  url: https://docs.rsshub.app/
-  type: rss
-  enabled: true
-  coverage_status: deferred_no_feed
-
-- name: Beehiiv Feed
-  category: ai_engineering
-  url: https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: Machine Learning Mastery
-  category: ai_engineering
-  url: http://feeds.feedburner.com/MachineLearningMastery
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: MIT News Computers
+- name: arXiv cs.NE
   category: research
-  url: http://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml
+  url: https://arxiv.org/rss/cs.NE
   type: rss
   enabled: true
   coverage_status: live
+  notes: Neural and Evolutionary Computing — from inbox https://arxiv.org/
 
-- name: Springer AI Review
+- name: arXiv cs.MA
   category: research
-  url: http://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10462&channel-name=Artificial%20Intelligence%20Review
+  url: https://arxiv.org/rss/cs.MA
   type: rss
   enabled: true
   coverage_status: live
+  notes: Multiagent Systems — from inbox https://arxiv.org/
 
-- name: SolidSmack
-  category: cad_cae_cam
-  url: http://feeds.feedburner.com/solidsmack
-  type: rss
-  enabled: true
-  coverage_status: live
-
-- name: MIT News AI
+- name: arXiv cs.IR
   category: research
-  url: http://news.mit.edu/rss/topic/artificial-intelligence2
+  url: https://arxiv.org/rss/cs.IR
   type: rss
   enabled: true
   coverage_status: live
+  notes: Information Retrieval — from inbox https://arxiv.org/
 
-- name: ScienceDaily AI
+- name: arXiv cs.RO
   category: research
-  url: http://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml
+  url: https://arxiv.org/rss/cs.RO
   type: rss
   enabled: true
   coverage_status: live
+  notes: Robotics — from inbox https://arxiv.org/
 
-- name: Rhino3D Blog
-  category: cad_cae_cam
-  url: http://blog.rhino3d.com/feeds/posts/default
+- name: arXiv cs.HC
+  category: research
+  url: https://arxiv.org/rss/cs.HC
   type: rss
   enabled: true
   coverage_status: live
+  notes: Human-Computer Interaction — from inbox https://arxiv.org/
 
-- name: NVIDIA Blog Feed
-  category: ai_engineering
-  url: http://feeds.feedburner.com/nvidiablog
+- name: arXiv cs.SI
+  category: research
+  url: https://arxiv.org/rss/cs.SI
   type: rss
   enabled: true
   coverage_status: live
+  notes: Social and Information Networks — from inbox https://arxiv.org/
+
+- name: arXiv stat.ML
+  category: research
+  url: https://arxiv.org/rss/stat.ML
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Statistics — Machine Learning — from inbox https://arxiv.org/
+
+# --- Robotics, physical AI, CAD/CAM, sim-to-real, manufacturing, enterprise ---
+
+- name: arXiv cs.CE
+  category: research
+  url: https://arxiv.org/rss/cs.CE
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Computational Engineering — manufacturing AI, CAD/CAM, simulation — from inbox https://arxiv.org/
+
+- name: arXiv cs.CG
+  category: research
+  url: https://arxiv.org/rss/cs.CG
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Computational Geometry — CAD/CAM geometry, meshes — from inbox https://arxiv.org/
+
+- name: arXiv cs.GR
+  category: research
+  url: https://arxiv.org/rss/cs.GR
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Graphics — 3D/CAD visualization — from inbox https://arxiv.org/
+
+- name: arXiv cs.SY
+  category: research
+  url: https://arxiv.org/rss/cs.SY
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Systems and Control (alias eess.SY) — sim-to-real, cyber-physical, physical AI — from inbox https://arxiv.org/
+
+- name: arXiv eess.IV
+  category: research
+  url: https://arxiv.org/rss/eess.IV
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Image and Video Processing — industrial vision, physical sensing — from inbox https://arxiv.org/
+
+- name: arXiv cs.CY
+  category: research
+  url: https://arxiv.org/rss/cs.CY
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Computers and Society — enterprise AI policy, deployment impact (partial) — from inbox https://arxiv.org/
+
+- name: arXiv cs.SE
+  category: research
+  url: https://arxiv.org/rss/cs.SE
+  type: rss
+  enabled: true
+  coverage_status: live
+  notes: Software Engineering — enterprise AI systems, MLOps-style work (partial) — from inbox https://arxiv.org/

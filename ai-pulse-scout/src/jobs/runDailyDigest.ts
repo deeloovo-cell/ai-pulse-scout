@@ -3,6 +3,7 @@ import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
+import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
 import { saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
@@ -69,8 +70,14 @@ export async function runDailyDigest(
   const selected = await enrichKeyInsights(selectItems(deduped, config.digest));
   logger.info(`Selected: ${selected.length} items for digest`);
 
-  const subject = buildSubject(config.email.subject_template, now);
-  const html = renderHtmlEmail({ items: selected, date: now, subjectTemplate: config.email.subject_template });
+  const executiveBrief = await generateExecutiveBrief(selected);
+  const subject = buildSubject(config.email.subject_template, now, selected.length);
+  const html = renderHtmlEmail({
+    items: selected,
+    date: now,
+    subjectTemplate: config.email.subject_template,
+    executiveBrief,
+  });
 
   if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
   const datePart = now.toISOString().slice(0, 10);
