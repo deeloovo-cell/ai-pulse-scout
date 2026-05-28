@@ -15,8 +15,8 @@ export interface ExecutiveInsight {
 }
 
 export interface ExecutiveBrief {
-  opportunity: string;
-  risk: string;
-  rd_signal: string;
+  productivity_upside: string;
+  adoption_implementation_risk: string;
+  technical_signal: string;
   suggested_action: string;
 }

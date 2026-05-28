@@ -39,13 +39,13 @@ export function parseExecutiveBriefResponse(raw: string): ExecutiveBrief | null 
 
   try {
     const parsed = JSON.parse(jsonText) as Record<string, unknown>;
-    const opportunity = asString(parsed.opportunity);
-    const risk = asString(parsed.risk);
-    const rd_signal = asString(parsed.rd_signal);
+    const productivity_upside = asString(parsed.productivity_upside);
+    const adoption_implementation_risk = asString(parsed.adoption_implementation_risk);
+    const technical_signal = asString(parsed.technical_signal);
     const suggested_action = asString(parsed.suggested_action);
-    if (!opportunity || !risk || !rd_signal || !suggested_action) return null;
+    if (!productivity_upside || !adoption_implementation_risk || !technical_signal || !suggested_action) return null;
 
-    return { opportunity, risk, rd_signal, suggested_action };
+    return { productivity_upside, adoption_implementation_risk, technical_signal, suggested_action };
   } catch {
     return null;
   }

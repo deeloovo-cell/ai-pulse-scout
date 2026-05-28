@@ -45,11 +45,10 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
 <table width="100%" cellpadding="0" cellspacing="0" style="max-width:720px;margin:0 auto;">
   <tr>
     <td style="padding:24px 20px 14px 20px;border-bottom:3px solid ${ACCENT};">
-      <h1 style="margin:0;font-size:22px;color:#1a1a1a;font-weight:bold;">Manufacturing AI Pulse</h1>
+      <h1 style="margin:0;font-size:22px;color:#1a1a1a;font-weight:bold;">AI Pulse Scout</h1>
       <p style="margin:6px 0 0 0;font-size:13px;color:#555;line-height:1.5;">
-        ${escapeHtml(formatDigestDate(date))} &nbsp;|&nbsp; ${items.length} growth signal${items.length === 1 ? '' : 's'} &nbsp;|&nbsp; Last 24 hours
+        ${escapeHtml(formatDigestDate(date))} &nbsp;|&nbsp; ${items.length} signal${items.length === 1 ? '' : 's'} &nbsp;|&nbsp; Last 24 hours
       </p>
-      <p style="margin:4px 0 0 0;font-size:12px;color:#777;">CIO / Chief AI Officer brief &mdash; high-tech manufacturing</p>
     </td>
   </tr>
   ${briefHtml}
@@ -69,9 +68,9 @@ function renderExecutiveBrief(brief: ExecutiveBrief): string {
     <td style="padding:20px;background:#eef4fb;border-bottom:1px solid #d7e3f4;">
       <h2 style="margin:0 0 12px 0;font-size:17px;color:${ACCENT};font-weight:bold;">Executive brief</h2>
       <table width="100%" cellpadding="0" cellspacing="0" style="font-size:13px;color:#333;line-height:1.55;">
-        ${briefRow('Opportunity', brief.opportunity)}
-        ${briefRow('Risk / watch', brief.risk)}
-        ${briefRow('R&amp;D signal', brief.rd_signal)}
+        ${briefRow('Productivity upside', brief.productivity_upside)}
+        ${briefRow('Adoption / implementation risk', brief.adoption_implementation_risk)}
+        ${briefRow('Technical signal', brief.technical_signal)}
         ${briefRow('Suggested action', brief.suggested_action)}
       </table>
     </td>

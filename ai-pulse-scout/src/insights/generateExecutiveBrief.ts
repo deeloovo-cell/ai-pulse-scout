@@ -4,15 +4,15 @@ import { requestChatCompletion, resolveLlmClient, type LlmClientConfig } from '.
 import { parseExecutiveBriefResponse } from './parseExecutiveInsight.js';
 import { logger } from '../utils/logger.js';
 
-const ITEM_SYSTEM_PROMPT = `You are preparing a daily executive brief for a CIO and Chief AI Officer at a high-tech manufacturing company.
+export const EXECUTIVE_BRIEF_SYSTEM_PROMPT = `You are preparing a daily executive brief for a CIO and Chief AI Officer.
 Return ONLY valid JSON with these keys:
 {
-  "opportunity": "one sentence — highest growth upside from today's signals",
-  "risk": "one sentence — top risk or watch item",
-  "rd_signal": "one sentence — strongest R&D or technology signal",
-  "suggested_action": "one sentence — concrete next step for leadership"
+  "productivity_upside": "one sentence — strongest productivity or efficiency upside from today's signals",
+  "adoption_implementation_risk": "one sentence — biggest adoption, integration, or implementation risk to watch",
+  "technical_signal": "one sentence — strongest technical or R&D signal from today's items",
+  "suggested_action": "one sentence — concrete next step for the technical leadership team"
 }
-Be specific, avoid hype, focus on manufacturing growth enablement.`;
+Be specific, avoid hype, focus on technical productivity, efficiency, implementation realism, and practical next actions.`;
 
 export interface ExecutiveBriefOptions {
   apiKey?: string;
@@ -35,7 +35,7 @@ export async function generateExecutiveBrief(
     const raw = await requestChatCompletion(
       client,
       [
-        { role: 'system', content: ITEM_SYSTEM_PROMPT },
+        { role: 'system', content: EXECUTIVE_BRIEF_SYSTEM_PROMPT },
         { role: 'user', content: buildBriefContext(items) },
       ],
       600,
@@ -48,8 +48,8 @@ export async function generateExecutiveBrief(
   }
 }
 
-function buildBriefContext(items: NormalizedItem[]): string {
-  const lines = items.slice(0, 12).map((item, index) => {
+export function __testOnly_buildBriefContext(items: NormalizedItem[]): string {
+  const lines = items.map((item, index) => {
     const insight = item.executive_insight?.why_it_matters ?? item.key_insight ?? item.summary;
     const tags = [
       item.executive_insight?.growth_lever,
@@ -61,7 +61,11 @@ function buildBriefContext(items: NormalizedItem[]): string {
     return `${index + 1}. [${tags}] ${item.title}\n   ${insight}`;
   });
 
-  return `Today's digest items (${items.length} total, showing up to 12):\n\n${lines.join('\n\n')}`;
+  return `Today's digest items (${items.length} total):\n\n${lines.join('\n\n')}`;
+}
+
+function buildBriefContext(items: NormalizedItem[]): string {
+  return __testOnly_buildBriefContext(items);
 }
 
 function buildFallbackBrief(items: NormalizedItem[]): ExecutiveBrief {
@@ -69,9 +73,9 @@ function buildFallbackBrief(items: NormalizedItem[]): ExecutiveBrief {
   const insight = lead.executive_insight?.why_it_matters ?? lead.key_insight ?? lead.summary;
 
   return {
-    opportunity: `Review "${lead.title}" for potential manufacturing or product impact.`,
-    risk: 'Automated brief only — validate vendor claims and safety implications before pilots.',
-    rd_signal: insight || 'No analyzed insight available; open top items in the digest.',
-    suggested_action: 'Assign a 30-minute review to your digital manufacturing or AI platform lead.',
+    productivity_upside: `Review "${lead.title}" for workflow automation or engineering-efficiency gains.`,
+    adoption_implementation_risk: 'Validate data quality, system fit, and rollout complexity before any pilot.',
+    technical_signal: insight || 'No analyzed technical signal available; review the top digest items directly.',
+    suggested_action: 'Assign a short technical review to the platform, AI, or engineering systems lead.',
   };
 }

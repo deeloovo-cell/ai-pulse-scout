@@ -37,16 +37,31 @@ describe('buildSubject', () => {
     const date = new Date('2026-01-15T00:00:00Z');
     expect(buildSubject('Digest {date}', date)).toBe('Digest 01-15-2026');
   });
+
+  it('formats subject with item count placeholder', () => {
+    const date = new Date('2026-05-28T12:00:00Z');
+    const subject = buildSubject('AI Pulse Scout — {date} | {count} signals', date, 3);
+    expect(subject).toBe('AI Pulse Scout — 05-28-2026 | 3 signals');
+  });
 });
 
 describe('renderHtmlEmail', () => {
-  it('includes the item title in bold and underlined', () => {
-    const html = renderHtmlEmail({ items: [makeItem()], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
-    expect(html).toContain('<strong><u>Major AI Breakthrough Released</u></strong>');
+  it('restores AI Pulse Scout brand and omits manufacturing subtitle', () => {
+    const html = renderHtmlEmail({
+      items: [makeItem()],
+      date: new Date('2026-05-28T12:00:00Z'),
+      subjectTemplate: 'AI Pulse Scout — {date} | {count} signals',
+      executiveBrief: null,
+    });
+    expect(html).toContain('AI Pulse Scout');
+    expect(html).not.toContain('Manufacturing AI Pulse');
+    expect(html).not.toContain('CIO / Chief AI Officer brief');
+    expect(html).toContain('1 signal');
   });
 
-  it('includes the source link', () => {
+  it('includes the item title link', () => {
     const html = renderHtmlEmail({ items: [makeItem()], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
+    expect(html).toContain('Major AI Breakthrough Released');
     expect(html).toContain('href="https://example.com/article"');
   });
 
@@ -72,8 +87,29 @@ describe('renderHtmlEmail', () => {
   it('uses alternating background colors for multiple items', () => {
     const items = [makeItem({ id: 'a' }), makeItem({ id: 'b', item_url: 'https://example.com/b', fingerprint: 'fp2' })];
     const html = renderHtmlEmail({ items, date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
-    expect(html).toContain('#f0f7ff');
-    expect(html).toContain('#fff8f0');
+    expect(html).toContain('#f4f8fc');
+    expect(html).toContain('#faf6f0');
+  });
+
+  it('renders productivity-oriented executive brief labels', () => {
+    const html = renderHtmlEmail({
+      items: [makeItem()],
+      date: new Date('2026-05-28T12:00:00Z'),
+      subjectTemplate: 'AI Pulse Scout — {date} | {count} signals',
+      executiveBrief: {
+        productivity_upside: 'Reduce repetitive engineering review time.',
+        adoption_implementation_risk: 'ERP integration quality may slow rollout.',
+        technical_signal: 'A stronger agent-eval pattern is emerging.',
+        suggested_action: 'Review the top two items with the platform lead.',
+      },
+    });
+
+    expect(html).toContain('Productivity upside');
+    expect(html).toContain('Adoption / implementation risk');
+    expect(html).toContain('Technical signal');
+    expect(html).toContain('Suggested action');
+    expect(html).not.toContain('Opportunity');
+    expect(html).not.toContain('Risk / watch');
   });
 
   it('omits CIO and AAC commentary sections', () => {
@@ -112,6 +148,6 @@ describe('renderHtmlEmail', () => {
   it('renders empty digest gracefully', () => {
     const html = renderHtmlEmail({ items: [], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
     expect(html).toContain('AI Pulse Scout');
-    expect(html).toContain('0 items');
+    expect(html).toContain('No new signals in the collection window');
   });
 });
