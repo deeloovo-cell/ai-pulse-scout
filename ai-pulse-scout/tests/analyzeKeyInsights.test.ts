@@ -94,10 +94,17 @@ describe('enrichKeyInsights', () => {
     process.env = originalEnv;
   });
 
-  it('returns original items when no API key is configured', async () => {
-    const items = [makeItem()];
+  it('attaches fallback key insight and executive insight when no API key is configured', async () => {
+    const [item] = await enrichKeyInsights([makeItem()], { apiKey: '' });
 
-    await expect(enrichKeyInsights(items, { apiKey: '' })).resolves.toEqual(items);
+    expect(item.key_insight).toBe('New agentic AI framework for industrial use.');
+    expect(item.executive_insight).toEqual({
+      why_it_matters: 'New agentic AI framework for industrial use.',
+      growth_lever: 'Efficiency',
+      applies_to: ['R&D'],
+      action: 'Monitor',
+      manufacturing_relevance: undefined,
+    });
   });
 
   it('adds key insight from DeepSeek chat completion response', async () => {
@@ -140,11 +147,12 @@ describe('enrichKeyInsights', () => {
     const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
     expect(body.messages).toHaveLength(2);
     expect(body.thinking).toEqual({ type: 'disabled' });
-    expect(body.max_tokens).toBe(800);
-    expect(body.messages[1].content).toContain('100 words or fewer');
+    expect(body.max_tokens).toBe(900);
+    expect(body.messages[1].content).toContain('Analyze this item for the daily manufacturing AI digest.');
+    expect(body.messages[1].content).toContain('Existing feed summary: New agentic AI framework for industrial use.');
   });
 
-  it('falls back to original item when DeepSeek request fails', async () => {
+  it('falls back to generated insight when DeepSeek request fails', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn().mockResolvedValue({
@@ -154,12 +162,18 @@ describe('enrichKeyInsights', () => {
       }),
     );
 
-    const original = makeItem();
-    const [item] = await enrichKeyInsights([original], {
+    const [item] = await enrichKeyInsights([makeItem()], {
       apiKey: 'test-key',
       fetchFullPosts: false,
     });
 
-    expect(item).toEqual(original);
+    expect(item.key_insight).toBe('New agentic AI framework for industrial use.');
+    expect(item.executive_insight).toEqual({
+      why_it_matters: 'New agentic AI framework for industrial use.',
+      growth_lever: 'Efficiency',
+      applies_to: ['R&D'],
+      action: 'Monitor',
+      manufacturing_relevance: undefined,
+    });
   });
 });
