@@ -1,9 +1,9 @@
 import { loadConfig } from '../config/loadConfig.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
+import { selectDailyDigestItems } from '../filtering/selectDailyDigestItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
-import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
 import { saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
@@ -73,18 +73,18 @@ export async function runDailyDigest(
   logger.info(`After dedup: ${deduped.length} items`);
 
   const ordered = selectItems(deduped, config.digest);
-  logger.info(`Selected before enrichment: ${ordered.length} items for digest`);
-  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(ordered.length, DEFAULT_ENRICHMENT_CAP)} items`);
-  const selected = await enrichSelectedItems(ordered, DEFAULT_ENRICHMENT_CAP);
+  const finalItems = selectDailyDigestItems(ordered);
+  logger.info(`Selected before enrichment: ${finalItems.length} items for digest`);
+  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(finalItems.length, DEFAULT_ENRICHMENT_CAP)} items`);
+  const selected = await enrichSelectedItems(finalItems, DEFAULT_ENRICHMENT_CAP);
   logger.info(`Selected after enrichment: ${selected.length} items for digest`);
 
-  const executiveBrief = await generateExecutiveBrief(selected);
   const subject = buildSubject(config.email.subject_template, now, selected.length);
   const html = renderHtmlEmail({
     items: selected,
     date: now,
     subjectTemplate: config.email.subject_template,
-    executiveBrief,
+    executiveBrief: null,
   });
 
   if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });

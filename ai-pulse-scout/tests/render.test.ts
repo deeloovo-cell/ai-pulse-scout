@@ -46,7 +46,7 @@ describe('buildSubject', () => {
 });
 
 describe('renderHtmlEmail', () => {
-  it('restores AI Pulse Scout brand and omits manufacturing subtitle', () => {
+  it('restores AI Pulse Scout brand and renders chinese daily framing', () => {
     const html = renderHtmlEmail({
       items: [makeItem()],
       date: new Date('2026-05-28T12:00:00Z'),
@@ -54,9 +54,10 @@ describe('renderHtmlEmail', () => {
       executiveBrief: null,
     });
     expect(html).toContain('AI Pulse Scout');
+    expect(html).toContain('今日 AI 情报');
     expect(html).not.toContain('Manufacturing AI Pulse');
     expect(html).not.toContain('CIO / Chief AI Officer brief');
-    expect(html).toContain('1 signal');
+    expect(html).toContain('border-top:2px solid');
   });
 
   it('includes the item title link', () => {
@@ -119,7 +120,7 @@ describe('renderHtmlEmail', () => {
     expect(html).not.toContain('Why it matters for AAC');
   });
 
-  it('renders topic headings before grouped items', () => {
+  it('renders chinese topic headings before grouped items', () => {
     const html = renderHtmlEmail({
       items: [
         makeItem({
@@ -141,13 +142,13 @@ describe('renderHtmlEmail', () => {
       subjectTemplate: 'AI Pulse Scout -- {date}',
     });
 
-    expect(html).toContain('Frontier Model Labs');
-    expect(html).toContain('AI Developer Tools &amp; Agents');
+    expect(html).toContain('前沿模型实验室');
+    expect(html).toContain('AI 开发工具与 Agents');
   });
 
-  it('renders empty digest gracefully', () => {
+  it('renders empty digest gracefully in chinese', () => {
     const html = renderHtmlEmail({ items: [], date: new Date(), subjectTemplate: 'AI Pulse Scout -- {date}' });
     expect(html).toContain('AI Pulse Scout');
-    expect(html).toContain('No new signals in the collection window');
+    expect(html).toContain('当前时间窗内没有新的 AI 情报');
   });
 });

@@ -27,6 +27,6 @@ fi
 log "node $(node --version)"
 log "project $PROJECT_DIR"
 
-./node_modules/.bin/tsx src/cli/sendTest.ts
+./node_modules/.bin/tsx src/cli/sendDaily.ts
 
 log "=== Done (OK) ==="

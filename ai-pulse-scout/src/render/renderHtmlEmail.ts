@@ -1,7 +1,9 @@
 import type { NormalizedItem } from '../types/item.js';
 import type { ExecutiveBrief, ExecutiveInsight } from '../types/executive.js';
 import { DIGEST_TOPICS } from '../topics/topicOrder.js';
+import { TOPIC_LABELS_ZH } from '../topics/topicLabels.js';
 import { defaultExecutiveInsight } from '../insights/parseExecutiveInsight.js';
+import { buildChineseDigestFallback } from './buildChineseDigestFallback.js';
 import { formatDigestDate } from '../utils/time.js';
 
 const ITEM_COLORS = ['#f4f8fc', '#faf6f0'];
@@ -35,7 +37,7 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
   const briefHtml = executiveBrief ? renderExecutiveBrief(executiveBrief) : '';
 
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -46,16 +48,17 @@ export function renderHtmlEmail(options: DigestRenderOptions): string {
   <tr>
     <td style="padding:24px 20px 14px 20px;border-bottom:3px solid ${ACCENT};">
       <h1 style="margin:0;font-size:22px;color:#1a1a1a;font-weight:bold;">AI Pulse Scout</h1>
+      <p style="margin:6px 0 0 0;font-size:16px;color:#1a1a1a;line-height:1.5;font-weight:600;">今日 AI 情报</p>
       <p style="margin:6px 0 0 0;font-size:13px;color:#555;line-height:1.5;">
-        ${escapeHtml(formatDigestDate(date))} &nbsp;|&nbsp; ${items.length} signal${items.length === 1 ? '' : 's'} &nbsp;|&nbsp; Last 24 hours
+        ${escapeHtml(formatDigestDate(date))} &nbsp;|&nbsp; 共 ${items.length} 条 &nbsp;|&nbsp; 过去 24 小时
       </p>
     </td>
   </tr>
   ${briefHtml}
   ${items.length === 0 ? renderEmptyState() : itemsHtml}
   <tr>
-    <td style="padding:20px;font-size:11px;color:#999;border-top:1px solid #e0e0e0;text-align:center;">
-      AI Pulse Scout &mdash; automated digest &mdash; ${escapeHtml(formatDigestDate(date))}
+    <td style="padding:20px;font-size:11px;color:#999;border-top:2px solid #e0e0e0;text-align:center;">
+      AI Pulse Scout &mdash; 每日自动情报 &mdash; ${escapeHtml(formatDigestDate(date))}
     </td>
   </tr>
 </table>
@@ -88,15 +91,15 @@ function briefRow(label: string, value: string): string {
 function renderEmptyState(): string {
   return `<tr>
     <td style="padding:24px 20px;font-size:14px;color:#555;">
-      No new signals in the collection window. Sources remain active for the next run.
+      当前时间窗内没有新的 AI 情报，相关来源会继续参与下一次抓取。
     </td>
   </tr>`;
 }
 
 function renderTopicHeading(topic: string): string {
   return `<tr>
-    <td style="padding:18px 20px 8px 20px;background:#ffffff;border-bottom:1px solid #d7e3f4;">
-      <h2 style="margin:0;font-size:17px;color:#1a1a1a;font-weight:bold;">${escapeHtml(topic)}</h2>
+    <td style="padding:18px 20px 8px 20px;background:#ffffff;border-top:2px solid #d7e3f4;border-bottom:1px solid #d7e3f4;">
+      <h2 style="margin:0;font-size:17px;color:#1a1a1a;font-weight:bold;">${escapeHtml(TOPIC_LABELS_ZH[topic] ?? topic)}</h2>
     </td>
   </tr>`;
 }
@@ -106,15 +109,15 @@ function renderItem(item: NormalizedItem, index: number): string {
   const insight = resolveExecutiveInsight(item);
   const meta = renderMetaTags(insight);
   const relevance = insight.manufacturing_relevance
-    ? `<span style="display:inline-block;margin-right:8px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;font-size:11px;border-radius:3px;">Mfg relevance: ${escapeHtml(insight.manufacturing_relevance)}</span>`
+    ? `<span style="display:inline-block;margin-right:8px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;font-size:11px;border-radius:3px;">制造相关性：${escapeHtml(insight.manufacturing_relevance)}</span>`
     : '';
 
   const linkLabel = item.rawMetadata?.extractionLevel === 'link_only'
-    ? `Read source (${escapeHtml(item.source_name)}) &rarr;`
+    ? `查看来源（${escapeHtml(item.source_name)}） &rarr;`
     : `${escapeHtml(item.source_name)} &rarr;`;
 
   return `<tr>
-    <td style="padding:16px 20px;background:${bgColor};border-bottom:1px solid #e0e0e0;">
+    <td style="padding:16px 20px;background:${bgColor};border-bottom:1px solid #e0e0e0;border-top:2px solid #ffffff;">
       <p style="margin:0 0 8px 0;font-size:15px;line-height:1.4;">
         <a href="${escapeHtml(item.item_url)}" style="color:#1a1a1a;text-decoration:underline;font-weight:bold;">
           ${escapeHtml(item.title)}
@@ -125,7 +128,7 @@ function renderItem(item: NormalizedItem, index: number): string {
         ${relevance}
       </p>
       <p style="margin:0 0 6px 0;font-size:13px;color:#333;line-height:1.55;">
-        <strong>Why it matters for us:</strong> ${escapeHtml(insight.why_it_matters)}
+        <strong>关键信息：</strong> ${escapeHtml(renderWhyItMatters(item, insight))}
       </p>
       <p style="margin:10px 0 0 0;font-size:12px;">
         <a href="${escapeHtml(item.item_url)}" style="color:${ACCENT};text-decoration:none;">
@@ -139,14 +142,21 @@ function renderItem(item: NormalizedItem, index: number): string {
 
 function renderMetaTags(insight: ExecutiveInsight): string {
   const tag = (label: string, value: string) =>
-    `<span style="display:inline-block;margin:0 8px 6px 0;padding:2px 8px;background:#fff;border:1px solid #d0d7de;color:#444;font-size:11px;border-radius:3px;"><strong>${label}:</strong> ${escapeHtml(value)}</span>`;
+    `<span style="display:inline-block;margin:0 8px 6px 0;padding:2px 8px;background:#fff;border:1px solid #d0d7de;color:#444;font-size:11px;border-radius:3px;"><strong>${label}：</strong> ${escapeHtml(value)}</span>`;
 
   const applies = insight.applies_to.join(', ');
   return [
-    tag('Growth lever', insight.growth_lever),
-    tag('Applies to', applies),
-    tag('Action', insight.action),
+    tag('增长杠杆', insight.growth_lever),
+    tag('适用范围', applies),
+    tag('建议动作', insight.action),
   ].join('');
+}
+
+function renderWhyItMatters(item: NormalizedItem, insight: ExecutiveInsight): string {
+  if (item.executive_insight || item.key_insight) {
+    return insight.why_it_matters;
+  }
+  return buildChineseDigestFallback(item);
 }
 
 function resolveExecutiveInsight(item: NormalizedItem): ExecutiveInsight {
