@@ -2,7 +2,7 @@ import { loadConfig } from '../config/loadConfig.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
-import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
+import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
 import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
 import { saveSuccessfulRun } from '../state/runState.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
@@ -72,8 +72,11 @@ export async function runDailyDigest(
   const deduped = dedupeItems(allItems, ledger);
   logger.info(`After dedup: ${deduped.length} items`);
 
-  const selected = await enrichKeyInsights(selectItems(deduped, config.digest));
-  logger.info(`Selected: ${selected.length} items for digest`);
+  const ordered = selectItems(deduped, config.digest);
+  logger.info(`Selected before enrichment: ${ordered.length} items for digest`);
+  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(ordered.length, DEFAULT_ENRICHMENT_CAP)} items`);
+  const selected = await enrichSelectedItems(ordered, DEFAULT_ENRICHMENT_CAP);
+  logger.info(`Selected after enrichment: ${selected.length} items for digest`);
 
   const executiveBrief = await generateExecutiveBrief(selected);
   const subject = buildSubject(config.email.subject_template, now, selected.length);

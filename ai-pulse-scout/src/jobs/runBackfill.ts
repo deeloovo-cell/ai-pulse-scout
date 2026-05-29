@@ -13,7 +13,7 @@ import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
 import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
-import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
+import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
 import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
 import { loadLedger, appendToLedger } from '../state/ledger.js';
 import { computeBackfillWindowStart } from '../utils/time.js';
@@ -85,8 +85,11 @@ export async function runBackfill(
     max_items: Math.max(config.digest.max_items, BACKFILL_MAX_ITEMS),
   };
 
-  const selected = await enrichKeyInsights(selectItems(deduped, backfillDigestConfig));
-  logger.info(`Selected: ${selected.length} items for backfill digest`);
+  const ordered = selectItems(deduped, backfillDigestConfig);
+  logger.info(`Selected before enrichment: ${ordered.length} items for backfill digest`);
+  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(ordered.length, DEFAULT_ENRICHMENT_CAP)} items`);
+  const selected = await enrichSelectedItems(ordered, DEFAULT_ENRICHMENT_CAP);
+  logger.info(`Selected after enrichment: ${selected.length} items for backfill digest`);
 
   const executiveBrief = await generateExecutiveBrief(selected);
   const baseSubject = buildSubject(config.email.subject_template, now, selected.length);
