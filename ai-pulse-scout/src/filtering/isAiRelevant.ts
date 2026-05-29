@@ -18,7 +18,13 @@ const SOFT_NEGATIVE_PATTERNS = [
 ];
 
 function buildHaystack(item: NormalizedItem): string {
-  return [item.source_name, item.title, item.summary, item.content_text, item.tags.join(' ')]
+  return [
+    item.source_name,
+    item.title,
+    item.summary,
+    item.content_text,
+    (item.tags ?? []).join(' '),
+  ]
     .filter(Boolean)
     .join('\n');
 }
