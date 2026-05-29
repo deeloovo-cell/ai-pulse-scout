@@ -68,12 +68,12 @@ describe('renderHtmlEmail', () => {
 
   it('prefers analyzed key insight over feed summary', () => {
     const html = renderHtmlEmail({
-      items: [makeItem({ key_insight: 'This is the analyzed executive insight.' })],
+      items: [makeItem({ key_insight: '这是 LLM 生成的中文关键信息。' })],
       date: new Date(),
       subjectTemplate: 'AI Pulse Scout -- {date}',
     });
 
-    expect(html).toContain('This is the analyzed executive insight.');
+    expect(html).toContain('这是 LLM 生成的中文关键信息。');
     expect(html).not.toContain('New agentic AI framework for industrial use.');
   });
 
@@ -144,6 +144,30 @@ describe('renderHtmlEmail', () => {
 
     expect(html).toContain('前沿模型实验室');
     expect(html).toContain('AI 开发工具与 Agents');
+  });
+
+  it('renders localized executive-insight labels in chinese', () => {
+    const html = renderHtmlEmail({
+      items: [
+        makeItem({
+          executive_insight: {
+            why_it_matters: '这项更新会影响制造企业对 agent 系统的部署节奏。',
+            growth_lever: 'Efficiency',
+            applies_to: ['R&D', 'Process'],
+            action: 'Evaluate pilot',
+            manufacturing_relevance: 'High',
+          },
+          key_insight: '这项更新会影响制造企业对 agent 系统的部署节奏。',
+        }),
+      ],
+      date: new Date(),
+      subjectTemplate: 'AI Pulse Scout -- {date}',
+    });
+
+    expect(html).toContain('效率');
+    expect(html).toContain('研发、流程');
+    expect(html).toContain('评估试点');
+    expect(html).toContain('制造相关性：高');
   });
 
   it('renders empty digest gracefully in chinese', () => {

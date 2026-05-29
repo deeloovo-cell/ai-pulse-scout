@@ -107,23 +107,20 @@ describe('enrichKeyInsights', () => {
     });
   });
 
-  it('adds key insight from DeepSeek chat completion response', async () => {
+  it('requests Chinese why_it_matters from the chat completion prompt', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         choices: [
           {
             message: {
-              content: 'The real insight is that production agent cost control is now an architecture concern.',
+              content: '{"why_it_matters":"这说明生产级 agent 的成本控制已经变成架构问题。","growth_lever":"Efficiency","applies_to":["R&D"],"action":"Monitor"}',
             },
           },
         ],
       }),
     });
-    vi.stubGlobal(
-      'fetch',
-      fetchMock,
-    );
+    vi.stubGlobal('fetch', fetchMock);
 
     const [item] = await enrichKeyInsights([makeItem()], {
       apiKey: 'test-key',
@@ -132,7 +129,7 @@ describe('enrichKeyInsights', () => {
       fetchFullPosts: false,
     });
 
-    expect(item.key_insight).toBe('The real insight is that production agent cost control is now an architecture concern.');
+    expect(item.key_insight).toBe('这说明生产级 agent 的成本控制已经变成架构问题。');
     expect(fetchMock).toHaveBeenCalledWith(
       'https://aigw.aac.tech/v1/chat/completions',
       expect.objectContaining({
@@ -148,6 +145,7 @@ describe('enrichKeyInsights', () => {
     expect(body.messages).toHaveLength(2);
     expect(body.thinking).toEqual({ type: 'disabled' });
     expect(body.max_tokens).toBe(900);
+    expect(body.messages[0].content).toContain('why_it_matters 必须使用简体中文');
     expect(body.messages[1].content).toContain('Analyze this item for the daily manufacturing AI digest.');
     expect(body.messages[1].content).toContain('Existing feed summary: New agentic AI framework for industrial use.');
   });

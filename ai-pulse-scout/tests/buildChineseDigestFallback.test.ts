@@ -2,15 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { buildChineseDigestFallback } from '../src/render/buildChineseDigestFallback.js';
 
 describe('buildChineseDigestFallback', () => {
-  it('prefers summary and returns Chinese wrapper text', () => {
+  it('builds a Chinese fallback instead of exposing raw English abstract text', () => {
     const result = buildChineseDigestFallback({
       title: 'AI item',
-      summary: 'This is an English summary.',
+      source_name: 'arXiv cs.AI',
+      primary_topic: 'Research & Papers',
+      summary: 'Abstract: This is an English summary.',
       content_text: 'Longer content body.',
       key_insight: undefined,
     } as any);
 
-    expect(result).toContain('摘要');
-    expect(result).toContain('This is an English summary.');
+    expect(result).toContain('这条');
+    expect(result).not.toContain('Abstract:');
+    expect(result).not.toContain('This is an English summary.');
   });
 });

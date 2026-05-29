@@ -8,6 +8,30 @@ import { formatDigestDate } from '../utils/time.js';
 
 const ITEM_COLORS = ['#f4f8fc', '#faf6f0'];
 const ACCENT = '#0d5cab';
+const GROWTH_LEVER_LABELS: Record<string, string> = {
+  Efficiency: '效率',
+  Quality: '质量',
+  Revenue: '收入',
+  Speed: '速度',
+  Risk: '风险',
+};
+const APPLIES_TO_LABELS: Record<string, string> = {
+  Design: '设计',
+  Process: '流程',
+  'Shop floor': '车间',
+  'Supply chain': '供应链',
+  'R&D': '研发',
+};
+const ACTION_LABELS: Record<string, string> = {
+  Monitor: '持续跟踪',
+  'Evaluate pilot': '评估试点',
+  'Engage partner': '接洽合作方',
+};
+const RELEVANCE_LABELS: Record<string, string> = {
+  High: '高',
+  Medium: '中',
+  Low: '低',
+};
 
 export interface DigestRenderOptions {
   items: NormalizedItem[];
@@ -109,7 +133,7 @@ function renderItem(item: NormalizedItem, index: number): string {
   const insight = resolveExecutiveInsight(item);
   const meta = renderMetaTags(insight);
   const relevance = insight.manufacturing_relevance
-    ? `<span style="display:inline-block;margin-right:8px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;font-size:11px;border-radius:3px;">制造相关性：${escapeHtml(insight.manufacturing_relevance)}</span>`
+    ? `<span style="display:inline-block;margin-right:8px;padding:2px 8px;background:#e8f5e9;color:#2e7d32;font-size:11px;border-radius:3px;">制造相关性：${escapeHtml(RELEVANCE_LABELS[insight.manufacturing_relevance] ?? insight.manufacturing_relevance)}</span>`
     : '';
 
   const linkLabel = item.rawMetadata?.extractionLevel === 'link_only'
@@ -144,11 +168,11 @@ function renderMetaTags(insight: ExecutiveInsight): string {
   const tag = (label: string, value: string) =>
     `<span style="display:inline-block;margin:0 8px 6px 0;padding:2px 8px;background:#fff;border:1px solid #d0d7de;color:#444;font-size:11px;border-radius:3px;"><strong>${label}：</strong> ${escapeHtml(value)}</span>`;
 
-  const applies = insight.applies_to.join(', ');
+  const applies = insight.applies_to.map((entry) => APPLIES_TO_LABELS[entry] ?? entry).join('、');
   return [
-    tag('增长杠杆', insight.growth_lever),
+    tag('增长杠杆', GROWTH_LEVER_LABELS[insight.growth_lever] ?? insight.growth_lever),
     tag('适用范围', applies),
-    tag('建议动作', insight.action),
+    tag('建议动作', ACTION_LABELS[insight.action] ?? insight.action),
   ].join('');
 }
 
