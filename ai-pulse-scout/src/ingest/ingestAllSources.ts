@@ -1,4 +1,5 @@
 import type { ProductionSourceAdapter } from '../adapters/types.js';
+import { capSourceItems } from '../filtering/capSourceItems.js';
 import type { SourceConfig } from '../types/config.js';
 import type {
   IngestAllSourcesResult,
@@ -44,13 +45,28 @@ export async function ingestAllSources(
       continue;
     }
 
-    results.push(
-      await adapter.ingest({
-        source,
-        windowStart: input.windowStart,
-        windowEnd: input.windowEnd,
-      }),
-    );
+    const ingested = await adapter.ingest({
+      source,
+      windowStart: input.windowStart,
+      windowEnd: input.windowEnd,
+    });
+
+    const capped = capSourceItems(ingested.items, 10);
+
+    results.push({
+      ...ingested,
+      items: capped.items,
+      diagnostics: {
+        ...ingested.diagnostics,
+        aiAccepted: capped.counts.aiAccepted,
+        aiRejected: capped.counts.aiRejected,
+        capped: capped.counts.capped,
+        dropped:
+          ingested.diagnostics.dropped +
+          capped.counts.aiRejected +
+          (capped.counts.aiAccepted - capped.counts.capped),
+      },
+    });
   }
 
   const items = results.flatMap((result) => result.items);

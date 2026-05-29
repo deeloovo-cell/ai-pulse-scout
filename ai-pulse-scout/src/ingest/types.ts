@@ -40,6 +40,9 @@ export interface IngestionDiagnostics {
   attempted: number;
   normalized: number;
   dropped: number;
+  aiAccepted?: number;
+  aiRejected?: number;
+  capped?: number;
   reason?: string;
   adapterType?: string;
 }
