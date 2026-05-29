@@ -62,6 +62,11 @@ export async function runDailyDigest(
   const allItems = ingestion.items;
   logger.info(`Unified ingestion fetched ${allItems.length} items across ${ingestion.summary.totalSources} sources`);
   logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
+  for (const result of ingestion.results) {
+    logger.info(
+      `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
+    );
+  }
 
   const ledger = loadLedger();
   const deduped = dedupeItems(allItems, ledger);

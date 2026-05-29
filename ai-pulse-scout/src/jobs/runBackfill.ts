@@ -1,7 +1,17 @@
+import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+import { FeedAdapter } from '../adapters/feedAdapter.js';
+import { GenericWebAdapter } from '../adapters/genericWebAdapter.js';
+import { YouTubeAdapter } from '../adapters/youtubeAdapter.js';
+import { GitHubAdapter } from '../adapters/githubAdapter.js';
+import { DocsAdapter } from '../adapters/docsAdapter.js';
+import { CommunityAdapter } from '../adapters/communityAdapter.js';
+import { PapersAdapter } from '../adapters/papersAdapter.js';
 import { loadConfig } from '../config/loadConfig.js';
-import { fetchAllSources } from '../fetchers/rssFetcher.js';
 import { dedupeItems } from '../filtering/dedupeItems.js';
 import { selectItems } from '../filtering/selectItems.js';
+import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichKeyInsights } from '../insights/analyzeKeyInsights.js';
 import { generateExecutiveBrief } from '../insights/generateExecutiveBrief.js';
@@ -10,9 +20,6 @@ import { computeBackfillWindowStart } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
 import type { MailClient } from '../mail/MailClient.js';
 import type { NormalizedItem } from '../types/item.js';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, '../../data/output');
@@ -44,9 +51,28 @@ export async function runBackfill(
 
   logger.info(`Backfill window: ${windowStart.toISOString()} → ${now.toISOString()} (${options.days} days)`);
 
-  const fetchResults = await fetchAllSources(config.sources, windowStart, now);
-  const allItems = fetchResults.flatMap((r) => r.items);
-  logger.info(`Total fetched: ${allItems.length} items`);
+  const ingestion = await ingestAllSources({
+    sources: config.sources,
+    windowStart,
+    windowEnd: now,
+    adapters: [
+      new FeedAdapter(),
+      new GenericWebAdapter(),
+      new YouTubeAdapter(),
+      new GitHubAdapter(),
+      new DocsAdapter(),
+      new CommunityAdapter(),
+      new PapersAdapter(),
+    ],
+  });
+  const allItems = ingestion.items;
+  logger.info(`Unified ingestion fetched ${allItems.length} items across ${ingestion.summary.totalSources} sources`);
+  logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
+  for (const result of ingestion.results) {
+    logger.info(
+      `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
+    );
+  }
 
   // Preview: use empty ledger so all historical items are visible.
   // Send: check real ledger to avoid re-sending items already delivered.
