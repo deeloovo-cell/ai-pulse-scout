@@ -95,5 +95,6 @@ describe('runDailyDigest unified ingestion', () => {
     expect(result.html).not.toContain('Executive brief');
     expect(result.html).toContain('新闻速览');
     expect(result.html).toContain('前沿模型实验室');
+    expect(result.html).toContain('共 2 条');
   });
 });

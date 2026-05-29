@@ -30,16 +30,16 @@ describe('enrichSelectedItems', () => {
     enrichKeyInsightsMock.mockClear();
   });
 
-  it('only enriches the first 50 items and still returns all items', async () => {
+  it('only enriches the first 25 items and still returns all items', async () => {
     const { enrichSelectedItems } = await import('../src/insights/enrichSelectedItems.js');
     const items = Array.from({ length: 60 }, (_, i) => makeItem(i + 1));
 
-    const result = await enrichSelectedItems(items, 50);
+    const result = await enrichSelectedItems(items, 25);
 
     expect(enrichKeyInsightsMock).toHaveBeenCalledTimes(1);
-    expect(enrichKeyInsightsMock.mock.calls[0]?.[0]).toHaveLength(50);
+    expect(enrichKeyInsightsMock.mock.calls[0]?.[0]).toHaveLength(25);
     expect(result).toHaveLength(60);
     expect(result[0]?.key_insight).toBe('llm:item-1');
-    expect(result[55]?.key_insight).toBeUndefined();
+    expect(result[30]?.key_insight).toBeUndefined();
   });
 });
