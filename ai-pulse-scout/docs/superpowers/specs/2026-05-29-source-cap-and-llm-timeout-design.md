@@ -4,13 +4,18 @@
 
 Reduce daily digest runtime and eliminate indefinite hangs by:
 
-1. capping each source/feed to its top 10 candidate items before global downstream processing
-2. preserving a simple, deterministic ranking rule per source
-3. adding timeout protection to LLM calls so digest generation degrades gracefully instead of blocking forever
+1. enforcing an AI-relevance compliance gate on every item within every source/feed before ranking and truncation
+2. capping each source/feed to its top 10 compliant candidate items before global downstream processing
+3. preserving a simple, deterministic ranking rule per source
+4. adding timeout protection to LLM calls so digest generation degrades gracefully instead of blocking forever
 
 ## User intent
 
 The user wants to change the fetch-content logic so the system no longer allows very large per-source candidate volumes to flow into the expensive insight-generation stage.
+
+They also added a hard content-compliance requirement:
+- every item retained from every feed must be AI-related
+- if AI relevance is not enforced first, later ranking and top-10 truncation are considered invalid
 
 They explicitly chose:
 - per-source/feed cap, not per-topic or per-category-field cap
@@ -35,15 +40,21 @@ With the current source set, this can produce thousands of items before dedupe. 
 
 ## Recommended approach
 
-Implement two coordinated protections.
+Implement three coordinated protections.
 
-### 1. Per-source top-10 cap before global merge
+### 1. Per-item AI relevance compliance gate inside each source
 
-After each source is ingested and normalized for the active time window, sort that source's items using a deterministic ranking rule and keep only the top 10 items from that source.
+After each source is ingested and normalized for the active time window, evaluate each item for AI relevance.
+Only items that pass the AI relevance gate are allowed to continue.
+Items that fail are dropped before any per-source ranking or top-10 truncation is applied.
+
+### 2. Per-source top-10 cap before global merge
+
+After AI relevance filtering, sort that source's compliant items using a deterministic ranking rule and keep only the top 10 items from that source.
 
 Only those capped results continue into the merged global item set.
 
-### 2. Timeout-protected LLM requests with graceful fallback
+### 3. Timeout-protected LLM requests with graceful fallback
 
 Wrap chat-completion requests in a request timeout.
 If the timeout is reached, treat the request as a recoverable degradation:
@@ -71,10 +82,49 @@ it requires a stronger and more explicit topic-grouping contract than the system
 
 Cap each source to top 10 and harden LLM requests with timeout/fallback.
 
+**Rejected because:**
+it reduces volume and hang-risk, but still allows non-AI items to compete for top-10 slots, which violates the user's content requirement.
+
+### Option D: AI relevance gate plus per-source cap plus timeout fallback
+
+Filter each source to AI-related items first, then rank/cap to 10, and harden LLM requests with timeout/fallback.
+
 **Chosen because:**
-it directly addresses both scale and hang-risk while keeping the implementation small and aligned with current data structures.
+it enforces the user's relevance rule first, then addresses both scale and hang-risk while keeping the design aligned with current data structures.
 
 ## Detailed design
+
+## AI relevance compliance gate
+
+Each source must apply an AI relevance gate before ranking and top-10 selection.
+
+Conceptually:
+
+```text
+source ingest -> AI relevance filter -> source-local sort -> source-local top 10 -> merge all sources -> global dedupe -> downstream analysis
+```
+
+### Compliance rule
+
+An item is eligible only if it is materially AI-related.
+General computing, software, policy, society, or engineering items that do not have a clear AI connection must be excluded before ranking.
+
+### Practical enforcement approach
+
+The relevance gate should be lightweight and deterministic rather than another expensive LLM-dependent stage.
+The preferred implementation direction is a rule-based AI relevance classifier using title, summary, source metadata, and extracted text when available.
+
+Examples of positive signals:
+- explicit mentions of AI, artificial intelligence, machine learning, deep learning, foundation models, LLMs, agents, computer vision, NLP, robotics AI, generative AI, inference, training, multimodal models, MLOps, AI chips/accelerators when clearly discussed in an AI workload context
+- arXiv papers whose title/summary clearly indicates AI/ML/modeling/robotics/computer vision/language/model systems relevance
+- enterprise/product/developer items clearly about AI product capability, AI adoption, AI tooling, model deployment, agent frameworks, or AI system implementation
+
+Examples of negative signals:
+- generic software engineering posts with no AI connection
+- broad social/policy/computers-and-society posts that mention technology but not AI specifically
+- generic hardware, cloud, security, or developer-tool items with no meaningful AI angle
+
+Borderline cases should bias toward exclusion rather than inclusion, because the user explicitly wants AI relevance to be a hard gate.
 
 ## Source-level ranking rule
 
@@ -111,13 +161,7 @@ When still tied, prefer stronger timestamp confidence:
 
 ## Where the cap applies
 
-The cap applies after source ingestion returns normalized items for that source and before cross-source merge/global dedupe.
-
-Conceptually:
-
-```text
-source ingest -> source-local sort -> source-local top 10 -> merge all sources -> global dedupe -> downstream analysis
-```
+The cap applies after source ingestion returns normalized items for that source, after AI relevance filtering, and before cross-source merge/global dedupe.
 
 This means:
 - no source contributes more than 10 items into downstream stages
@@ -159,6 +203,8 @@ If the request times out or fails:
 Add/retain logs that make the new behavior visible:
 
 - total raw items returned per source
+- AI-relevant item count per source after compliance filtering
+- dropped non-AI item count per source
 - capped item count per source after ranking/truncation
 - total merged item count after source caps
 - deduped item count
@@ -181,6 +227,7 @@ New flow:
 
 ```text
 per-source ingest
+-> AI relevance filter
 -> per-source rank
 -> per-source cap to 10
 -> merge
@@ -216,18 +263,20 @@ Retain existing empty-digest behavior.
 
 Add or update tests to verify:
 
-1. source-local ranking preserves the current priority order
-2. source-local cap keeps only the top 10 items from a single source
-3. cap happens before global merge/dedupe behavior is finalized
-4. multiple sources can each contribute up to 10 items before dedupe
-5. LLM timeout causes fallback, not whole-run failure
-6. executive brief timeout causes fallback, not whole-run failure
+1. non-AI items are removed before per-source ranking/truncation
+2. source-local ranking preserves the current priority order
+3. source-local cap keeps only the top 10 compliant items from a single source
+4. cap happens before global merge/dedupe behavior is finalized
+5. multiple sources can each contribute up to 10 compliant items before dedupe
+6. LLM timeout causes fallback, not whole-run failure
+7. executive brief timeout causes fallback, not whole-run failure
 
 ## Non-goals
 
 This change does not:
 - redesign source taxonomy
 - introduce topic-level quotas
+- replace the lightweight relevance gate with a new expensive LLM-only classifier
 - redesign digest selection after dedupe
 - change email template content strategy
 - optimize all performance bottlenecks in the pipeline
@@ -247,8 +296,9 @@ This should:
 
 The change is successful when all of the following are true:
 
-1. each enabled source contributes at most 10 items into the merged candidate pool
-2. per-source item ordering follows the existing recency/extraction/timestamp-priority rule
-3. digest runs no longer wait indefinitely on a stalled chat-completion request
-4. when LLM requests time out, the digest still renders and can send using fallback content
-5. logs make source capping and timeout fallback visible
+1. every item that survives source-local filtering is materially AI-related
+2. each enabled source contributes at most 10 compliant items into the merged candidate pool
+3. per-source item ordering follows the existing recency/extraction/timestamp-priority rule
+4. digest runs no longer wait indefinitely on a stalled chat-completion request
+5. when LLM requests time out, the digest still renders and can send using fallback content
+6. logs make AI relevance filtering, source capping, and timeout fallback visible
