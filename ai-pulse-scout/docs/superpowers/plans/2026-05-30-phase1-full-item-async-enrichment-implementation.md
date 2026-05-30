@@ -1344,7 +1344,7 @@ git commit -m "feat: finalize phase 1 async enrichment pipeline"
 
 ## Placeholder Scan
 
-- No `TODO` / `TBD` placeholders intentionally left.
+- No unfinished placeholders are intentionally left in the plan.
 - Each coding task includes concrete file paths, sample code, and explicit test commands.
 
 ## Type Consistency Check
