@@ -15,13 +15,15 @@ export const SCHEMA_STATEMENTS = [
     metadata_json TEXT NOT NULL DEFAULT '{}'
   )`,
   `CREATE TABLE IF NOT EXISTS items (
-    id TEXT PRIMARY KEY,
+    item_key TEXT PRIMARY KEY,
+    id TEXT NOT NULL,
     run_id TEXT NOT NULL,
     source_id TEXT NOT NULL,
     url TEXT NOT NULL,
     title TEXT NOT NULL,
     published_at TEXT,
     dedupe_key TEXT NOT NULL,
+    normalized_item_json TEXT,
     content_status TEXT NOT NULL,
     enrichment_status TEXT NOT NULL,
     final_status TEXT NOT NULL,
@@ -31,10 +33,11 @@ export const SCHEMA_STATEMENTS = [
     carry_forward_run_id TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
-    FOREIGN KEY(run_id) REFERENCES runs(id)
+    FOREIGN KEY(run_id) REFERENCES runs(id),
+    UNIQUE(run_id, id)
   )`,
   `CREATE TABLE IF NOT EXISTS item_contents (
-    item_id TEXT PRIMARY KEY,
+    item_key TEXT PRIMARY KEY,
     raw_content TEXT,
     clean_content TEXT,
     content_length INTEGER NOT NULL DEFAULT 0,
@@ -43,10 +46,10 @@ export const SCHEMA_STATEMENTS = [
     fetch_completed_at TEXT,
     fetch_duration_ms INTEGER,
     fetch_error TEXT,
-    FOREIGN KEY(item_id) REFERENCES items(id)
+    FOREIGN KEY(item_key) REFERENCES items(item_key)
   )`,
   `CREATE TABLE IF NOT EXISTS item_enrichments (
-    item_id TEXT PRIMARY KEY,
+    item_key TEXT PRIMARY KEY,
     model TEXT,
     prompt_version TEXT,
     summary TEXT,
@@ -59,11 +62,11 @@ export const SCHEMA_STATEMENTS = [
     tokens_out INTEGER,
     duration_ms INTEGER,
     created_at TEXT NOT NULL,
-    FOREIGN KEY(item_id) REFERENCES items(id)
+    FOREIGN KEY(item_key) REFERENCES items(item_key)
   )`,
   `CREATE TABLE IF NOT EXISTS item_attempts (
     id TEXT PRIMARY KEY,
-    item_id TEXT NOT NULL,
+    item_key TEXT NOT NULL,
     stage TEXT NOT NULL,
     attempt_number INTEGER NOT NULL,
     started_at TEXT NOT NULL,
@@ -71,6 +74,6 @@ export const SCHEMA_STATEMENTS = [
     duration_ms INTEGER,
     outcome TEXT NOT NULL,
     error_message TEXT,
-    FOREIGN KEY(item_id) REFERENCES items(id)
+    FOREIGN KEY(item_key) REFERENCES items(item_key)
   )`,
 ] as const;

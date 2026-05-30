@@ -1,17 +1,14 @@
 import { loadConfig } from '../config/loadConfig.js';
-import { dedupeItems } from '../filtering/dedupeItems.js';
-import { selectItems } from '../filtering/selectItems.js';
-import { selectDailyDigestItems } from '../filtering/selectDailyDigestItems.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
-import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
 import { saveSuccessfulRun } from '../state/runState.js';
-import { loadLedger, appendToLedger } from '../state/ledger.js';
+import { appendToLedger } from '../state/ledger.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
 import type { MailClient } from '../mail/MailClient.js';
 import type { NormalizedItem } from '../types/item.js';
 import { writeFileSync, mkdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
+import { tmpdir } from 'os';
 import { fileURLToPath } from 'url';
 import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { FeedAdapter } from '../adapters/feedAdapter.js';
@@ -21,6 +18,8 @@ import { GitHubAdapter } from '../adapters/githubAdapter.js';
 import { DocsAdapter } from '../adapters/docsAdapter.js';
 import { CommunityAdapter } from '../adapters/communityAdapter.js';
 import { PapersAdapter } from '../adapters/papersAdapter.js';
+import { runPipeline } from './runPipeline.js';
+import { enrichSingleItem } from '../insights/analyzeKeyInsights.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, '../../data/output');
@@ -40,73 +39,130 @@ export async function runDailyDigest(
 ): Promise<DigestRunResult> {
   const config = loadConfig();
   const now = new Date();
-
   const { windowStart, windowEnd } = computeDailyCutoffWindow(now);
 
   logger.info(`Collection window: ${windowStart.toISOString()} → ${windowEnd.toISOString()}`);
 
-  const ingestion = await ingestAllSources({
-    sources: config.sources,
-    windowStart,
-    windowEnd,
-    adapters: [
-      new FeedAdapter(),
-      new GenericWebAdapter(),
-      new YouTubeAdapter(),
-      new GitHubAdapter(),
-      new DocsAdapter(),
-      new CommunityAdapter(),
-      new PapersAdapter(),
-    ],
+  const pipelineDbPath = process.env.PIPELINE_DB_PATH ?? (process.env.VITEST ? join(tmpdir(), `ai-pulse-scout-${now.getTime()}.sqlite`) : undefined);
+
+  const pipelineResult = await runPipeline({
+    now,
+    dbPath: pipelineDbPath,
+    ingest: async () => {
+      const ingestion = await ingestAllSources({
+        sources: config.sources,
+        windowStart,
+        windowEnd,
+        adapters: [
+          new FeedAdapter(),
+          new GenericWebAdapter(),
+          new YouTubeAdapter(),
+          new GitHubAdapter(),
+          new DocsAdapter(),
+          new CommunityAdapter(),
+          new PapersAdapter(),
+        ],
+      });
+
+      logger.info(`Unified ingestion fetched ${ingestion.items.length} items across ${ingestion.summary.totalSources} sources`);
+      logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
+      for (const result of ingestion.results) {
+        logger.info(
+          `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
+        );
+      }
+
+      return {
+        items: ingestion.items.map((item) => ({
+          id: item.id,
+          sourceId: item.source_url,
+          url: item.item_url,
+          title: item.title,
+          publishedAt: item.published_at ? item.published_at.toISOString() : null,
+          dedupeKey: item.fingerprint,
+          normalizedItem: item,
+        })),
+      };
+    },
+    fetchItem: async (item) => ({
+      rawContent: item.title,
+      cleanContent: item.title,
+      fetchMethod: 'normalized-item-snapshot',
+    }),
+    enrichItem: async (item) => {
+      const source = (item as { normalized_item_json?: string | null }).normalized_item_json
+        ? JSON.parse((item as { normalized_item_json: string }).normalized_item_json)
+        : null;
+      const enriched = source ? await enrichSingleItem(source, { fetchFullPosts: false }) : null;
+      return {
+        summary: enriched?.summary ?? '',
+        whyItMatters: enriched?.executive_insight?.why_it_matters ?? enriched?.key_insight ?? '',
+        topics: enriched ? [enriched.primary_topic] : [],
+        relevanceScore: enriched?.relevance_scores?.overall ?? 0,
+        relevanceBucket: (enriched?.executive_insight?.manufacturing_relevance ?? 'Low').toLowerCase(),
+        rawResponse: JSON.stringify(enriched?.executive_insight ?? {}),
+        model: 'single-item-enrichment',
+        durationMs: 0,
+      };
+    },
+    render: (items) => {
+      const typedItems = items as NormalizedItem[];
+      const subject = buildSubject(config.email.subject_template, now, typedItems.length);
+      return renderHtmlEmail({
+        items: typedItems,
+        date: now,
+        subjectTemplate: config.email.subject_template,
+        executiveBrief: null,
+      }).replace('<title>','<title>').replace(subject, subject);
+    },
+    publish: async (html) => {
+      if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
+      const datePart = now.toISOString().slice(0, 10);
+      const outputPath = join(OUTPUT_DIR, `digest-${datePart}.html`);
+      writeFileSync(outputPath, html, 'utf8');
+
+      if (sendEmail && mailClient && pipelineResultCache.items.length > 0) {
+        const fromAddr = config.email.from_address || process.env.SMTP_USER || 'pulse@example.com';
+        await mailClient.send({
+          to: config.email.to,
+          from: `${config.email.from_name} <${fromAddr}>`,
+          subject: pipelineResultCache.subject,
+          html,
+        });
+        appendToLedger(pipelineResultCache.items);
+        saveSuccessfulRun(now);
+        logger.info('Ledger updated and run state saved.');
+      } else if (sendEmail && pipelineResultCache.items.length === 0) {
+        logger.info('No digest items selected — skipping email send and state update.');
+      }
+    },
   });
-  const allItems = ingestion.items;
-  logger.info(`Unified ingestion fetched ${allItems.length} items across ${ingestion.summary.totalSources} sources`);
-  logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
-  for (const result of ingestion.results) {
-    logger.info(
-      `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
-    );
-  }
 
-  const ledger = loadLedger();
-  const deduped = dedupeItems(allItems, ledger);
-  logger.info(`After dedup: ${deduped.length} items`);
-
-  const ordered = selectItems(deduped, config.digest);
-  const finalItems = selectDailyDigestItems(ordered);
-  logger.info(`Selected before enrichment: ${finalItems.length} items for digest`);
-  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(finalItems.length, DEFAULT_ENRICHMENT_CAP)} items`);
-  const selected = await enrichSelectedItems(finalItems, DEFAULT_ENRICHMENT_CAP);
-  logger.info(`Selected after enrichment: ${selected.length} items for digest`);
-
-  const subject = buildSubject(config.email.subject_template, now, selected.length);
-  const html = renderHtmlEmail({
-    items: selected,
+  const typedItems = ((pipelineResult.items ?? []) as NormalizedItem[]);
+  const subject = pipelineResult.subject ?? buildSubject(config.email.subject_template, now, typedItems.length);
+  const html = pipelineResult.html ?? renderHtmlEmail({
+    items: typedItems,
     date: now,
     subjectTemplate: config.email.subject_template,
     executiveBrief: null,
   });
-
-  if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
   const datePart = now.toISOString().slice(0, 10);
-  const outputPath = join(OUTPUT_DIR, `digest-${datePart}.html`);
-  writeFileSync(outputPath, html, 'utf8');
-  logger.info(`Saved HTML artifact: ${outputPath}`);
+  const outputPath = pipelineResult.outputPath ?? join(OUTPUT_DIR, `digest-${datePart}.html`);
 
-  if (sendEmail && mailClient && selected.length > 0) {
-    const fromAddr = config.email.from_address || process.env.SMTP_USER || 'pulse@example.com';
-    await mailClient.send({
-      to: config.email.to,
-      from: `${config.email.from_name} <${fromAddr}>`,
-      subject,
-      html,
-    });
-    appendToLedger(selected);
-    saveSuccessfulRun(now);
-    logger.info('Ledger updated and run state saved.');
-  } else if (sendEmail && selected.length === 0) {
-    logger.info('No digest items selected — skipping email send and state update.');
-  }
+  pipelineResultCache.subject = subject;
+  pipelineResultCache.items = typedItems;
 
-  return { subject, html, items: selected, itemCount: selected.length, totalFetched: allItems.length, outputPath };
+  return {
+    subject,
+    html,
+    items: typedItems,
+    itemCount: typedItems.length,
+    totalFetched: pipelineResult.totalItems ?? typedItems.length,
+    outputPath,
+  };
 }
+
+const pipelineResultCache: { subject: string; items: NormalizedItem[] } = {
+  subject: '',
+  items: [],
+};

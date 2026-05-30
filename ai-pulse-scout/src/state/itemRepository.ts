@@ -7,19 +7,34 @@ interface DiscoveredItemInput {
   title: string;
   publishedAt: string | null;
   dedupeKey: string;
+  normalizedItem?: unknown;
+}
+
+function itemKeyFor(runId: string, itemId: string): string {
+  return `${runId}:${itemId}`;
+}
+
+function getLatestItemKey(db: PipelineDb, itemId: string): string {
+  const row = db
+    .prepare(`SELECT item_key FROM items WHERE id = ? ORDER BY created_at DESC LIMIT 1`)
+    .get(itemId) as { item_key: string } | undefined;
+
+  if (!row) throw new Error(`Item not found: ${itemId}`);
+  return row.item_key;
 }
 
 export function insertDiscoveredItems(db: PipelineDb, runId: string, items: DiscoveredItemInput[]): void {
   const now = new Date().toISOString();
   const stmt = db.prepare(
-    `INSERT INTO items (
-      id, run_id, source_id, url, title, published_at, dedupe_key,
+    `INSERT OR REPLACE INTO items (
+      item_key, id, run_id, source_id, url, title, published_at, dedupe_key, normalized_item_json,
       content_status, enrichment_status, final_status, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', 'pending', ?, ?)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 'pending', 'pending', ?, ?)`,
   );
 
   for (const item of items) {
     stmt.run(
+      itemKeyFor(runId, item.id),
       item.id,
       runId,
       item.sourceId,
@@ -27,6 +42,7 @@ export function insertDiscoveredItems(db: PipelineDb, runId: string, items: Disc
       item.title,
       item.publishedAt,
       item.dedupeKey,
+      item.normalizedItem ? JSON.stringify(item.normalizedItem) : null,
       now,
       now,
     );
@@ -34,17 +50,18 @@ export function insertDiscoveredItems(db: PipelineDb, runId: string, items: Disc
 }
 
 export function claimNextFetchItem(db: PipelineDb) {
-  const row = db.prepare(
-    `SELECT id FROM items WHERE content_status = 'pending' ORDER BY created_at ASC LIMIT 1`,
-  ).get() as { id: string } | undefined;
+  const row = db.prepare(`SELECT item_key FROM items WHERE content_status = 'pending' ORDER BY created_at ASC LIMIT 1`).get() as
+    | { item_key: string }
+    | undefined;
 
   if (!row) return null;
 
-  db.prepare(
-    `UPDATE items SET content_status = 'running', updated_at = ? WHERE id = ?`,
-  ).run(new Date().toISOString(), row.id);
+  db.prepare(`UPDATE items SET content_status = 'running', updated_at = ? WHERE item_key = ?`).run(
+    new Date().toISOString(),
+    row.item_key,
+  );
 
-  return db.prepare(`SELECT * FROM items WHERE id = ?`).get(row.id);
+  return db.prepare(`SELECT * FROM items WHERE item_key = ?`).get(row.item_key);
 }
 
 export function markFetchDone(
@@ -58,12 +75,14 @@ export function markFetchDone(
     completedAt: string;
   },
 ): void {
+  const itemKey = getLatestItemKey(db, itemId);
+
   db.prepare(
     `INSERT OR REPLACE INTO item_contents (
-      item_id, raw_content, clean_content, content_length, fetch_method, fetch_completed_at, fetch_duration_ms
+      item_key, raw_content, clean_content, content_length, fetch_method, fetch_completed_at, fetch_duration_ms
     ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
   ).run(
-    itemId,
+    itemKey,
     input.rawContent,
     input.cleanContent,
     input.cleanContent.length,
@@ -75,25 +94,28 @@ export function markFetchDone(
   db.prepare(
     `UPDATE items
      SET content_status = 'done', enrichment_status = 'pending', updated_at = ?
-     WHERE id = ?`,
-  ).run(input.completedAt, itemId);
+     WHERE item_key = ?`,
+  ).run(input.completedAt, itemKey);
 }
 
 export function claimNextEnrichmentItem(db: PipelineDb) {
   const row = db.prepare(
-    `SELECT id FROM items WHERE content_status = 'done' AND enrichment_status = 'pending' ORDER BY updated_at ASC LIMIT 1`,
-  ).get() as { id: string } | undefined;
+    `SELECT item_key FROM items WHERE content_status = 'done' AND enrichment_status = 'pending' ORDER BY updated_at ASC LIMIT 1`,
+  ).get() as { item_key: string } | undefined;
 
   if (!row) return null;
 
-  db.prepare(`UPDATE items SET enrichment_status = 'running', updated_at = ? WHERE id = ?`).run(new Date().toISOString(), row.id);
+  db.prepare(`UPDATE items SET enrichment_status = 'running', updated_at = ? WHERE item_key = ?`).run(
+    new Date().toISOString(),
+    row.item_key,
+  );
 
   return db.prepare(
     `SELECT items.*, item_contents.clean_content
      FROM items
-     LEFT JOIN item_contents ON item_contents.item_id = items.id
-     WHERE items.id = ?`,
-  ).get(row.id);
+     LEFT JOIN item_contents ON item_contents.item_key = items.item_key
+     WHERE items.item_key = ?`,
+  ).get(row.item_key);
 }
 
 export function markEnrichmentDone(
@@ -110,13 +132,15 @@ export function markEnrichmentDone(
     durationMs: number;
   },
 ): void {
+  const itemKey = getLatestItemKey(db, itemId);
+
   db.prepare(
     `INSERT OR REPLACE INTO item_enrichments (
-      item_id, model, prompt_version, summary, why_it_matters, topics_json,
+      item_key, model, prompt_version, summary, why_it_matters, topics_json,
       relevance_score, relevance_bucket, raw_response, duration_ms, created_at
     ) VALUES (?, ?, 'phase1', ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
-    itemId,
+    itemKey,
     result.model,
     result.summary,
     result.whyItMatters,
@@ -131,15 +155,15 @@ export function markEnrichmentDone(
   db.prepare(
     `UPDATE items
      SET enrichment_status = 'done', final_status = 'ready', updated_at = ?
-     WHERE id = ?`,
-  ).run(new Date().toISOString(), itemId);
+     WHERE item_key = ?`,
+  ).run(new Date().toISOString(), itemKey);
 }
 
 export function markEnrichmentFailed(db: PipelineDb, itemId: string): void {
   db.prepare(
     `UPDATE items
      SET enrichment_status = 'failed', final_status = 'enrichment_failed', updated_at = ?
-     WHERE id = ?`,
+     WHERE id = ? AND final_status = 'pending'`,
   ).run(new Date().toISOString(), itemId);
 }
 
@@ -147,7 +171,7 @@ export function markDeferredForRetry(db: PipelineDb, itemId: string, nextRunId: 
   db.prepare(
     `UPDATE items
      SET final_status = 'deferred_for_retry', carry_forward_run_id = ?, updated_at = ?
-     WHERE id = ?`,
+     WHERE id = ? AND final_status != 'ready'`,
   ).run(nextRunId, new Date().toISOString(), itemId);
 }
 

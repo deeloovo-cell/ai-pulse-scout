@@ -10,11 +10,12 @@ import {
 import { runFetchWorkerOnce } from './fetchWorker.js';
 import { runEnrichmentWorkerOnce } from './enrichmentWorker.js';
 import { evaluatePublishThreshold } from './publishThreshold.js';
+import type { NormalizedItem } from '../types/item.js';
 
 export async function runPipeline(input: {
   now: Date;
   dbPath?: string;
-  ingest: () => Promise<{ items: Array<{ id: string; sourceId: string; url: string; title: string; publishedAt: string | null; dedupeKey: string }> }>;
+  ingest: () => Promise<{ items: Array<{ id: string; sourceId: string; url: string; title: string; publishedAt: string | null; dedupeKey: string; normalizedItem?: NormalizedItem }> }>;
   fetchItem: (item: { id: string; url: string; title: string }) => Promise<{ rawContent: string; cleanContent: string; fetchMethod: string }>;
   enrichItem: (item: { id: string; title: string; clean_content: string | null }) => Promise<{
     summary: string;
@@ -62,6 +63,9 @@ export async function runPipeline(input: {
   const threshold = evaluatePublishThreshold({ totalItems, successfulItems, failedItems });
 
   let deferredItems = 0;
+  let readyItems: NormalizedItem[] = [];
+  let html: string | undefined;
+
   if (threshold.publishable) {
     for (const item of items.filter((entry) => entry.final_status !== 'ready')) {
       markDeferredForRetry(db, item.id, `retry-${runId}`);
@@ -76,8 +80,10 @@ export async function runPipeline(input: {
       deferredItems,
     });
 
-    const readyItems = (listItemsForRun(db, runId) as Array<{ final_status: string }>).filter((item) => item.final_status === 'ready');
-    const html = input.render(readyItems);
+    readyItems = (listItemsForRun(db, runId) as Array<{ final_status: string; normalized_item_json?: string | null }>).
+      filter((item) => item.final_status === 'ready').
+      map((item) => item.normalized_item_json ? reviveNormalizedItem(JSON.parse(item.normalized_item_json)) : item);
+    html = input.render(readyItems);
     await input.publish(html);
   } else {
     for (const item of items.filter((entry) => entry.final_status !== 'ready')) {
@@ -95,5 +101,13 @@ export async function runPipeline(input: {
   }
 
   db.close();
-  return { publishable: threshold.publishable, failedItems, totalItems, deferredItems };
+  return { publishable: threshold.publishable, failedItems, totalItems, deferredItems, items: readyItems, html };
+}
+
+function reviveNormalizedItem(value: NormalizedItem): NormalizedItem {
+  return {
+    ...value,
+    published_at: value.published_at ? new Date(value.published_at) : null,
+    fetched_at: new Date(value.fetched_at),
+  };
 }
