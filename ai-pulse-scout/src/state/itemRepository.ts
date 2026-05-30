@@ -175,6 +175,49 @@ export function markDeferredForRetry(db: PipelineDb, itemId: string, nextRunId: 
   ).run(nextRunId, new Date().toISOString(), itemId);
 }
 
+export function recordAttempt(
+  db: PipelineDb,
+  itemId: string,
+  input: {
+    stage: string;
+    attemptNumber: number;
+    startedAt: string;
+    completedAt: string | null;
+    durationMs: number | null;
+    outcome: string;
+    errorMessage: string | null;
+  },
+): void {
+  const itemKey = getLatestItemKey(db, itemId);
+  db.prepare(
+    `INSERT INTO item_attempts (
+      id, item_key, stage, attempt_number, started_at, completed_at, duration_ms, outcome, error_message
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(
+    `${itemKey}:${input.stage}:${input.attemptNumber}`,
+    itemKey,
+    input.stage,
+    input.attemptNumber,
+    input.startedAt,
+    input.completedAt,
+    input.durationMs,
+    input.outcome,
+    input.errorMessage,
+  );
+}
+
+export function listAttemptsForItem(db: PipelineDb, itemId: string) {
+  return db
+    .prepare(
+      `SELECT item_attempts.*
+       FROM item_attempts
+       JOIN items ON items.item_key = item_attempts.item_key
+       WHERE items.id = ?
+       ORDER BY item_attempts.started_at ASC`,
+    )
+    .all(itemId);
+}
+
 export function listItemsForRun(db: PipelineDb, runId: string) {
   return db.prepare(`SELECT * FROM items WHERE run_id = ? ORDER BY created_at ASC`).all(runId);
 }

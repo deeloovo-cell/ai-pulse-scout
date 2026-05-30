@@ -43,6 +43,14 @@ export function updateRunCounters(
   );
 }
 
+export function markRunPublished(db: PipelineDb, runId: string, publishedAt: string): void {
+  db.prepare(
+    `UPDATE runs
+     SET status = 'published', published_at = ?, completed_at = ?
+     WHERE id = ?`,
+  ).run(publishedAt, publishedAt, runId);
+}
+
 export function getRunById(db: PipelineDb, runId: string) {
   return db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId);
 }

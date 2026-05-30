@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 import { openPipelineDb, initializePipelineSchema } from '../state/db.js';
-import { createRun, markRunReadyForProcessing, updateRunCounters } from '../state/runRepository.js';
+import { createRun, markRunPublished, markRunReadyForProcessing, updateRunCounters } from '../state/runRepository.js';
 import {
   insertDiscoveredItems,
   listItemsForRun,
@@ -85,6 +85,7 @@ export async function runPipeline(input: {
       map((item) => item.normalized_item_json ? reviveNormalizedItem(JSON.parse(item.normalized_item_json)) : item);
     html = input.render(readyItems);
     await input.publish(html);
+    markRunPublished(db, runId, new Date().toISOString());
   } else {
     for (const item of items.filter((entry) => entry.final_status !== 'ready')) {
       markDeferredForRetry(db, item.id, `retry-${runId}`);
