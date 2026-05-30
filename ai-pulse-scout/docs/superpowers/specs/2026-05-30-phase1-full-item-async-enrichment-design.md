@@ -5,20 +5,27 @@ Branch: `feature/ai-pulse-scout-mvp`
 
 ## Summary
 
-This design defines Phase 1 of the next AI Pulse Scout evolution: move from a single long-running synchronous digest job to a persisted run-based pipeline that can process all discovered items, perform required LLM enrichment for every item, and publish only after the full run reaches a terminal state.
+This design defines Phase 1 of the next AI Pulse Scout evolution: move from a single long-running synchronous digest job to a persisted run-based pipeline that can process all discovered items, perform required LLM enrichment for every item when processing succeeds, and publish once the run has crossed a defined completion threshold.
 
-The key constraint is not “allow partial publishing.” The key constraint is the opposite: every discovered item in the run must be processed before publication. The system therefore needs to eliminate timeout risk by changing the execution model rather than by merely increasing one global timeout.
+The key operational rule for this phase is:
+
+- try to process all discovered items,
+- but do not block publication forever on a minority of bad items,
+- and allow publication when failed items are no more than 50% of total discovered items.
+
+Failed items must be explicitly marked and carried into later retry/send handling rather than silently disappearing.
 
 The chosen approach is a medium-scope architectural upgrade that keeps the current Node/TypeScript and script-driven structure, while adding SQLite persistence, explicit run/item state tracking, and asynchronous worker stages for content fetch and enrichment.
 
 ## Goals
 
 - Ensure every discovered item enters the processing pipeline for the run.
-- Ensure every item receives required LLM enrichment coverage in Phase 1.
+- Ensure every item is attempted for required LLM enrichment coverage in Phase 1.
 - Eliminate dependence on one monolithic synchronous job that must finish end-to-end before timing out.
-- Publish only when the run is complete.
+- Publish when the run crosses a defined completion threshold, rather than waiting for perfect success.
 - Preserve the current repository’s script-first operational model rather than introducing external infrastructure.
 - Create a durable foundation for later web publishing and human feedback loops.
+- Explicitly track and preserve failed items for retry in a later send.
 
 ## Non-Goals
 
@@ -31,8 +38,10 @@ The chosen approach is a medium-scope architectural upgrade that keeps the curre
 ## Constraints Confirmed
 
 - Scope is limited to Phase 1.
-- All discovered items in a run must be processed.
-- Publication happens only after the entire run is complete.
+- All discovered items in a run should be attempted.
+- Publication does not require perfect completion.
+- Publication is allowed when failed items are no more than 50% of total discovered items.
+- Failed items must be marked and retried in a later send.
 - The publish schedule is window-based rather than pinned to one exact minute.
 - Engineering change scope should be medium-sized: larger than a tactical patch, smaller than a full rewrite.
 
@@ -55,7 +64,7 @@ The system must instead:
 - persist every item,
 - persist processing progress,
 - allow asynchronous worker progress inside the publish window,
-- and gate publication on run completion rather than on one process staying alive for the entire duration.
+- and gate publication on a defined success/failure threshold rather than on one process staying alive for the entire duration.
 
 ## Options Considered
 
@@ -79,7 +88,7 @@ Keep the current Node/TypeScript script structure, but add SQLite persistence, e
 **Pros**
 - Solves the actual timeout problem.
 - Preserves local simplicity.
-- Enables retries, progress tracking, and deterministic publish gating.
+- Enables retries, progress tracking, threshold-based publish gating, and deterministic carry-forward of failed items.
 - Naturally supports later website and feedback work.
 
 **Cons**
@@ -105,7 +114,7 @@ AI Pulse Scout Phase 1 will adopt:
 - SQLite persistence,
 - a run/item state machine,
 - asynchronous fetch and enrichment workers,
-- and publish gating that requires the run to reach full terminal-state completion before publication.
+- and publish gating that allows publication once the run has crossed a defined completion threshold and failed items remain within tolerance.
 
 This is intentionally a pipeline redesign, not merely a timeout increase.
 
@@ -131,7 +140,7 @@ Responsibilities:
 - persist item records,
 - mark items ready for downstream processing.
 
-This stage is responsible for establishing the run ledger. After it completes, the system has a durable list of everything that must be processed before publication is allowed.
+This stage is responsible for establishing the run ledger. After it completes, the system has a durable list of everything that should be attempted before publication can be evaluated.
 
 ### Stage 2: Fetch Content
 
@@ -151,18 +160,19 @@ Responsibilities:
 - write structured enrichment output,
 - record model usage and latency,
 - retry transient failures,
-- transition items into terminal success or terminal failure states.
+- transition items into success, retryable, or terminal failure states.
 
-Phase 1 requires full-item coverage, but the “required enrichment” set must still be bounded and predictable. Every item must receive the required schema, not necessarily the most expensive imaginable enrichment.
+Phase 1 requires full-item attempt coverage, but the “required enrichment” set must stay bounded and predictable. Every item should be attempted for the required schema, but publication must not wait forever for the minority of items that repeatedly fail.
 
 ### Stage 4: Publish
 
 Responsibilities:
-- verify that the run has no non-terminal items remaining,
-- assemble the final digest from persisted results,
+- verify that the run has reached a publishable threshold,
+- assemble the final digest from persisted successful results,
 - render the publish artifact,
 - publish/send,
-- mark the run published.
+- mark the run published,
+- preserve failed items for later retry/send.
 
 Publish never invokes fresh fetch or fresh LLM enrichment. It reads completed state.
 
@@ -183,8 +193,8 @@ Proposed run states:
 
 Interpretation:
 - `ready_for_processing`: collection and dedupe are complete; workers may proceed.
-- `processing`: at least one item is still non-terminal.
-- `ready_to_publish`: all items are terminal.
+- `processing`: the run is still being worked and publish eligibility has not yet been reached.
+- `ready_to_publish`: the run has crossed the publish threshold.
 - `published`: final artifact sent or posted successfully.
 
 ### Item States
@@ -212,30 +222,36 @@ Recommended item state dimensions:
   - `ready`
   - `fetch_failed`
   - `enrichment_failed`
-  - `skipped_by_policy`
+  - `deferred_for_retry`
   - `published`
 
-The final status is what matters for publish gating.
+The final status is what matters for publish gating and carry-forward handling.
 
-## Terminal-State Rule
+## Publish Threshold Rule
 
 This is the most important semantic rule in the design.
 
-Publication requires **all items in the run to be terminal**, not necessarily all to be successful.
+Publication does **not** require all items in the run to be terminal, and does **not** require all items to succeed.
 
-Allowed terminal states:
-- `ready` (successful fetch + successful enrichment)
+Instead, a run becomes publishable when both are true:
+
+1. enough items have finished successfully to produce the day’s digest, and
+2. the number of failed items is **no more than 50% of total discovered items**.
+
+Failed items are those whose final status is one of:
 - `fetch_failed`
 - `enrichment_failed`
-- `skipped_by_policy`
 
-This avoids a deadlock where one permanently bad URL prevents the digest from ever being released.
+Successful publishable items are those whose final status is:
+- `ready`
 
-In other words, “complete” means “all items have been fully adjudicated,” not “all items succeeded.”
+Items that are still retryable at the publish point should be converted into `deferred_for_retry` or equivalent carry-forward tracking and excluded from the current digest.
+
+This avoids a deadlock where a minority of permanently bad or slow items prevents the digest from being released. It also matches the user’s operational rule: if errors stay within 50%, publish now, mark the failed items, and try them again on the next send.
 
 ## Required Enrichment Schema
 
-Phase 1 requires every item to receive one bounded, required enrichment payload. The exact field names can align with current project terminology, but the schema should stay intentionally limited so throughput remains predictable.
+Phase 1 requires every item to be attempted with one bounded, required enrichment payload. The exact field names can align with current project terminology, but the schema should stay intentionally limited so throughput remains predictable.
 
 Recommended required fields:
 - normalized summary,
@@ -265,6 +281,7 @@ Suggested fields:
 - `terminal_items`
 - `successful_items`
 - `failed_items`
+- `deferred_items`
 - `metadata_json`
 
 #### `items`
@@ -282,6 +299,7 @@ Suggested fields:
 - `retry_count_fetch`
 - `retry_count_enrichment`
 - `priority`
+- `carry_forward_run_id`
 - `created_at`
 - `updated_at`
 
@@ -348,7 +366,7 @@ Characteristics:
 - structured retries,
 - deterministic transition to terminal failure after retry budget is exhausted.
 
-The enrichment pool should operate only on items whose content stage has completed successfully or whose existing metadata is sufficient per policy.
+The enrichment pool should operate only on items whose content stage has completed successfully or whose existing metadata is sufficient per policy. Items that miss the publish window or exhaust retry budget should be explicitly marked for next-run retry or terminal failure rather than silently disappearing.
 
 ## Scheduling Model
 
@@ -358,19 +376,22 @@ Recommended operational flow:
 1. create the run at or before the publish window,
 2. perform collection,
 3. start fetch/enrichment workers,
-4. continue processing until all items reach terminal state,
-5. publish immediately upon run readiness.
+4. continue processing through the window,
+5. publish once the run crosses the success threshold and the failed-item share is still at or below 50%,
+6. retain failed items for retry on the next send.
 
-This preserves the user’s “publish only when complete” rule while removing the need to finish the entire system in one synchronous command execution.
+This preserves the user’s updated rule while removing the need to finish the entire system in one synchronous command execution.
 
 ## Publish Gating Logic
 
 A run is publishable only when all of the following are true:
 
-- no items remain in `pending` or `running` stage states,
-- every item has a terminal `final_status`,
+- the count of failed items is at or below 50% of total discovered items,
+- there are enough `ready` items to render a meaningful digest,
 - the run has not already been published,
 - final artifact generation succeeds.
+
+Items may still exist in non-terminal retryable states at publish time, but those items must be excluded from the current digest and carried forward for retry/next-send handling.
 
 The publish job must be idempotent. Re-running publish after a crash should either complete safely or detect that publication already happened.
 
@@ -388,7 +409,14 @@ Policy:
 Policy:
 - retry transient LLM/provider failures,
 - record terminal `enrichment_failed` when retry budget is exhausted,
-- keep the item in the run and allow the run to complete once all items are terminal.
+- keep the item in the run and allow the run to publish if the threshold policy is still satisfied.
+
+### Deferred Retry Handling
+
+Policy:
+- items that are still incomplete but not worth blocking publication should be marked `deferred_for_retry`,
+- those items should be visible in reporting,
+- and they should be eligible for inclusion in the next send/run according to carry-forward policy.
 
 ### Run Failure
 
@@ -398,7 +426,7 @@ A run should move to `failed` only for true systemic cases, for example:
 - a fatal orchestration bug,
 - or publication artifact generation irrecoverably fails.
 
-Normal bad items should not fail the run.
+Normal bad items should not fail the run. A run should fail only when it cannot even evaluate or publish against the threshold policy.
 
 ## Observability Requirements
 
@@ -410,9 +438,11 @@ Minimum useful run-level reporting:
 - fetch done / failed counts,
 - enrichment done / failed counts,
 - items remaining,
+- current failed-item ratio,
+- whether the run has crossed the publish threshold,
 - per-stage duration,
 - slowest sources or items,
-- final terminal-state distribution.
+- final status distribution.
 
 This should be available both in logs and in an inspectable persisted form.
 
@@ -452,12 +482,15 @@ Testing should cover:
    - transient failures retry; terminal failures settle correctly.
 
 4. **publish gating**
-   - publish does not trigger until all items are terminal.
+   - publish does not trigger until the failed-item ratio is within policy and enough successful items exist.
 
 5. **idempotency**
    - rerunning worker or publish commands after interruption is safe.
 
-6. **migration compatibility**
+6. **carry-forward behavior**
+   - deferred or failed items are retained for next-send retry handling.
+
+7. **migration compatibility**
    - existing digest output still renders from persisted enriched items.
 
 ## Risks and Trade-Offs
@@ -472,14 +505,16 @@ SQLite is sufficient here, but worker claiming and updates must be done carefull
 
 ### Cost growth from full-item enrichment
 
-Because all items now require enrichment coverage, provider cost and total throughput pressure may increase. That is acceptable for Phase 1 only if the required schema remains bounded.
+Because all items now require enrichment attempts, provider cost and total throughput pressure may increase. That is acceptable for Phase 1 only if the required schema remains bounded.
 
-### Terminal-state publishing means some items may fail
+### Threshold-based publishing means some items may be deferred
 
-This is an explicit trade-off. The run can finish and publish even when some items are terminal failures. The alternative is an operationally brittle system that can deadlock forever.
+This is an explicit trade-off. The run can publish while some items have failed or are deferred for retry, as long as those failures remain within the 50% tolerance. The alternative is an operationally brittle system that can deadlock forever.
 
 ## Final Decision
 
-Phase 1 will be implemented as a medium-scope architecture upgrade that introduces SQLite-backed persistence, run/item state tracking, separate fetch and enrichment workers, and publish gating based on full terminal-state completion of the run.
+Phase 1 will be implemented as a medium-scope architecture upgrade that introduces SQLite-backed persistence, run/item state tracking, separate fetch and enrichment workers, and publish gating based on a tolerated failed-item threshold.
 
-This is the smallest design that meaningfully solves the user’s core requirement: process all items with required LLM enrichment and publish only after the whole run is complete, without depending on one monolithic synchronous job to survive end-to-end.
+The concrete policy for this phase is: if failed items are no more than 50% of total discovered items, publish the successful subset, mark failed items explicitly, and carry them into later retry/send handling.
+
+This is the smallest design that meaningfully solves the user’s updated core requirement: attempt all items, enrich as many as possible, avoid timeout-driven deadlock, and publish once error volume stays within an acceptable operational boundary.
