@@ -63,7 +63,7 @@ describe('renderHtmlEmail webpage quality rendering', () => {
 
     expect(html).toContain('Recovered article link');
     expect(html).toContain('https://example.com/blog/post-1');
-    expect(html).toContain('Read source');
+    expect(html).toContain('查看来源（Web Source）');
     expect(html).not.toContain('link_only');
     expect(html).not.toContain('detail_fetch_failed');
     expect(html).not.toContain('listing_page_candidate');
