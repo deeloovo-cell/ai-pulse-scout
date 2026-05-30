@@ -1,0 +1,132 @@
+# AI Pulse Scout -- Source Registry
+# Synced from config/source-inbox.md.
+# Current inbox contains only https://arxiv.org/, so production sources are
+# the canonical arXiv RSS expansions used by the digest pipeline.
+
+sources:
+  - name: "arXiv CS.AI"
+    category: research
+    url: "https://arxiv.org/rss/cs.AI"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.LG"
+    category: research
+    url: "https://arxiv.org/rss/cs.LG"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.CL"
+    category: research
+    url: "https://arxiv.org/rss/cs.CL"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.CV"
+    category: research
+    url: "https://arxiv.org/rss/cs.CV"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.NE"
+    category: research
+    url: "https://arxiv.org/rss/cs.NE"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.MA"
+    category: research
+    url: "https://arxiv.org/rss/cs.MA"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.IR"
+    category: research
+    url: "https://arxiv.org/rss/cs.IR"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.RO"
+    category: research
+    url: "https://arxiv.org/rss/cs.RO"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.HC"
+    category: research
+    url: "https://arxiv.org/rss/cs.HC"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.SI"
+    category: research
+    url: "https://arxiv.org/rss/cs.SI"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv STAT.ML"
+    category: research
+    url: "https://arxiv.org/rss/stat.ML"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.CE"
+    category: research
+    url: "https://arxiv.org/rss/cs.CE"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.CG"
+    category: research
+    url: "https://arxiv.org/rss/cs.CG"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.GR"
+    category: research
+    url: "https://arxiv.org/rss/cs.GR"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.SY"
+    category: research
+    url: "https://arxiv.org/rss/cs.SY"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv EESS.IV"
+    category: research
+    url: "https://arxiv.org/rss/eess.IV"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.CY"
+    category: research
+    url: "https://arxiv.org/rss/cs.CY"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "arXiv CS.SE"
+    category: research
+    url: "https://arxiv.org/rss/cs.SE"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.env
+data/state/*.json
+data/state/*.jsonl
+data/cache/
+data/logs/
+data/output/

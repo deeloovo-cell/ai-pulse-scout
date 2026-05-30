@@ -1,0 +1,15 @@
+# AI Pulse Scout — Email Configuration
+
+email:
+  # Primary recipient
+  to: "deeloovo@gmail.com"
+
+  # Sender display name and address (must match SMTP credentials)
+  from_name: "AI Pulse Scout"
+  from_address: ""  # Override with SMTP_USER from .env
+
+  # Subject format — {date} = MM-DD-YYYY, {count} = item count
+  subject_template: "AI Pulse Scout — {date} | {count} signals"
+
+  # Reply-to address (optional)
+  reply_to: ""

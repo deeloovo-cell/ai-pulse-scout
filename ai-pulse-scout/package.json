@@ -1,0 +1,39 @@
+{
+  "name": "ai-pulse-scout",
+  "version": "0.1.0",
+  "description": "Config-driven AI news digest — fetches RSS, deduplicates, scores, renders HTML email, sends via SMTP",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "preview": "tsx src/cli/preview.ts",
+    "send-test": "tsx src/cli/sendTest.ts",
+    "send-daily": "tsx src/cli/sendTest.ts",
+    "backfill": "tsx src/cli/backfill.ts",
+    "validate-sources": "tsx src/cli/validateSources.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "schedule:install": "bash scripts/install-schedule.sh",
+    "schedule:uninstall": "bash scripts/uninstall-schedule.sh",
+    "schedule:status": "launchctl list com.ai-pulse-scout.daily 2>/dev/null || echo 'Not loaded'",
+    "coverage:sources": "tsx src/cli/coverage.ts",
+    "pipeline:run": "tsx src/cli/runPipeline.ts",
+    "review:web": "tsx src/cli/reviewServer.ts"
+  },
+  "dependencies": {
+    "@types/better-sqlite3": "^7.6.13",
+    "better-sqlite3": "^12.10.0",
+    "date-fns": "^3.6.0",
+    "dotenv": "^16.4.5",
+    "js-yaml": "^4.1.0",
+    "nodemailer": "^6.9.13",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^6.4.14",
+    "tsx": "^4.15.0",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}
