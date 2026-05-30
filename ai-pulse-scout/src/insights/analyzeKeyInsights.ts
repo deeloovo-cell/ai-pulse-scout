@@ -31,43 +31,49 @@ export interface KeyInsightOptions {
   fetchFullPosts?: boolean;
 }
 
-export async function enrichKeyInsights(
-  items: NormalizedItem[],
+export async function enrichSingleItem(
+  item: NormalizedItem,
   options: KeyInsightOptions = {},
-): Promise<NormalizedItem[]> {
+): Promise<NormalizedItem> {
   const client = resolveLlmClient(options);
   if (!client) {
     logger.info('DEEPSEEK_API_KEY not set (and GLM_API_KEY fallback missing) -- using feed excerpts as key insights.');
-    return items.map((item) => attachFallbackInsight(item));
+    return attachFallbackInsight(item);
   }
 
   const fetchFullPosts =
     options.fetchFullPosts ??
     (process.env.DEEPSEEK_FETCH_FULL_POSTS ?? process.env.GLM_FETCH_FULL_POSTS) !== 'false';
 
+  try {
+    const articleText = fetchFullPosts ? await fetchArticleText(item.item_url) : null;
+    const raw = await requestChatCompletion(
+      client,
+      [
+        { role: 'system', content: ITEM_SYSTEM_PROMPT },
+        {
+          role: 'user',
+          content: `Analyze this item for the daily manufacturing AI digest.\n\n${buildArticleContext(item, articleText)}`,
+        },
+      ],
+      900,
+    );
+    return applyInsightResponse(item, raw);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.warn(`Executive insight analysis failed for "${item.title}": ${message}`);
+    return attachFallbackInsight(item);
+  }
+}
+
+export async function enrichKeyInsights(
+  items: NormalizedItem[],
+  options: KeyInsightOptions = {},
+): Promise<NormalizedItem[]> {
   const enriched: NormalizedItem[] = [];
   for (const item of items) {
-    try {
-      const articleText = fetchFullPosts ? await fetchArticleText(item.item_url) : null;
-      const raw = await requestChatCompletion(
-        client,
-        [
-          { role: 'system', content: ITEM_SYSTEM_PROMPT },
-          {
-            role: 'user',
-            content: `Analyze this item for the daily manufacturing AI digest.\n\n${buildArticleContext(item, articleText)}`,
-          },
-        ],
-        900,
-      );
-      enriched.push(applyInsightResponse(item, raw));
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      logger.warn(`Executive insight analysis failed for "${item.title}": ${message}`);
-      enriched.push(attachFallbackInsight(item));
-    }
+    enriched.push(await enrichSingleItem(item, options));
   }
-
   return enriched;
 }
 
