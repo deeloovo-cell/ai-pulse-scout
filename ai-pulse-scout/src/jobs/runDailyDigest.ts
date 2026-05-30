@@ -2,6 +2,8 @@ import { loadConfig } from '../config/loadConfig.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { saveSuccessfulRun } from '../state/runState.js';
 import { appendToLedger } from '../state/ledger.js';
+import { openPipelineDb, initializePipelineSchema } from '../state/db.js';
+import { saveDigestReviewItems } from '../state/reviewRepository.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
 import { logger } from '../utils/logger.js';
 import type { MailClient } from '../mail/MailClient.js';
@@ -148,6 +150,27 @@ export async function runDailyDigest(
   });
   const datePart = now.toISOString().slice(0, 10);
   const outputPath = pipelineResult.outputPath ?? join(OUTPUT_DIR, `digest-${datePart}.html`);
+
+  if (pipelineDbPath) {
+    const reviewDb = openPipelineDb(pipelineDbPath);
+    initializePipelineSchema(reviewDb);
+    saveDigestReviewItems(reviewDb, {
+      digestDate: datePart,
+      runId: `run-${now.toISOString()}`,
+      items: typedItems.map((item) => ({
+        itemKey: item.id,
+        publishedAt: item.published_at ? item.published_at.toISOString() : null,
+        title: item.title,
+        excerpt: item.summary || item.content_text.slice(0, 240),
+        itemUrl: item.item_url,
+        sourceName: item.source_name,
+        topicTags: item.tags.length > 0 ? item.tags : [item.primary_topic],
+        matchScore: item.relevance_scores?.overall ?? 0,
+        normalizedItemJson: JSON.stringify(item),
+      })),
+    });
+    reviewDb.close();
+  }
 
   pipelineResultCache.subject = subject;
   pipelineResultCache.items = typedItems;

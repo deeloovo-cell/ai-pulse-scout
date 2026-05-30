@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import { mkdtempSync } from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 import type { NormalizedItem } from '../../src/types/item.js';
+import { openPipelineDb, initializePipelineSchema } from '../../src/state/db.js';
+import { listReviewItemsWindow } from '../../src/state/reviewRepository.js';
 
 const runPipelineMock = vi.fn();
 
@@ -44,13 +49,34 @@ describe('runDailyDigest pipeline integration', () => {
       outputPath: '/tmp/digest.html',
     });
 
+    const dir = mkdtempSync(join(tmpdir(), 'ai-pulse-review-snapshots-'));
+    const dbPath = join(dir, 'pipeline.sqlite');
+    process.env.PIPELINE_DB_PATH = dbPath;
+    const db = openPipelineDb(dbPath);
+    initializePipelineSchema(db);
+    db.close();
+
     const { runDailyDigest } = await import('../../src/jobs/runDailyDigest.js');
     const result = await runDailyDigest(null, false);
+
+    const verifyDb = openPipelineDb(dbPath);
+    initializePipelineSchema(verifyDb);
+    const digestDate = new Date().toISOString().slice(0, 10);
+    const reviewItems = listReviewItemsWindow(verifyDb, {
+      startDigestDate: digestDate,
+      endDigestDate: digestDate,
+    });
 
     expect(runPipelineMock).toHaveBeenCalledOnce();
     expect(result.subject).toBe('AI Digest');
     expect(result.itemCount).toBe(1);
     expect(result.totalFetched).toBe(2);
     expect(result.outputPath).toBe('/tmp/digest.html');
+    expect(reviewItems.map((item) => item.itemKey).sort()).toEqual(
+      result.items.map((item) => item.id).sort(),
+    );
+
+    delete process.env.PIPELINE_DB_PATH;
+    verifyDb.close();
   });
 });
