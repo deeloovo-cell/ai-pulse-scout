@@ -1,11 +1,13 @@
 import { join } from 'node:path';
 import { openPipelineDb, initializePipelineSchema } from '../state/db.js';
-import { createRun, markRunPublished, markRunReadyForProcessing, updateRunCounters } from '../state/runRepository.js';
+import { createRun, markRunCompletedNotPublished, markRunPublished, markRunReadyForProcessing, updateRunCounters } from '../state/runRepository.js';
 import {
   insertDiscoveredItems,
+  listAttemptsForItem,
   listItemsForRun,
   markEnrichmentFailed,
   markDeferredForRetry,
+  recordAttempt,
 } from '../state/itemRepository.js';
 import { runFetchWorkerOnce } from './fetchWorker.js';
 import { runEnrichmentWorkerOnce } from './enrichmentWorker.js';
@@ -48,10 +50,22 @@ export async function runPipeline(input: {
     try {
       const worked = await runEnrichmentWorkerOnce(db, input.enrichItem);
       if (!worked) break;
-    } catch {
+    } catch (error) {
       const items = listItemsForRun(db, runId) as Array<{ id: string; enrichment_status: string }>;
       const running = items.find((item) => item.enrichment_status === 'running');
-      if (running) markEnrichmentFailed(db, running.id);
+      if (running) {
+        markEnrichmentFailed(db, running.id);
+        const priorAttempts = listAttemptsForItem(db, running.id).filter((attempt: any) => attempt.stage === 'enrichment').length;
+        recordAttempt(db, running.id, {
+          stage: 'enrichment',
+          attemptNumber: priorAttempts + 1,
+          startedAt: new Date().toISOString(),
+          completedAt: new Date().toISOString(),
+          durationMs: 0,
+          outcome: 'failed',
+          errorMessage: error instanceof Error ? error.message : String(error),
+        });
+      }
     }
   }
 
@@ -99,6 +113,7 @@ export async function runPipeline(input: {
       failedItems,
       deferredItems,
     });
+    markRunCompletedNotPublished(db, runId, new Date().toISOString());
   }
 
   db.close();

@@ -51,6 +51,14 @@ export function markRunPublished(db: PipelineDb, runId: string, publishedAt: str
   ).run(publishedAt, publishedAt, runId);
 }
 
+export function markRunCompletedNotPublished(db: PipelineDb, runId: string, completedAt: string): void {
+  db.prepare(
+    `UPDATE runs
+     SET status = 'completed_not_published', completed_at = ?
+     WHERE id = ?`,
+  ).run(completedAt, runId);
+}
+
 export function getRunById(db: PipelineDb, runId: string) {
   return db.prepare(`SELECT * FROM runs WHERE id = ?`).get(runId);
 }
