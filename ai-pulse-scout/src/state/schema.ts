@@ -76,4 +76,25 @@ export const SCHEMA_STATEMENTS = [
     error_message TEXT,
     FOREIGN KEY(item_key) REFERENCES items(item_key)
   )`,
+  `CREATE TABLE IF NOT EXISTS digest_review_items (
+    digest_date TEXT NOT NULL,
+    run_id TEXT NOT NULL,
+    item_key TEXT NOT NULL,
+    published_at TEXT,
+    title TEXT NOT NULL,
+    excerpt TEXT NOT NULL,
+    item_url TEXT,
+    source_name TEXT,
+    topic_tags_json TEXT NOT NULL,
+    match_score REAL NOT NULL DEFAULT 0,
+    normalized_item_json TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (digest_date, item_key)
+  )`,
+  `CREATE TABLE IF NOT EXISTS digest_item_reviews (
+    item_key TEXT PRIMARY KEY,
+    rating INTEGER,
+    follow_up INTEGER NOT NULL DEFAULT 0,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  )`,
 ] as const;
