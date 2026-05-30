@@ -23,12 +23,12 @@ export function resolveLlmClient(options: {
   model?: string;
   baseUrl?: string;
 }): LlmClientConfig | null {
-  const apiKey = options.apiKey ?? process.env.DEEPSEEK_API_KEY ?? process.env.GLM_API_KEY;
+  const apiKey = options.apiKey ?? process.env.DEEPSEEK_API_KEY;
   if (!apiKey) return null;
 
-  const model = options.model ?? process.env.DEEPSEEK_MODEL ?? process.env.GLM_MODEL ?? 'deepseek-v3.2';
+  const model = options.model ?? process.env.DEEPSEEK_MODEL ?? 'deepseek-v3.2';
   const baseUrl =
-    options.baseUrl ?? process.env.DEEPSEEK_BASE_URL ?? process.env.GLM_BASE_URL ?? DEFAULT_DEEPSEEK_BASE_URL;
+    options.baseUrl ?? process.env.DEEPSEEK_BASE_URL ?? DEFAULT_DEEPSEEK_BASE_URL;
 
   return {
     apiKey,

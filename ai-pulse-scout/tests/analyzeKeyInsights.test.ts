@@ -37,7 +37,7 @@ describe('enrichKeyInsights', () => {
     vi.unstubAllGlobals();
   });
 
-  it('prefers DEEPSEEK env vars and falls back to GLM env vars', async () => {
+  it('uses DEEPSEEK env vars only and ignores legacy non-DeepSeek env vars', async () => {
     const originalEnv = { ...process.env };
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
@@ -75,21 +75,16 @@ describe('enrichKeyInsights', () => {
     delete process.env.DEEPSEEK_API_KEY;
     delete process.env.DEEPSEEK_BASE_URL;
     delete process.env.DEEPSEEK_MODEL;
-    process.env.GLM_API_KEY = 'glm-fallback-key';
-    process.env.GLM_BASE_URL = 'https://fallback.example/v1';
-    process.env.GLM_MODEL = 'fallback-model';
+    process.env.GLM_API_KEY = 'legacy-key';
+    process.env.GLM_BASE_URL = 'https://legacy.example/v1';
+    process.env.GLM_MODEL = 'legacy-model';
 
     const [fallbackItem] = await enrichKeyInsights([makeItem()], {
       fetchFullPosts: false,
     });
 
-    expect(fallbackItem.key_insight).toBe('DeepSeek-compatible insight.');
-    expect(fetchMock).toHaveBeenLastCalledWith(
-      'https://fallback.example/v1/chat/completions',
-      expect.objectContaining({
-        body: expect.stringContaining('"model":"fallback-model"'),
-      }),
-    );
+    expect(fallbackItem.key_insight).toBe('New agentic AI framework for industrial use.');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
 
     process.env = originalEnv;
   });

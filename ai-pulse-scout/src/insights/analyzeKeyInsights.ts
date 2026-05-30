@@ -37,13 +37,13 @@ export async function enrichSingleItem(
 ): Promise<NormalizedItem> {
   const client = resolveLlmClient(options);
   if (!client) {
-    logger.info('DEEPSEEK_API_KEY not set (and GLM_API_KEY fallback missing) -- using feed excerpts as key insights.');
+    logger.info('DEEPSEEK_API_KEY not set -- using feed excerpts as key insights.');
     return attachFallbackInsight(item);
   }
 
   const fetchFullPosts =
     options.fetchFullPosts ??
-    (process.env.DEEPSEEK_FETCH_FULL_POSTS ?? process.env.GLM_FETCH_FULL_POSTS) !== 'false';
+    process.env.DEEPSEEK_FETCH_FULL_POSTS !== 'false';
 
   try {
     const articleText = fetchFullPosts ? await fetchArticleText(item.item_url) : null;
