@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     globals: false,
     environment: 'node',
+    pool: 'forks',
     include: ['tests/**/*.test.ts'],
   },
 });
