@@ -225,3 +225,117 @@ When using long inline scripts for Notion block assembly, either build `children
 - Related Files: /Users/aactest/.openclaw/workspace
 
 ---
+
+
+## [ERR-20260521-001] notion-kb-db-resolution
+
+**Logged**: 2026-05-21T15:42:00Z
+**Priority**: high
+**Status**: pending
+**Area**: infra
+
+### Summary
+Local Notion KB helper pointed to a database id that is no longer accessible to the integration, blocking KB saves.
+
+### Error
+```
+Notion API 错误: Could not find database with ID: 33aec093-c49c-81d9-b581-eddba05a835e. Make sure the relevant pages and databases are shared with your integration "My Notes".
+```
+
+### Context
+- Operation attempted: inspect/write KB target database for a `KB:` ingestion request
+- Working local helper file: `tmp_notion_db_inspect.mjs`
+- The script can read one database metadata response path but subsequent query path fails with inaccessible/stale database id.
+
+### Suggested Fix
+Discover the current DL-KB database/page id through search or refresh the local helper configuration, then update the KB workflow to use that canonical target.
+
+### Metadata
+- Reproducible: yes
+- Related Files: tmp_notion_db_inspect.mjs
+
+---
+## [ERR-20260522-001] git_push_github_auth_and_wrong_repo_scope
+
+**Logged**: 2026-05-22T12:16:00Z
+**Priority**: high
+**Status**: pending
+**Area**: config
+
+### Summary
+GitHub push failed due to missing HTTPS credentials, and the commit was made in the nested project repo with only `.DS_Store` files staged.
+
+### Error
+fatal: could not read Username for 'https://github.com': Device not configured
+
+### Context
+- Operation attempted: add remote, commit, and push `feature/ai-pulse-scout-mvp`
+- Repo path used: `/Users/aactest/.config/superpowers/worktrees/workspace/feature/ai-pulse-scout-mvp/ai-pulse-scout`
+- `git add -A` in that repo staged only `.DS_Store` files, indicating the actual project code was already committed or repo scope/placement needs verification before push.
+
+### Suggested Fix
+Verify the correct git repo root and inspect commit history before committing. For push, use configured SSH auth or a logged-in GitHub credential helper instead of unauthenticated HTTPS.
+
+### Metadata
+- Reproducible: yes
+- Related Files: .learnings/ERRORS.md
+- See Also: LRN-20260522-001
+
+---
+## [ERR-20260523-001] long-running coverage exec killed after summary already obtained
+
+**Logged**: 2026-05-23T00:15:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: tests
+
+### Summary
+A long-running `npm run coverage:sources` exec session was later SIGKILLed even though the needed coverage summary had already been emitted earlier.
+
+### Error
+```
+Exec failed (signal SIGKILL) on a stale coverage session after useful output had already been captured.
+```
+
+### Context
+- Command/operation attempted: `npm run coverage:sources`
+- We already had the final coverage summary from a newer run and had committed/pushed based on that evidence.
+- Risk: stale background coverage runs can create noisy completion/failure events after the task is effectively done.
+
+### Suggested Fix
+After capturing the final needed summary from a long-running coverage process, explicitly kill or avoid leaving redundant older sessions running.
+
+### Metadata
+- Reproducible: unknown
+- Related Files: .learnings/ERRORS.md
+
+---
+
+## [ERR-20260530-001] kb_fetch_missing_script
+
+**Logged**: 2026-05-30T08:39:00+08:00
+**Priority**: medium
+**Status**: pending
+**Area**: docs
+
+### Summary
+KB helper script path referenced by the Notion workflow was not present in this workspace, so fallback retrieval had to use direct fetch tools.
+
+### Error
+```
+Error: Cannot find module '/Users/aactest/.openclaw/workspace/scripts/kb_fetch.mjs'
+```
+
+### Context
+- Command attempted: `node scripts/kb_fetch.mjs --url "https://developer.nvidia.com/blog/dynosim-simulating-the-pareto-frontier/" --out /tmp/kb-fetch.json`
+- The notion-ludi skill references local helper scripts that may not exist in every workspace.
+- Use direct `web_fetch` / browser / available Notion tooling when script is absent.
+
+### Suggested Fix
+Either add the referenced helper scripts to the workspace or check for file existence before invoking them.
+
+### Metadata
+- Reproducible: yes
+- Related Files: .learnings/ERRORS.md
+
+---
