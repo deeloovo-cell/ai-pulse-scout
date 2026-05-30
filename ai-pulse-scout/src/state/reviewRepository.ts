@@ -88,6 +88,30 @@ export function upsertItemReview(db: PipelineDb, input: { itemKey: string; ratin
   `).run(input.itemKey, input.rating, input.followUp ? 1 : 0);
 }
 
+export function getItemReviewState(db: PipelineDb, itemKey: string): { rating: number | null; followUp: boolean } {
+  const row = db.prepare(`
+    SELECT rating AS rating, follow_up AS followUp
+    FROM digest_item_reviews
+    WHERE item_key = ?
+  `).get(itemKey) as { rating: number | null; followUp: number } | undefined;
+
+  return {
+    rating: row?.rating ?? null,
+    followUp: Boolean(row?.followUp ?? 0),
+  };
+}
+
+export function reviewItemExists(db: PipelineDb, itemKey: string): boolean {
+  const row = db.prepare(`
+    SELECT 1 AS found
+    FROM digest_review_items
+    WHERE item_key = ?
+    LIMIT 1
+  `).get(itemKey) as { found: number } | undefined;
+
+  return Boolean(row?.found);
+}
+
 export function listReviewItemsWindow(
   db: PipelineDb,
   input: { startDigestDate: string; endDigestDate: string },
