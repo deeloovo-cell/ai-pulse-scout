@@ -6,6 +6,7 @@
   "scripts": {
     "build": "tsc",
     "build:site": "tsx src/cli/buildStaticSite.ts",
+    "publish:site": "tsx src/cli/publishStaticSite.ts",
     "preview": "tsx src/cli/preview.ts",
     "send-test": "tsx src/cli/sendTest.ts",
     "send-daily": "tsx src/cli/sendTest.ts",

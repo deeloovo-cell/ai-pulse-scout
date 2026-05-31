@@ -66,6 +66,24 @@ async function sleep(ms: number): Promise<void> {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const ARXIV_API_TIMEOUT_MS = 3000;
+
+async function fetchWithTimeout(url: URL, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { signal: controller.signal });
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`arXiv API request timed out after ${timeoutMs}ms`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function fetchArxivApiResponse(category: string): Promise<ArxivApiEntry[]> {
   const query = new URL('https://arxiv.org/api/query');
   query.searchParams.set('search_query', `cat:${category}`);
@@ -78,7 +96,7 @@ async function fetchArxivApiResponse(category: string): Promise<ArxivApiEntry[]>
   let lastStatus: number | null = null;
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    const response = await fetch(query);
+    const response = await fetchWithTimeout(query, ARXIV_API_TIMEOUT_MS);
     if (response.ok) {
       const xml = await response.text();
       return parseArxivApiResponse(xml);

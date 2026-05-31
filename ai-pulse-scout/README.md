@@ -159,6 +159,30 @@ For the current repo layout, the working Vercel configuration is:
 - **Build Command:** `npm run build:site`
 - **Output Directory:** `data/output/site`
 
+### Automated morning site publish
+
+The existing 07:00 local launchd job can be wired to automatically build the latest static site and trigger a Vercel deployment so `daily.deanlu.ai` refreshes each morning.
+
+Required environment:
+
+```bash
+VERCEL_DEPLOY_HOOK_URL=https://vercel.com/api/hooks/...
+```
+
+Manual verification:
+
+```bash
+npm run publish:site
+npm run schedule:install
+npm run schedule:status
+```
+
+The automated log file is:
+
+```bash
+data/logs/static-site-publish-YYYY-MM-DD.log
+```
+
 ### Important repo-layout note
 
 The deployable Node project lives inside the nested `ai-pulse-scout/` directory. If Vercel is pointed at the repository root instead, install/build will fail before deployment because the root directory does not contain the project `package.json` / `package-lock.json` used for this site.

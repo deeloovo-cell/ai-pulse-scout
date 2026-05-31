@@ -139,4 +139,20 @@ describe('fetchArxivApiEntries', () => {
     expect(entries.map((entry) => entry.title)).toEqual(['Latest Batch Paper']);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('fails fast when the arxiv api fetch hangs instead of stalling indefinitely', async () => {
+    const fetchMock = vi.fn((_url, init?: RequestInit) =>
+      new Promise((_, reject) => {
+        init?.signal?.addEventListener('abort', () => {
+          const error = new Error('This operation was aborted');
+          error.name = 'AbortError';
+          reject(error);
+        });
+      }),
+    ) as any;
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchLatestArxivApiEntries('cs.AI')).rejects.toThrow(/timed out|aborted/i);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  }, 4000);
 });
