@@ -15,5 +15,7 @@ describe('buildChineseDigestFallback', () => {
     expect(result).toContain('这条');
     expect(result).not.toContain('Abstract:');
     expect(result).not.toContain('This is an English summary.');
+    expect(result).not.toContain('arXiv');
+    expect(result).not.toContain('cs.AI');
   });
 });

@@ -10,7 +10,15 @@ function pickTopicLabel(item: NormalizedItem): string {
 }
 
 function pickSourceLabel(item: NormalizedItem): string {
-  return item.source_name || '来源';
+  const raw = (item.source_name || '').trim();
+  if (!raw) return '该来源';
+
+  if (/arxiv/i.test(raw)) return '该研究来源';
+  if (/github/i.test(raw)) return '该项目来源';
+  if (/hugging\s*face/i.test(raw)) return '该模型来源';
+  if (/substack|newsletter/i.test(raw)) return '该通讯来源';
+
+  return '该来源';
 }
 
 function looksEnglish(text: string): boolean {
@@ -23,12 +31,12 @@ export function buildChineseDigestFallback(item: NormalizedItem): string {
   const detail = item.summary || item.content_text || item.title || '';
 
   if (!detail) {
-    return `这条来自 ${source} 的${topic}更新已进入今日摘要，当前自动提取信息有限，请点击原文查看详情。`;
+    return `这条${topic}更新已进入今日摘要，当前自动提取信息有限；系统已保留原文链接，建议点击查看完整细节。`;
   }
 
   if (looksEnglish(detail)) {
-    return `这条来自 ${source} 的${topic}更新已进入今日摘要，核心内容与「${truncate(item.title, 60)}」相关；系统已保留原文链接，建议点击查看完整细节。`;
+    return `这条${source}的${topic}更新已进入今日摘要，核心内容与「${truncate(item.title, 60)}」相关；系统已保留原文链接，建议点击查看完整细节。`;
   }
 
-  return `这条来自 ${source} 的${topic}更新重点是：${truncate(detail)}`;
+  return `这条${source}的${topic}更新重点是：${truncate(detail)}`;
 }
