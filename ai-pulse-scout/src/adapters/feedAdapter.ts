@@ -7,7 +7,7 @@ import type { FetchStrategy } from '../inbox/types.js';
 import type { SourceConfig } from '../types/config.js';
 import type { ProductionSourceAdapter } from './types.js';
 import { inferPrimaryTopic } from '../topics/inferPrimaryTopic.js';
-import { fetchArxivApiEntriesForSource, isArxivRssSourceUrl } from './arxivApi.js';
+import { fetchArxivApiEntriesForSource, fetchLatestArxivEntriesForSource, isArxivRssSourceUrl } from './arxivApi.js';
 
 interface ResolvedFeedSource {
   url: string;
@@ -157,30 +157,51 @@ export class FeedAdapter implements ProductionSourceAdapter {
     windowStart: Date;
     windowEnd: Date;
   }): Promise<SourceIngestionResult> {
-    const items = this.deps.fetchFeedItems
-      ? await this.deps.fetchFeedItems({ source, windowStart, windowEnd })
-      : isArxivRssSourceUrl(source.url)
-        ? await fetchArxivApiEntriesForSource(source, windowStart, windowEnd)
-        : (await fetchRssSource(source, windowStart, windowEnd)).items.map((item) =>
-            toIngestedItem(source, {
-              title: item.title,
-              url: item.item_url,
-              content: item.content_text,
-              author: item.author,
-              publishedAt: item.published_at?.toISOString() ?? null,
-            }),
-          );
+    try {
+      let items: IngestedItem[];
 
-    return {
-      source,
-      status: 'production_supported',
-      items,
-      diagnostics: {
-        attempted: items.length,
-        normalized: items.length,
-        dropped: 0,
-        adapterType: 'feed',
-      },
-    };
+      if (this.deps.fetchFeedItems) {
+        items = await this.deps.fetchFeedItems({ source, windowStart, windowEnd });
+      } else if (isArxivRssSourceUrl(source.url)) {
+        const windowItems = await fetchArxivApiEntriesForSource(source, windowStart, windowEnd);
+        items = windowItems.length > 0 ? windowItems : await fetchLatestArxivEntriesForSource(source);
+      } else {
+        items = (await fetchRssSource(source, windowStart, windowEnd)).items.map((item) =>
+          toIngestedItem(source, {
+            title: item.title,
+            url: item.item_url,
+            content: item.content_text,
+            author: item.author,
+            publishedAt: item.published_at?.toISOString() ?? null,
+          }),
+        );
+      }
+
+      return {
+        source,
+        status: 'production_supported',
+        items,
+        diagnostics: {
+          attempted: items.length,
+          normalized: items.length,
+          dropped: 0,
+          adapterType: 'feed',
+        },
+      };
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      return {
+        source,
+        status: 'partial_supported',
+        items: [],
+        diagnostics: {
+          attempted: 1,
+          normalized: 0,
+          dropped: 0,
+          adapterType: 'feed',
+          reason,
+        },
+      };
+    }
   }
 }

@@ -62,35 +62,49 @@ export function parseArxivApiResponse(xml: string): ArxivApiEntry[] {
   });
 }
 
-export async function fetchArxivApiEntries(category: string, windowStart: Date, windowEnd: Date): Promise<ArxivApiEntry[]> {
-  const query = new URL('https://export.arxiv.org/api/query');
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchArxivApiResponse(category: string): Promise<ArxivApiEntry[]> {
+  const query = new URL('https://arxiv.org/api/query');
   query.searchParams.set('search_query', `cat:${category}`);
   query.searchParams.set('sortBy', 'submittedDate');
   query.searchParams.set('sortOrder', 'descending');
   query.searchParams.set('start', '0');
-  query.searchParams.set('max_results', '100');
+  query.searchParams.set('max_results', '20');
 
-  const response = await fetch(query);
-  if (!response.ok) {
-    throw new Error(`arXiv API request failed for ${category}: ${response.status}`);
+  const retryStatuses = new Set([429, 503]);
+  let lastStatus: number | null = null;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const response = await fetch(query);
+    if (response.ok) {
+      const xml = await response.text();
+      return parseArxivApiResponse(xml);
+    }
+
+    lastStatus = response.status;
+    if (!retryStatuses.has(response.status) || attempt === 2) {
+      throw new Error(`arXiv API request failed for ${category}: ${response.status}`);
+    }
+
+    await sleep(500 * (attempt + 1));
   }
 
-  const xml = await response.text();
-  return parseArxivApiResponse(xml).filter((entry) => entry.publishedAt >= windowStart && entry.publishedAt < windowEnd);
+  throw new Error(`arXiv API request failed for ${category}: ${lastStatus ?? 'unknown'}`);
 }
 
-export async function fetchArxivApiEntriesForSource(
-  source: SourceConfig,
-  windowStart: Date,
-  windowEnd: Date,
-): Promise<IngestedItem[]> {
-  const category = extractArxivCategoryFromSourceUrl(source.url);
-  if (!category) {
-    return [];
-  }
+export async function fetchArxivApiEntries(category: string, windowStart: Date, windowEnd: Date): Promise<ArxivApiEntry[]> {
+  const entries = await fetchArxivApiResponse(category);
+  return entries.filter((entry) => entry.publishedAt >= windowStart && entry.publishedAt < windowEnd);
+}
 
-  const entries = await fetchArxivApiEntries(category, windowStart, windowEnd);
+export async function fetchLatestArxivApiEntries(category: string): Promise<ArxivApiEntry[]> {
+  return fetchArxivApiResponse(category);
+}
 
+function mapArxivEntriesToIngestedItems(source: SourceConfig, entries: ArxivApiEntry[]): IngestedItem[] {
   return entries.map((entry) => {
     const stableIdentity = buildStableIdentity({
       canonicalUrl: entry.canonicalUrl,
@@ -151,4 +165,28 @@ export async function fetchArxivApiEntriesForSource(
       primary_topic: topic,
     } satisfies IngestedItem;
   });
+}
+
+export async function fetchArxivApiEntriesForSource(
+  source: SourceConfig,
+  windowStart: Date,
+  windowEnd: Date,
+): Promise<IngestedItem[]> {
+  const category = extractArxivCategoryFromSourceUrl(source.url);
+  if (!category) {
+    return [];
+  }
+
+  const entries = await fetchArxivApiEntries(category, windowStart, windowEnd);
+  return mapArxivEntriesToIngestedItems(source, entries);
+}
+
+export async function fetchLatestArxivEntriesForSource(source: SourceConfig): Promise<IngestedItem[]> {
+  const category = extractArxivCategoryFromSourceUrl(source.url);
+  if (!category) {
+    return [];
+  }
+
+  const entries = await fetchLatestArxivApiEntries(category);
+  return mapArxivEntriesToIngestedItems(source, entries);
 }
