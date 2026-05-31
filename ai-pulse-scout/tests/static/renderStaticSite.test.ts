@@ -37,13 +37,14 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
 describe('renderStaticIndexPage', () => {
   it('renders homepage content with recent-days navigation and digest items', () => {
     const html = renderStaticIndexPage({
-      siteTitle: 'AI Pulse Scout Daily',
+      siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
       recentDays: ['2026-05-30'],
       items: [makeItem()],
     });
 
-    expect(html).toContain('AI Pulse Scout Daily');
+    expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
+    expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
     expect(html).toContain('最近 7 天');
     expect(html).toContain('href="days/2026-05-30.html"');
@@ -91,7 +92,7 @@ describe('renderStaticIndexPage', () => {
 
   it('renders a valid empty state when no items exist', () => {
     const html = renderStaticIndexPage({
-      siteTitle: 'AI Pulse Scout Daily',
+      siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
       recentDays: ['2026-05-30'],
       items: [],
@@ -104,13 +105,14 @@ describe('renderStaticIndexPage', () => {
 describe('renderStaticDayPage', () => {
   it('renders archive page content with a homepage backlink', () => {
     const html = renderStaticDayPage({
-      siteTitle: 'AI Pulse Scout Daily',
+      siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
       homeHref: '../index.html',
       items: [makeItem()],
     });
 
-    expect(html).toContain('AI Pulse Scout Daily');
+    expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
+    expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
     expect(html).toContain('href="../index.html"');
     expect(html).toContain('返回首页');

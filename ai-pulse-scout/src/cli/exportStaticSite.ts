@@ -69,7 +69,7 @@ logger.info(`After enrichment: ${enriched.length} items`);
 
 const result = await exportStaticSite({
   outputDir,
-  siteTitle: 'AI Pulse Scout Daily',
+  siteTitle: 'The Daily Scout',
   targetDate: date,
   recentDays: [date],
   items: enriched,
