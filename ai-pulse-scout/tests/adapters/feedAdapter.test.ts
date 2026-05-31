@@ -1,6 +1,116 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FeedAdapter } from '../../src/adapters/feedAdapter';
 import type { SourceConfig } from '../../src/types/config';
+import * as arxivApi from '../../src/adapters/arxivApi';
+
+vi.mock('../../src/adapters/arxivApi', () => ({
+  isArxivRssSourceUrl: (url: string) => url.startsWith('https://arxiv.org/rss/'),
+  fetchArxivApiEntriesForSource: vi.fn(async (_source: SourceConfig, windowStart: Date, _windowEnd: Date) => [
+    {
+      sourceType: 'rss',
+      sourceUrl: 'https://arxiv.org/rss/cs.AI',
+      sourceName: 'arXiv CS.AI',
+      itemUrl: 'https://arxiv.org/abs/2605.99999v1',
+      canonicalUrl: 'https://arxiv.org/abs/2605.99999v1',
+      title: 'API Paper Title',
+      publishedAt: windowStart.toISOString(),
+      publishedAtConfidence: 'exact',
+      discoveredAt: windowStart.toISOString(),
+      content: 'Paper summary text.',
+      summaryMaterial: 'Paper summary text.',
+      stableIdentity: 'arxiv:2605.99999v1',
+      topicHints: ['research'],
+      rawMetadata: { adapterType: 'arxiv-api' },
+      id: 'arxiv-item-1',
+      source_name: 'arXiv CS.AI',
+      source_category: 'research',
+      source_url: 'https://arxiv.org/rss/cs.AI',
+      item_url: 'https://arxiv.org/abs/2605.99999v1',
+      published_at: new Date(windowStart.toISOString()),
+      fetched_at: new Date(windowStart.toISOString()),
+      author: 'Author One',
+      content_text: 'Paper summary text.',
+      summary: 'Paper summary text.',
+      tags: ['cs.AI'],
+      content_type: 'article',
+      fingerprint: 'arxiv:2605.99999v1',
+      relevance_scores: { ai_engineering: 0, industrial_ai: 0, cad_cae_cam: 0, executive_signal: 0, aac_relevance: 0, overall: 0 },
+      decision: 'pending',
+      decision_reason: '',
+      primary_topic: 'research',
+    },
+  ]),
+  fetchLatestArxivEntriesForSource: vi.fn(async (_source: SourceConfig) => [
+    {
+      sourceType: 'rss',
+      sourceUrl: 'https://arxiv.org/rss/cs.AI',
+      sourceName: 'arXiv CS.AI',
+      itemUrl: 'https://arxiv.org/abs/2605.99999v1',
+      canonicalUrl: 'https://arxiv.org/abs/2605.99999v1',
+      title: 'API Paper Title',
+      publishedAt: windowStart.toISOString(),
+      publishedAtConfidence: 'exact',
+      discoveredAt: windowStart.toISOString(),
+      content: 'Paper summary text.',
+      summaryMaterial: 'Paper summary text.',
+      stableIdentity: 'arxiv:2605.99999v1',
+      topicHints: ['research'],
+      rawMetadata: { adapterType: 'arxiv-api' },
+      id: 'arxiv-item-1',
+      source_name: 'arXiv CS.AI',
+      source_category: 'research',
+      source_url: 'https://arxiv.org/rss/cs.AI',
+      item_url: 'https://arxiv.org/abs/2605.99999v1',
+      published_at: new Date(windowStart.toISOString()),
+      fetched_at: new Date(windowStart.toISOString()),
+      author: 'Author One',
+      content_text: 'Paper summary text.',
+      summary: 'Paper summary text.',
+      tags: ['cs.AI'],
+      content_type: 'article',
+      fingerprint: 'arxiv:2605.99999v1',
+      relevance_scores: { ai_engineering: 0, industrial_ai: 0, cad_cae_cam: 0, executive_signal: 0, aac_relevance: 0, overall: 0 },
+      decision: 'pending',
+      decision_reason: '',
+      primary_topic: 'research',
+    },
+  ]),
+  fetchLatestArxivEntriesForSource: vi.fn(async (_source: SourceConfig) => [
+    {
+      sourceType: 'rss',
+      sourceUrl: 'https://arxiv.org/rss/cs.AI',
+      sourceName: 'arXiv CS.AI',
+      itemUrl: 'https://arxiv.org/abs/2605.30353v1',
+      canonicalUrl: 'https://arxiv.org/abs/2605.30353v1',
+      title: 'Latest Batch Paper',
+      publishedAt: '2026-05-28T17:59:59.000Z',
+      publishedAtConfidence: 'exact',
+      discoveredAt: '2026-05-31T06:00:00.000Z',
+      content: 'Latest batch summary.',
+      summaryMaterial: 'Latest batch summary.',
+      stableIdentity: 'arxiv:2605.30353v1',
+      topicHints: ['research'],
+      rawMetadata: { adapterType: 'arxiv-api' },
+      id: 'arxiv-item-latest',
+      source_name: 'arXiv CS.AI',
+      source_category: 'research',
+      source_url: 'https://arxiv.org/rss/cs.AI',
+      item_url: 'https://arxiv.org/abs/2605.30353v1',
+      published_at: new Date('2026-05-28T17:59:59.000Z'),
+      fetched_at: new Date('2026-05-31T06:00:00.000Z'),
+      author: 'Author One',
+      content_text: 'Latest batch summary.',
+      summary: 'Latest batch summary.',
+      tags: ['cs.AI'],
+      content_type: 'article',
+      fingerprint: 'arxiv:2605.30353v1',
+      relevance_scores: { ai_engineering: 0, industrial_ai: 0, cad_cae_cam: 0, executive_signal: 0, aac_relevance: 0, overall: 0 },
+      decision: 'pending',
+      decision_reason: '',
+      primary_topic: 'research',
+    },
+  ]),
+}));
 
 const source: SourceConfig = {
   name: 'Feed Source',
@@ -11,6 +121,9 @@ const source: SourceConfig = {
 };
 
 describe('FeedAdapter', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
   it('normalizes fetched feed items into production ingestion items', async () => {
     const adapter = new FeedAdapter({
       fetchFeedItems: vi.fn(async () => [
@@ -59,5 +172,81 @@ describe('FeedAdapter', () => {
     expect(result.status).toBe('production_supported');
     expect(result.items).toHaveLength(1);
     expect(result.diagnostics.normalized).toBe(1);
+  });
+
+  it('routes arxiv rss sources through the arxiv api path', async () => {
+    const adapter = new FeedAdapter();
+    const arxivSource: SourceConfig = {
+      name: 'arXiv CS.AI',
+      category: 'research',
+      url: 'https://arxiv.org/rss/cs.AI',
+      type: 'rss',
+      enabled: true,
+      coverage_status: 'live',
+    };
+
+    const result = await adapter.ingest({
+      source: arxivSource,
+      windowStart: new Date('2026-05-31T00:00:00.000Z'),
+      windowEnd: new Date('2026-06-01T00:00:00.000Z'),
+    });
+
+    expect(result.status).toBe('production_supported');
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0]).toMatchObject({
+      title: 'API Paper Title',
+      source_name: 'arXiv CS.AI',
+      item_url: 'https://arxiv.org/abs/2605.99999v1',
+    });
+    expect(result.diagnostics.normalized).toBe(1);
+  });
+
+  it('falls back to the latest arxiv batch when the requested window is empty', async () => {
+    vi.mocked(arxivApi.fetchArxivApiEntriesForSource).mockResolvedValueOnce([]);
+
+    const adapter = new FeedAdapter();
+    const arxivSource: SourceConfig = {
+      name: 'arXiv CS.AI',
+      category: 'research',
+      url: 'https://arxiv.org/rss/cs.AI',
+      type: 'rss',
+      enabled: true,
+      coverage_status: 'live',
+    };
+
+    const result = await adapter.ingest({
+      source: arxivSource,
+      windowStart: new Date('2026-05-31T00:00:00.000Z'),
+      windowEnd: new Date('2026-06-01T00:00:00.000Z'),
+    });
+
+    expect(result.status).toBe('production_supported');
+    expect(result.items).toHaveLength(1);
+    expect(result.items[0].title).toBe('Latest Batch Paper');
+  });
+
+  it('degrades gracefully when arxiv api ingestion fails for a source', async () => {
+    vi.mocked(arxivApi.fetchArxivApiEntriesForSource).mockRejectedValueOnce(new Error('Rate exceeded.'));
+    vi.mocked(arxivApi.fetchLatestArxivEntriesForSource).mockRejectedValueOnce(new Error('Rate exceeded.'));
+
+    const adapter = new FeedAdapter();
+    const arxivSource: SourceConfig = {
+      name: 'arXiv CS.AI',
+      category: 'research',
+      url: 'https://arxiv.org/rss/cs.AI',
+      type: 'rss',
+      enabled: true,
+      coverage_status: 'live',
+    };
+
+    const result = await adapter.ingest({
+      source: arxivSource,
+      windowStart: new Date('2026-05-31T00:00:00.000Z'),
+      windowEnd: new Date('2026-06-01T00:00:00.000Z'),
+    });
+
+    expect(result.status).toBe('partial_supported');
+    expect(result.items).toHaveLength(0);
+    expect(result.diagnostics.reason).toContain('Rate exceeded');
   });
 });
