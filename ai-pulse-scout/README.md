@@ -130,3 +130,35 @@ This command:
 ### Timezone note
 
 launchd `StartCalendarInterval` fires on **host local time**. If the machine clock is set to Asia/Shanghai the job fires at 07:00 CST. No extra timezone configuration is required on a correctly-set machine.
+
+## Static Site Deployment (Vercel)
+
+AI Pulse Scout can also build a static site artifact for publishing, including a latest homepage and per-day archive pages under `data/output/site/`.
+
+### Local build
+
+```bash
+npm run build:site
+```
+
+This command:
+- requires no manual date argument
+- automatically selects the digest date using the existing Asia/Shanghai 07:00 cutoff semantics
+- writes static output to `data/output/site`
+- preserves the manual historical export flow:
+
+```bash
+npm run site:export -- --date YYYY-MM-DD
+```
+
+### Verified Vercel settings
+
+For the current repo layout, the working Vercel configuration is:
+
+- **Root Directory:** `ai-pulse-scout`
+- **Build Command:** `npm run build:site`
+- **Output Directory:** `data/output/site`
+
+### Important repo-layout note
+
+The deployable Node project lives inside the nested `ai-pulse-scout/` directory. If Vercel is pointed at the repository root instead, install/build will fail before deployment because the root directory does not contain the project `package.json` / `package-lock.json` used for this site.
