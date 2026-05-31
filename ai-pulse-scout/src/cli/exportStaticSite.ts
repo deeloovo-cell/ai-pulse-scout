@@ -14,7 +14,11 @@ import { selectItems } from '../filtering/selectItems.js';
 import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
 import { exportStaticSite } from '../static/exportStaticSite.js';
-import { computeDigestWindowForDate, defaultStaticSiteOutputDir } from '../static/exportStaticSiteCli.js';
+import {
+  capStaticDigestItems,
+  computeDigestWindowForDate,
+  defaultStaticSiteOutputDir,
+} from '../static/exportStaticSiteCli.js';
 import { logger } from '../utils/logger.js';
 
 function readFlag(name: string): string | null {
@@ -64,7 +68,10 @@ logger.info(`After dedupe: ${deduped.length} items`);
 const ordered = selectItems(deduped, config.digest);
 logger.info(`After ordering: ${ordered.length} items`);
 
-const enriched = await enrichSelectedItems(ordered, DEFAULT_ENRICHMENT_CAP);
+const capped = capStaticDigestItems(ordered);
+logger.info(`After static digest cap: ${capped.length} items`);
+
+const enriched = await enrichSelectedItems(capped, DEFAULT_ENRICHMENT_CAP);
 logger.info(`After enrichment: ${enriched.length} items`);
 
 const result = await exportStaticSite({

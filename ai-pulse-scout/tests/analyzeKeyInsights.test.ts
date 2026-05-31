@@ -140,9 +140,44 @@ describe('enrichKeyInsights', () => {
     expect(body.messages).toHaveLength(2);
     expect(body.thinking).toEqual({ type: 'disabled' });
     expect(body.max_tokens).toBe(900);
+    expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
     expect(body.messages[0].content).toContain('why_it_matters 必须使用简体中文');
     expect(body.messages[1].content).toContain('Analyze this item for the daily manufacturing AI digest.');
     expect(body.messages[1].content).toContain('Existing feed summary: New agentic AI framework for industrial use.');
+  });
+
+  it('uses a 20-second timeout for DeepSeek requests', async () => {
+    vi.useFakeTimers();
+
+    const fetchMock = vi.fn(
+      async (_url: string, init?: RequestInit) => {
+        const signal = init?.signal;
+        if (!(signal instanceof AbortSignal)) {
+          throw new Error('missing abort signal');
+        }
+
+        return await new Promise((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(new Error('aborted')));
+        });
+      },
+    );
+    vi.stubGlobal('fetch', fetchMock);
+
+    const run = enrichKeyInsights([makeItem()], {
+      apiKey: 'test-key',
+      baseUrl: 'https://aigw.aac.tech/v1',
+      model: 'deepseek-v3.2',
+      fetchFullPosts: false,
+    });
+
+    await vi.advanceTimersByTimeAsync(19_000);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    await vi.advanceTimersByTimeAsync(1_001);
+    const [item] = await run;
+
+    expect(item.key_insight).toBe('New agentic AI framework for industrial use.');
+    vi.useRealTimers();
   });
 
   it('falls back to generated insight when DeepSeek request fails', async () => {

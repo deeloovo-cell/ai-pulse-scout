@@ -1,5 +1,5 @@
 const DEFAULT_DEEPSEEK_BASE_URL = 'https://aigw.aac.tech/v1';
-const DEFAULT_CHAT_TIMEOUT_MS = 8000;
+const DEFAULT_CHAT_TIMEOUT_MS = 20000;
 
 export interface ChatCompletionsResult {
   choices?: Array<{

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  capStaticDigestItems,
   computeAutoDeployDigestDate,
   computeDigestWindowForDate,
   defaultStaticSiteOutputDir,
@@ -31,5 +32,16 @@ describe('computeAutoDeployDigestDate', () => {
 describe('defaultStaticSiteOutputDir', () => {
   it('points to data/output/site under the project root', () => {
     expect(defaultStaticSiteOutputDir()).toMatch(/data\/output\/site$/);
+  });
+});
+
+describe('capStaticDigestItems', () => {
+  it('temporarily keeps only the top 20 ordered items for static digest export', () => {
+    const items = Array.from({ length: 35 }, (_, index) => ({ id: `item-${index + 1}` }));
+
+    expect(capStaticDigestItems(items)).toHaveLength(20);
+    expect(capStaticDigestItems(items).map((item) => item.id)).toEqual(
+      Array.from({ length: 20 }, (_, index) => `item-${index + 1}`),
+    );
   });
 });

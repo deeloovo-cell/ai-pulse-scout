@@ -2,6 +2,7 @@ import { join } from 'node:path';
 
 const SHANGHAI_OFFSET_HOURS = 8;
 const DAILY_CUTOFF_HOUR = 7;
+export const STATIC_DIGEST_ITEM_CAP = 20;
 
 function formatDateFromShanghaiLocal(localYear: number, localMonth: number, localDate: number): string {
   const month = String(localMonth + 1).padStart(2, '0');
@@ -37,4 +38,8 @@ export function computeAutoDeployDigestDate(now: Date = new Date()): string {
 
 export function defaultStaticSiteOutputDir(): string {
   return join(process.cwd(), 'data/output/site');
+}
+
+export function capStaticDigestItems<T>(items: T[]): T[] {
+  return items.slice(0, STATIC_DIGEST_ITEM_CAP);
 }
