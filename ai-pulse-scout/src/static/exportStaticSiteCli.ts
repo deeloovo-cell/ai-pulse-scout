@@ -17,6 +17,35 @@ export function computeDigestWindowForDate(targetDate: string): { windowStart: D
   return { windowStart, windowEnd };
 }
 
+export function resolveStaticSiteBuildWindow({
+  digestDate,
+  windowStartIso,
+  windowEndIso,
+}: {
+  digestDate: string;
+  windowStartIso?: string;
+  windowEndIso?: string;
+}): {
+  windowStart: Date;
+  windowEnd: Date;
+  source: 'explicit' | 'digest_date';
+} {
+  if (windowStartIso && windowEndIso) {
+    return {
+      windowStart: new Date(windowStartIso),
+      windowEnd: new Date(windowEndIso),
+      source: 'explicit',
+    };
+  }
+
+  const { windowStart, windowEnd } = computeDigestWindowForDate(digestDate);
+  return {
+    windowStart,
+    windowEnd,
+    source: 'digest_date',
+  };
+}
+
 export function computeAutoDeployDigestDate(now: Date = new Date()): string {
   const localMs = now.getTime() + SHANGHAI_OFFSET_HOURS * 3600_000;
   const localNow = new Date(localMs);

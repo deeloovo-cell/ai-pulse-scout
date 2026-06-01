@@ -16,8 +16,8 @@ import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichS
 import { exportStaticSite } from '../static/exportStaticSite.js';
 import {
   capStaticDigestItems,
-  computeDigestWindowForDate,
   defaultStaticSiteOutputDir,
+  resolveStaticSiteBuildWindow,
 } from '../static/exportStaticSiteCli.js';
 import { logger } from '../utils/logger.js';
 
@@ -29,6 +29,8 @@ function readFlag(name: string): string | null {
 
 const date = readFlag('--date');
 const outputDirArg = readFlag('--output-dir');
+const windowStartArg = readFlag('--window-start');
+const windowEndArg = readFlag('--window-end');
 
 if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
   console.error('Usage: npm run site:export -- --date YYYY-MM-DD [--output-dir path]');
@@ -39,9 +41,14 @@ const outputDir = resolve(outputDirArg ?? defaultStaticSiteOutputDir());
 if (!existsSync(outputDir)) mkdirSync(outputDir, { recursive: true });
 
 const config = loadConfig();
-const { windowStart, windowEnd } = computeDigestWindowForDate(date);
+const { windowStart, windowEnd, source } = resolveStaticSiteBuildWindow({
+  digestDate: date,
+  windowStartIso: windowStartArg ?? undefined,
+  windowEndIso: windowEndArg ?? undefined,
+});
 
 logger.info(`Static site export for digest date ${date}`);
+logger.info(`Window source: ${source}`);
 logger.info(`Window: ${windowStart.toISOString()} -> ${windowEnd.toISOString()}`);
 logger.info(`Output dir: ${outputDir}`);
 

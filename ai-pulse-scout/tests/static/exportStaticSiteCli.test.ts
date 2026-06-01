@@ -4,6 +4,7 @@ import {
   computeAutoDeployDigestDate,
   computeDigestWindowForDate,
   defaultStaticSiteOutputDir,
+  resolveStaticSiteBuildWindow,
 } from '../../src/static/exportStaticSiteCli.js';
 
 describe('computeDigestWindowForDate', () => {
@@ -26,6 +27,20 @@ describe('computeAutoDeployDigestDate', () => {
     const result = computeAutoDeployDigestDate(new Date('2026-05-31T23:30:00.000Z'));
 
     expect(result).toBe('2026-06-01');
+  });
+});
+
+describe('resolveStaticSiteBuildWindow', () => {
+  it('prefers explicit window overrides over digest-date-derived daily window', () => {
+    const result = resolveStaticSiteBuildWindow({
+      digestDate: '2026-06-03',
+      windowStartIso: '2026-06-01T07:32:18.000Z',
+      windowEndIso: '2026-06-02T07:00:00.000Z',
+    });
+
+    expect(result.windowStart.toISOString()).toBe('2026-06-01T07:32:18.000Z');
+    expect(result.windowEnd.toISOString()).toBe('2026-06-02T07:00:00.000Z');
+    expect(result.source).toBe('explicit');
   });
 });
 
