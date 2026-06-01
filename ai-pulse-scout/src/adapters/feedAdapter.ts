@@ -7,7 +7,6 @@ import type { FetchStrategy } from '../inbox/types.js';
 import type { SourceConfig } from '../types/config.js';
 import type { ProductionSourceAdapter } from './types.js';
 import { inferPrimaryTopic } from '../topics/inferPrimaryTopic.js';
-import { fetchArxivApiEntriesForSource, fetchLatestArxivEntriesForSource, isArxivRssSourceUrl } from './arxivApi.js';
 
 interface ResolvedFeedSource {
   url: string;
@@ -162,9 +161,6 @@ export class FeedAdapter implements ProductionSourceAdapter {
 
       if (this.deps.fetchFeedItems) {
         items = await this.deps.fetchFeedItems({ source, windowStart, windowEnd });
-      } else if (isArxivRssSourceUrl(source.url)) {
-        const windowItems = await fetchArxivApiEntriesForSource(source, windowStart, windowEnd);
-        items = windowItems.length > 0 ? windowItems : await fetchLatestArxivEntriesForSource(source);
       } else {
         items = (await fetchRssSource(source, windowStart, windowEnd)).items.map((item) =>
           toIngestedItem(source, {
