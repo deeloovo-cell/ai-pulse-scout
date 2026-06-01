@@ -22,5 +22,9 @@ fi
 
 log "node $(node --version)"
 log "project $PROJECT_DIR"
-./node_modules/.bin/tsx src/cli/publishStaticSite.ts
+log "=== AI Pulse Scout — Static Site Autopublish ==="
+log "Step 1/2: build static site"
+./node_modules/.bin/tsx src/cli/buildStaticSite.ts
+log "Step 2/2: deploy generated static site"
+bash "$PROJECT_DIR/scripts/deploy-static-site.sh"
 log "=== Done (OK) ==="
