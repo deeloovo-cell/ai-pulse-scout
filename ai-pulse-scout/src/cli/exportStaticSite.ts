@@ -17,6 +17,7 @@ import { exportStaticSite } from '../static/exportStaticSite.js';
 import {
   capStaticDigestItems,
   defaultStaticSiteOutputDir,
+  resolveRecentDays,
   resolveStaticSiteBuildWindow,
 } from '../static/exportStaticSiteCli.js';
 import { logger } from '../utils/logger.js';
@@ -85,7 +86,7 @@ const result = await exportStaticSite({
   outputDir,
   siteTitle: 'The Daily Scout',
   targetDate: date,
-  recentDays: [date],
+  recentDays: resolveRecentDays(date),
   items: enriched,
 });
 

@@ -4,6 +4,7 @@ import {
   computeAutoDeployDigestDate,
   computeDigestWindowForDate,
   defaultStaticSiteOutputDir,
+  resolveRecentDays,
   resolveStaticSiteBuildWindow,
 } from '../../src/static/exportStaticSiteCli.js';
 
@@ -51,12 +52,26 @@ describe('defaultStaticSiteOutputDir', () => {
 });
 
 describe('capStaticDigestItems', () => {
-  it('temporarily keeps only the top 20 ordered items for static digest export', () => {
-    const items = Array.from({ length: 35 }, (_, index) => ({ id: `item-${index + 1}` }));
+  it('keeps the top 50 ordered items for static digest export', () => {
+    const items = Array.from({ length: 70 }, (_, index) => ({ id: `item-${index + 1}` }));
 
-    expect(capStaticDigestItems(items)).toHaveLength(20);
+    expect(capStaticDigestItems(items)).toHaveLength(50);
     expect(capStaticDigestItems(items).map((item) => item.id)).toEqual(
-      Array.from({ length: 20 }, (_, index) => `item-${index + 1}`),
+      Array.from({ length: 50 }, (_, index) => `item-${index + 1}`),
     );
+  });
+});
+
+describe('resolveRecentDays', () => {
+  it('excludes the current target date and starts recent-day navigation from the previous day', () => {
+    expect(resolveRecentDays('2026-06-02')).toEqual([
+      '2026-06-01',
+      '2026-05-31',
+      '2026-05-30',
+      '2026-05-29',
+      '2026-05-28',
+      '2026-05-27',
+      '2026-05-26',
+    ]);
   });
 });

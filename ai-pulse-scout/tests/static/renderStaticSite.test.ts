@@ -39,7 +39,7 @@ describe('renderStaticIndexPage', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
-      recentDays: ['2026-05-30'],
+      recentDays: ['2026-05-29'],
       items: [makeItem()],
     });
 
@@ -47,7 +47,8 @@ describe('renderStaticIndexPage', () => {
     expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
     expect(html).toContain('最近 7 天');
-    expect(html).toContain('href="days/2026-05-30.html"');
+    expect(html).toContain('href="days/2026-05-29.html"');
+    expect(html).not.toContain('href="days/2026-05-30.html"');
     expect(html).toContain('Static export item');
     expect(html).toContain('https://example.com/posts/static-item-1');
   });
