@@ -198,8 +198,8 @@ function renderShell(input: {
       .nav, .content { background: #ffffff; border: 1px solid #e6e4f2; border-radius: 18px; padding: 20px; box-shadow: 0 12px 36px rgba(83, 74, 183, 0.08); }
       .nav { margin-bottom: 20px; }
       .nav h2 { margin: 0 0 12px; font-size: 18px; }
-      .recent-days { margin: 0; padding-left: 20px; }
-      .recent-days li { margin: 6px 0; }
+      .recent-days { list-style: none; margin: 0; padding-left: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+      .recent-days li { margin: 0; }
       .digest-card { padding: 20px; border-top: 1px solid #eceaf5; display: flex; flex-direction: column; gap: 10px; }
       .digest-card:first-child { border-top: 0; padding-top: 0; }
       .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
