@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install the launchd agent that runs the daily 07:00 digest.
+# Install the launchd agent that runs the daily 07:00 static-site publish.
 # Safe to re-run — reloads if already installed.
 set -euo pipefail
 
@@ -22,7 +22,7 @@ launchctl unload "$DEST" 2>/dev/null || true
 launchctl load "$DEST"
 
 echo ""
-echo "Scheduled: daily at 07:00 host local time"
+echo "Scheduled: daily static-site publish at 07:00 host local time"
 echo "  Status : launchctl list $LABEL"
 echo "  Logs   : tail -f $PROJECT_DIR/data/logs/static-site-publish-\$(date +%Y-%m-%d).log"
 echo "  Remove : npm run schedule:uninstall   (from project dir)"

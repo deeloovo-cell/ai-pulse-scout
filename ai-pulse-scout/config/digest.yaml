@@ -1,7 +1,10 @@
 # AI Pulse Scout -- Digest Configuration
+# Note: production delivery currently uses generated static pages.
+# Email sending is not the active production path.
 
 digest:
   # Max recent posts to include in each digest.
+  # This config remains for shared selection logic even though production output is the static site.
   max_items: 18
 
   # Fetch posts published in the last 24 hours.

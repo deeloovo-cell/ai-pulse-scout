@@ -12,7 +12,7 @@
         <string>__PROJECT_DIR__/scripts/publish-static-site.sh</string>
     </array>
 
-    <!-- Fire every day at 07:00 host local time -->
+    <!-- Fire every day at 07:00 host local time for static-site publishing -->
     <key>StartCalendarInterval</key>
     <dict>
         <key>Hour</key>
@@ -24,7 +24,7 @@
     <key>RunAtLoad</key>
     <false/>
 
-    <!-- Capture launchd-level stderr (send-daily.sh redirects its own output to data/logs/) -->
+    <!-- Capture launchd-level stderr (publish-static-site.sh redirects its own output to data/logs/) -->
     <key>StandardOutPath</key>
     <string>__PROJECT_DIR__/data/logs/launchd-stdout.log</string>
     <key>StandardErrorPath</key>
