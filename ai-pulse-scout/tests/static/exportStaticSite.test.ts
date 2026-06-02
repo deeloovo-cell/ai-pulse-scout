@@ -55,7 +55,7 @@ describe('exportStaticSite', () => {
       outputDir,
       siteTitle: 'AI Pulse Scout Daily',
       targetDate: '2026-05-30',
-      recentDays: ['2026-05-29'],
+      recentDays: ['2026-06-02', '2026-06-01', '2026-05-30'],
       items: [makeItem()],
     });
 
@@ -66,9 +66,12 @@ describe('exportStaticSite', () => {
     const dayHtml = readFileSync(result.dayPath, 'utf8');
 
     expect(indexHtml).toContain('AI Pulse Scout Daily');
-    expect(indexHtml).toContain('href="days/2026-05-29.html"');
-    expect(indexHtml).not.toContain('href="days/2026-05-30.html"');
-    expect(dayHtml).toContain('href="../index.html"');
+    expect(indexHtml).toContain('href="days/2026-06-02.html"');
+    expect(indexHtml).toContain('href="days/2026-05-30.html"');
+    expect(dayHtml).toContain('最近 7 天');
+    expect(dayHtml).toContain('href="2026-06-02.html"');
+    expect(dayHtml).toContain('href="2026-05-30.html"');
+    expect(dayHtml).not.toContain('返回首页');
     expect(dayHtml).toContain('Exported item');
   });
 });

@@ -109,19 +109,22 @@ describe('renderStaticIndexPage', () => {
 });
 
 describe('renderStaticDayPage', () => {
-  it('renders archive page content with a homepage backlink', () => {
+  it('renders archive page content with the same recent-days navigation as homepage', () => {
     const html = renderStaticDayPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
       homeHref: '../index.html',
+      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30'],
       items: [makeItem()],
     });
 
     expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
     expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
-    expect(html).toContain('href="../index.html"');
-    expect(html).toContain('返回首页');
+    expect(html).toContain('最近 7 天');
+    expect(html).toContain('href="2026-06-02.html"');
+    expect(html).toContain('href="2026-05-30.html"');
+    expect(html).not.toContain('返回首页');
     expect(html).toContain('Static export item');
   });
 
@@ -130,6 +133,7 @@ describe('renderStaticDayPage', () => {
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
       homeHref: '../index.html',
+      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31'],
       items: [makeItem({
         title: 'Multimodal model reduces annotation cost',
         summary: '普通摘要不应优先出现',
@@ -147,6 +151,7 @@ describe('renderStaticDayPage', () => {
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
       homeHref: '../index.html',
+      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31'],
       items: [makeItem({
         title: 'Agentic coding workflow improves triage quality',
         summary: 'This raw English summary should not appear on the static page.',

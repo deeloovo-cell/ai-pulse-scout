@@ -34,6 +34,7 @@ export async function exportStaticSite(input: ExportStaticSiteInput): Promise<Ex
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
     homeHref: '../index.html',
+    recentDays: input.recentDays,
     items: input.items,
   });
 

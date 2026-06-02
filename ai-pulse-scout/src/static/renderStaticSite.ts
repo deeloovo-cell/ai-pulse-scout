@@ -13,6 +13,7 @@ interface StaticIndexPageInput extends StaticPageInput {
 
 interface StaticDayPageInput extends StaticPageInput {
   homeHref: string;
+  recentDays: string[];
 }
 
 function escapeHtml(value: string): string {
@@ -177,6 +178,17 @@ function renderItems(items: NormalizedItem[]): string {
   }).join('\n');
 }
 
+function renderRecentDaysNav(recentDays: string[], hrefPrefix: string): string {
+  return `
+    <nav class="nav">
+      <h2>最近 7 天</h2>
+      <ol class="recent-days">
+        ${recentDays.map((day) => `<li><a href="${escapeHtml(`${hrefPrefix}${day}.html`)}">${escapeHtml(day)}</a></li>`).join('')}
+      </ol>
+    </nav>
+  `;
+}
+
 function renderShell(input: {
   siteTitle: string;
   targetDate: string;
@@ -221,8 +233,6 @@ function renderShell(input: {
       .followup-pill { color: #534ab7; }
       .footer-divider { width: 1px; height: 16px; background: #e6e4f2; }
       .empty-state { color: #6b7280; line-height: 1.6; }
-      .backlink { display: inline-block; margin-bottom: 16px; color: #534ab7; text-decoration: none; }
-      .backlink:hover { text-decoration: underline; }
       @media (max-width: 640px) {
         .page { padding: 24px 14px 32px; }
         .nav, .content { padding: 16px; }
@@ -248,19 +258,10 @@ function renderShell(input: {
 }
 
 export function renderStaticIndexPage(input: StaticIndexPageInput): string {
-  const navHtml = `
-    <nav class="nav">
-      <h2>最近 7 天</h2>
-      <ol class="recent-days">
-        ${input.recentDays.map((day) => `<li><a href="days/${escapeHtml(day)}.html">${escapeHtml(day)}</a></li>`).join('')}
-      </ol>
-    </nav>
-  `;
-
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml,
+    navHtml: renderRecentDaysNav(input.recentDays, 'days/'),
     bodyHtml: renderItems(input.items),
   });
 }
@@ -269,7 +270,7 @@ export function renderStaticDayPage(input: StaticDayPageInput): string {
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml: '',
-    bodyHtml: `<a class="backlink" href="${escapeHtml(input.homeHref)}">返回首页</a>${renderItems(input.items)}`,
+    navHtml: renderRecentDaysNav(input.recentDays, ''),
+    bodyHtml: renderItems(input.items),
   });
 }

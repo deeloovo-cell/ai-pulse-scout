@@ -63,15 +63,15 @@ describe('capStaticDigestItems', () => {
 });
 
 describe('resolveRecentDays', () => {
-  it('excludes the current target date and starts recent-day navigation from the previous day', () => {
+  it('includes the current target date and keeps a seven-day navigation window', () => {
     expect(resolveRecentDays('2026-06-02')).toEqual([
+      '2026-06-02',
       '2026-06-01',
       '2026-05-31',
       '2026-05-30',
       '2026-05-29',
       '2026-05-28',
       '2026-05-27',
-      '2026-05-26',
     ]);
   });
 });

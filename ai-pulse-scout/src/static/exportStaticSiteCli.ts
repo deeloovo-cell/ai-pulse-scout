@@ -74,7 +74,7 @@ export function resolveRecentDays(targetDate: string, count = 7): string[] {
   const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
 
   return Array.from({ length: count }, (_, index) => {
-    const date = new Date(start.getTime() - (index + 1) * 24 * 3600_000);
+    const date = new Date(start.getTime() - index * 24 * 3600_000);
     return formatDateFromShanghaiLocal(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
   });
 }
