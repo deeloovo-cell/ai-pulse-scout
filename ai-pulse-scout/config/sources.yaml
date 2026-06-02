@@ -1,9 +1,17 @@
 # AI Pulse Scout -- Source Registry
 # Synced from config/source-inbox.md.
-# Current inbox contains only https://arxiv.org/, so production sources are
-# the canonical arXiv RSS expansions used by the digest pipeline.
+# Current inbox contains https://arxiv.org/ plus https://huggingface.co/blog,
+# so production sources are RSS-only: the canonical arXiv RSS expansions
+# plus the Hugging Face Blog RSS feed.
 
 sources:
+  - name: "Hugging Face Blog"
+    category: blog
+    url: "https://huggingface.co/blog/feed.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed for https://huggingface.co/blog from config/source-inbox.md"
   - name: "arXiv CS.AI"
     category: research
     url: "https://arxiv.org/rss/cs.AI"
