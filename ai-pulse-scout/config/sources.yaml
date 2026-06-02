@@ -6,6 +6,34 @@
 # and the NVIDIA Developer Blog Atom feed.
 
 sources:
+  - name: "Anthropic News"
+    category: blog
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "LangChain Blog"
+    category: blog
+    url: "https://www.langchain.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Google Cloud Blog AI & Machine Learning"
+    category: blog
+    url: "https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Beehiiv Feed 2R3C6Bt5wj"
+    category: blog
+    url: "https://rss.beehiiv.com/feeds/2R3C6Bt5wj.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
   - name: "Hugging Face Blog"
     category: blog
     url: "https://huggingface.co/blog/feed.xml"
@@ -20,6 +48,153 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Atom feed for https://developer.nvidia.com/blog from config/source-inbox.md"
+  - name: "SolidWorks Blog"
+    category: blog
+    url: "http://blogs.solidworks.com/solidworksblog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Machine Learning Mastery"
+    category: blog
+    url: "http://feeds.feedburner.com/MachineLearningMastery"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Claude Feed"
+    category: blog
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_claude.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS mirror feed validated from user-provided source list"
+  - name: "MIT Computers News"
+    category: blog
+    url: "http://web.mit.edu/newsoffice/topic/mitcomputers-rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Simon Willison Everything"
+    category: blog
+    url: "http://feeds.simonwillison.net/swn-everything"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Atom feed validated from user-provided source list"
+  - name: "Artificial Intelligence Review"
+    category: research
+    url: "http://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10462&channel-name=Artificial%20Intelligence%20Review"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Springer RSS feed validated from user-provided source list"
+  - name: "Anthropic Engineering"
+    category: blog
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_engineering.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS mirror feed validated from user-provided source list"
+  - name: "The CAD Hub Blog"
+    category: blog
+    url: "https://thecadhub.com/blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "SolidSmack"
+    category: blog
+    url: "http://feeds.feedburner.com/solidsmack"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "MIT Artificial Intelligence News"
+    category: blog
+    url: "http://news.mit.edu/rss/topic/artificial-intelligence2"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "DeepMind Blog"
+    category: blog
+    url: "https://deepmind.com/blog/feed/basic/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "DEVELOP3D"
+    category: blog
+    url: "https://develop3d.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Siemens NX Design Blog"
+    category: blog
+    url: "https://blogs.sw.siemens.com/nx-design/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "ScienceDaily Artificial Intelligence"
+    category: blog
+    url: "http://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Siemens Simcenter Blog"
+    category: blog
+    url: "https://blogs.sw.siemens.com/simcenter/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Anthropic Research"
+    category: blog
+    url: "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS mirror feed validated from user-provided source list"
+  - name: "OpenAI Developers"
+    category: blog
+    url: "https://developers.openai.com/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Google AI Blog"
+    category: blog
+    url: "https://www.blog.google/technology/ai/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Google Research Blog"
+    category: research
+    url: "https://research.google/blog/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "BAIR Blog"
+    category: research
+    url: "http://bair.berkeley.edu/blog/feed.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
+  - name: "Rhino Blog"
+    category: blog
+    url: "http://blog.rhino3d.com/feeds/posts/default"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Atom feed validated from user-provided source list"
   - name: "arXiv CS.AI"
     category: research
     url: "https://arxiv.org/rss/cs.AI"
