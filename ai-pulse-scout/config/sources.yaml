@@ -1,8 +1,9 @@
 # AI Pulse Scout -- Source Registry
 # Synced from config/source-inbox.md.
-# Current inbox contains https://arxiv.org/ plus https://huggingface.co/blog,
-# so production sources are RSS-only: the canonical arXiv RSS expansions
-# plus the Hugging Face Blog RSS feed.
+# Current inbox contains https://arxiv.org/, https://huggingface.co/blog,
+# and https://developer.nvidia.com/blog, so production sources are RSS-only:
+# the canonical arXiv RSS expansions plus the Hugging Face Blog RSS feed
+# and the NVIDIA Developer Blog Atom feed.
 
 sources:
   - name: "Hugging Face Blog"
@@ -12,6 +13,13 @@ sources:
     enabled: true
     coverage_status: live
     notes: "RSS feed for https://huggingface.co/blog from config/source-inbox.md"
+  - name: "NVIDIA Developer Blog"
+    category: blog
+    url: "https://developer.nvidia.com/blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Atom feed for https://developer.nvidia.com/blog from config/source-inbox.md"
   - name: "arXiv CS.AI"
     category: research
     url: "https://arxiv.org/rss/cs.AI"
