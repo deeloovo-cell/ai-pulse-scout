@@ -20,7 +20,7 @@ export async function exportStaticSite(input: ExportStaticSiteInput): Promise<Ex
   const daysDir = join(input.outputDir, 'days');
   await mkdir(daysDir, { recursive: true });
 
-  const recentDays = Array.from(new Set([input.targetDate, ...input.recentDays]));
+  const recentDays = Array.from(new Set(input.recentDays));
   const indexPath = join(input.outputDir, 'index.html');
   const dayPath = join(daysDir, `${input.targetDate}.html`);
 

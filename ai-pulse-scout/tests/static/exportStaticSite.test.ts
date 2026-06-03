@@ -103,6 +103,7 @@ describe('exportStaticSite', () => {
     expect(indexHtml).toContain('href="days/2026-05-28.html"');
     expect(targetDayHtml).toContain('href="2026-06-03.html"');
     expect(targetDayHtml).toContain('href="2026-05-28.html"');
+    expect(targetDayHtml).not.toContain('href="2026-05-27.html"');
 
     expect(refreshed0601Html).toBe(historical0601);
     expect(refreshed0531Html).toBe(historical0531);
@@ -128,5 +129,26 @@ describe('exportStaticSite', () => {
 
     expect(existsSync(stalePath)).toBe(false);
     expect(existsSync(join(daysDir, '2026-05-28.html'))).toBe(true);
+  });
+
+  it('does not force the currently viewed day into the recent-days nav when it falls outside the latest window', async () => {
+    const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-anchor-only-'));
+    tempDirs.push(outputDir);
+
+    const result = await exportStaticSite({
+      outputDir,
+      siteTitle: 'The Daily Scout',
+      targetDate: '2026-05-28',
+      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
+      items: [makeItem({ title: 'Historical page item' })],
+    });
+
+    const dayHtml = readFileSync(result.dayPath, 'utf8');
+    expect(dayHtml).toContain('href="2026-06-03.html"');
+    expect(dayHtml).toContain('href="2026-05-28.html"');
+
+    const navLine = dayHtml.match(/<ol class="recent-days">([\s\S]*?)<\/ol>/)?.[1] ?? '';
+    expect(navLine.indexOf('2026-06-03.html')).toBeLessThan(navLine.indexOf('2026-05-28.html'));
+    expect(navLine).not.toContain('href="2026-05-27.html"');
   });
 });
