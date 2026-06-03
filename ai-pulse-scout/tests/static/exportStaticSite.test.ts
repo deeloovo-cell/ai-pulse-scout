@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -106,5 +106,27 @@ describe('exportStaticSite', () => {
 
     expect(refreshed0601Html).toBe(historical0601);
     expect(refreshed0531Html).toBe(historical0531);
+  });
+
+  it('removes archive pages that fall outside the latest seven-day window', async () => {
+    const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-prune-'));
+    tempDirs.push(outputDir);
+    const daysDir = join(outputDir, 'days');
+    mkdirSync(daysDir, { recursive: true });
+
+    const stalePath = join(daysDir, '2026-05-27.html');
+    writeFileSync(stalePath, '<html><body>stale page</body></html>');
+    writeFileSync(join(daysDir, '2026-05-28.html'), '<html><body><article class="digest-card">keep</article></body></html>');
+
+    await exportStaticSite({
+      outputDir,
+      siteTitle: 'The Daily Scout',
+      targetDate: '2026-06-03',
+      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
+      items: [makeItem({ title: 'Latest digest item' })],
+    });
+
+    expect(existsSync(stalePath)).toBe(false);
+    expect(existsSync(join(daysDir, '2026-05-28.html'))).toBe(true);
   });
 });

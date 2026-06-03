@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { NormalizedItem } from '../types/item.js';
 import { renderStaticDayPage, renderStaticIndexPage } from './renderStaticSite.js';
@@ -41,6 +41,15 @@ export async function exportStaticSite(input: ExportStaticSiteInput): Promise<Ex
 
   await writeFile(indexPath, indexHtml, 'utf8');
   await writeFile(dayPath, dayHtml, 'utf8');
+
+  const keepDays = new Set(recentDays);
+  const dayFiles = await readdir(daysDir);
+  await Promise.all(
+    dayFiles
+      .filter((file) => file.endsWith('.html'))
+      .filter((file) => !keepDays.has(file.replace(/\.html$/, '')))
+      .map((file) => rm(join(daysDir, file), { force: true })),
+  );
 
   return { indexPath, dayPath };
 }
