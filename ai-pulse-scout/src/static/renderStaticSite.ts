@@ -178,7 +178,7 @@ function renderItems(items: NormalizedItem[]): string {
   }).join('\n');
 }
 
-function renderRecentDaysNav(recentDays: string[], hrefPrefix: string): string {
+export function renderStaticRecentDaysNav(recentDays: string[], hrefPrefix: string): string {
   return `
     <nav class="nav">
       <h2>最近 7 天</h2>
@@ -261,7 +261,7 @@ export function renderStaticIndexPage(input: StaticIndexPageInput): string {
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml: renderRecentDaysNav(input.recentDays, 'days/'),
+    navHtml: renderStaticRecentDaysNav(input.recentDays, 'days/'),
     bodyHtml: renderItems(input.items),
   });
 }
@@ -270,7 +270,7 @@ export function renderStaticDayPage(input: StaticDayPageInput): string {
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml: renderRecentDaysNav(input.recentDays, ''),
+    navHtml: renderStaticRecentDaysNav(input.recentDays, ''),
     bodyHtml: renderItems(input.items),
   });
 }

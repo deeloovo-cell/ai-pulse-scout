@@ -75,14 +75,16 @@ describe('exportStaticSite', () => {
     expect(dayHtml).toContain('Exported item');
   });
 
-  it('updates homepage and target-day navigation without overwriting historical archive content', async () => {
+  it('updates homepage and existing day-page navigation without overwriting historical archive content', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-refresh-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
     mkdirSync(daysDir, { recursive: true });
 
-    const historical0601 = '<html><body><article class="digest-card">historical-0601</article></body></html>';
-    const historical0531 = '<html><body><article class="digest-card">historical-0531</article></body></html>';
+    const historical0601 =
+      '<html><body><nav class="nav"><h2>最近 7 天</h2><ol class="recent-days"><li><a href="2026-06-01.html">2026-06-01</a></li><li><a href="2026-05-26.html">2026-05-26</a></li></ol></nav><article class="digest-card">historical-0601</article></body></html>';
+    const historical0531 =
+      '<html><body><nav class="nav"><h2>最近 7 天</h2><ol class="recent-days"><li><a href="2026-05-31.html">2026-05-31</a></li><li><a href="2026-05-25.html">2026-05-25</a></li></ol></nav><article class="digest-card">historical-0531</article></body></html>';
     writeFileSync(join(daysDir, '2026-06-01.html'), historical0601);
     writeFileSync(join(daysDir, '2026-05-31.html'), historical0531);
 
@@ -105,8 +107,14 @@ describe('exportStaticSite', () => {
     expect(targetDayHtml).toContain('href="2026-05-28.html"');
     expect(targetDayHtml).not.toContain('href="2026-05-27.html"');
 
-    expect(refreshed0601Html).toBe(historical0601);
-    expect(refreshed0531Html).toBe(historical0531);
+    expect(refreshed0601Html).toContain('<article class="digest-card">historical-0601</article>');
+    expect(refreshed0531Html).toContain('<article class="digest-card">historical-0531</article>');
+    expect(refreshed0601Html).toContain('href="2026-06-03.html"');
+    expect(refreshed0601Html).toContain('href="2026-05-28.html"');
+    expect(refreshed0601Html).not.toContain('href="2026-05-26.html"');
+    expect(refreshed0531Html).toContain('href="2026-06-03.html"');
+    expect(refreshed0531Html).toContain('href="2026-05-28.html"');
+    expect(refreshed0531Html).not.toContain('href="2026-05-25.html"');
   });
 
   it('removes archive pages that fall outside the latest seven-day window', async () => {
