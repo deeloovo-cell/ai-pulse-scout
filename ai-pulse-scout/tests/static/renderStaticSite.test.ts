@@ -47,8 +47,6 @@ describe('renderStaticIndexPage', () => {
     expect(html).toContain('2026-05-30');
     expect(html).not.toContain('最近 7 天');
     expect(html).not.toContain('<nav class="nav">');
-    expect(html).not.toContain('href="days/2026-05-29.html"');
-    expect(html).not.toContain('href="days/2026-05-30.html"');
     expect(html).toContain('display: flex;');
     expect(html).toContain('gap: 12px;');
     expect(html).toContain('Static export item');

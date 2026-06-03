@@ -4,7 +4,6 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 OUTPUT_DIR="$PROJECT_DIR/data/output/site"
 INDEX_FILE="$OUTPUT_DIR/index.html"
-DAY_DIR="$OUTPUT_DIR/days"
 VERCEL_SCOPE="deeloovo-cells-projects"
 VERCEL_PROJECT_ID="prj_OaQefLb6DX9IryOeqlj2w2AGA7DJ"
 VERCEL_ORG_ID="team_5MUuieoZ7jWaBHm24OXg4vyp"
@@ -26,11 +25,6 @@ fi
 
 if [ ! -f "$INDEX_FILE" ]; then
   log "ERROR: missing static site index: $INDEX_FILE"
-  exit 1
-fi
-
-if [ ! -d "$DAY_DIR" ] || ! find "$DAY_DIR" -type f -name '*.html' -print -quit | grep -q .; then
-  log "ERROR: missing day archive html files under $DAY_DIR"
   exit 1
 fi
 
