@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { renderStaticIndexPage, renderStaticDayPage } from '../../src/static/renderStaticSite.js';
+import { renderStaticIndexPage } from '../../src/static/renderStaticSite.js';
 import type { NormalizedItem } from '../../src/types/item.js';
 
 function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
@@ -39,7 +39,6 @@ describe('renderStaticIndexPage', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
-      recentDays: ['2026-05-29'],
       items: [makeItem()],
     });
 
@@ -60,7 +59,6 @@ describe('renderStaticIndexPage', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
-      recentDays: ['2026-05-31'],
       items: [makeItem({
         title: 'Agentic coding workflow improves triage quality',
         summary: '普通摘要',
@@ -83,7 +81,6 @@ describe('renderStaticIndexPage', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
-      recentDays: ['2026-05-31'],
       items: [makeItem({
         title: 'Vision-language system improves robotics planning',
         summary: '摘要',
@@ -103,41 +100,16 @@ describe('renderStaticIndexPage', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
-      recentDays: ['2026-05-30'],
       items: [],
     });
 
     expect(html).toContain('当前没有可展示的 digest 内容');
   });
-});
-
-describe('renderStaticDayPage', () => {
-  it('renders archive page content without recent-days navigation', () => {
-    const html = renderStaticDayPage({
-      siteTitle: 'The Daily Scout',
-      targetDate: '2026-05-30',
-      homeHref: '../index.html',
-      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30'],
-      items: [makeItem()],
-    });
-
-    expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
-    expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
-    expect(html).toContain('2026-05-30');
-    expect(html).not.toContain('最近 7 天');
-    expect(html).not.toContain('<nav class="nav">');
-    expect(html).not.toContain('href="2026-06-02.html"');
-    expect(html).not.toContain('href="2026-05-30.html"');
-    expect(html).not.toContain('返回首页');
-    expect(html).toContain('Static export item');
-  });
 
   it('prefers enrichment-style summary content over plain summary and raw snippet', () => {
-    const html = renderStaticDayPage({
+    const html = renderStaticIndexPage({
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
-      homeHref: '../index.html',
-      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31'],
       items: [makeItem({
         title: 'Multimodal model reduces annotation cost',
         summary: '普通摘要不应优先出现',
@@ -151,11 +123,9 @@ describe('renderStaticDayPage', () => {
   });
 
   it('falls back to a Chinese digest summary instead of exposing raw English snippets', () => {
-    const html = renderStaticDayPage({
+    const html = renderStaticIndexPage({
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
-      homeHref: '../index.html',
-      recentDays: ['2026-06-02', '2026-06-01', '2026-05-31'],
       items: [makeItem({
         title: 'Agentic coding workflow improves triage quality',
         summary: 'This raw English summary should not appear on the static page.',

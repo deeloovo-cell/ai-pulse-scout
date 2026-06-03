@@ -7,14 +7,7 @@ interface StaticPageInput {
   items: NormalizedItem[];
 }
 
-interface StaticIndexPageInput extends StaticPageInput {
-  recentDays: string[];
-}
-
-interface StaticDayPageInput extends StaticPageInput {
-  homeHref: string;
-  recentDays: string[];
-}
+interface StaticIndexPageInput extends StaticPageInput {}
 
 function escapeHtml(value: string): string {
   return value
@@ -284,10 +277,3 @@ export function renderStaticIndexPage(input: StaticIndexPageInput): string {
   });
 }
 
-export function renderStaticDayPage(input: StaticDayPageInput): string {
-  return renderShell({
-    siteTitle: input.siteTitle,
-    targetDate: input.targetDate,
-    bodyHtml: renderItems(input.items),
-  });
-}

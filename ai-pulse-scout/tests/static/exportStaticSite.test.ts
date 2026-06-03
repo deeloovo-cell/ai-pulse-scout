@@ -47,111 +47,49 @@ afterEach(() => {
 });
 
 describe('exportStaticSite', () => {
-  it('writes both homepage and archive page files', async () => {
+  it('writes only index.html and removes old archive pages', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-'));
     tempDirs.push(outputDir);
+    const daysDir = join(outputDir, 'days');
+    mkdirSync(daysDir, { recursive: true });
+    writeFileSync(join(daysDir, '2026-06-03.html'), '<html>old archive</html>');
 
     const result = await exportStaticSite({
       outputDir,
       siteTitle: 'AI Pulse Scout Daily',
       targetDate: '2026-05-30',
-      recentDays: ['2026-06-02', '2026-06-01', '2026-05-30'],
       items: [makeItem()],
     });
 
     expect(result.indexPath).toBe(join(outputDir, 'index.html'));
-    expect(result.dayPath).toBe(join(outputDir, 'days', '2026-05-30.html'));
-
     const indexHtml = readFileSync(result.indexPath, 'utf8');
-    const dayHtml = readFileSync(result.dayPath, 'utf8');
 
     expect(indexHtml).toContain('AI Pulse Scout Daily');
     expect(indexHtml).not.toContain('最近 7 天');
-    expect(indexHtml).not.toContain('href="days/2026-06-02.html"');
-    expect(indexHtml).not.toContain('href="days/2026-05-30.html"');
-    expect(dayHtml).not.toContain('最近 7 天');
-    expect(dayHtml).not.toContain('href="2026-06-02.html"');
-    expect(dayHtml).not.toContain('href="2026-05-30.html"');
-    expect(dayHtml).not.toContain('返回首页');
-    expect(dayHtml).toContain('Exported item');
+    expect(indexHtml).toContain('Exported item');
+    expect(existsSync(join(outputDir, 'index.html'))).toBe(true);
+    expect(existsSync(join(daysDir, '2026-06-03.html'))).toBe(false);
+    expect(existsSync(daysDir)).toBe(false);
   });
 
-  it('keeps only the current day archive page', async () => {
+  it('removes every stale archive page even when multiple files exist', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-refresh-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
     mkdirSync(daysDir, { recursive: true });
 
-    const historical0601 =
-      '<html><body><nav class="nav"><h2>最近 7 天</h2><ol class="recent-days"><li><a href="2026-06-01.html">2026-06-01</a></li><li><a href="2026-05-26.html">2026-05-26</a></li></ol></nav><article class="digest-card">historical-0601</article></body></html>';
-    const historical0531 =
-      '<html><body><nav class="nav"><h2>最近 7 天</h2><ol class="recent-days"><li><a href="2026-05-31.html">2026-05-31</a></li><li><a href="2026-05-25.html">2026-05-25</a></li></ol></nav><article class="digest-card">historical-0531</article></body></html>';
-    writeFileSync(join(daysDir, '2026-06-01.html'), historical0601);
-    writeFileSync(join(daysDir, '2026-05-31.html'), historical0531);
-
-    const result = await exportStaticSite({
-      outputDir,
-      siteTitle: 'The Daily Scout',
-      targetDate: '2026-06-03',
-      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
-      items: [makeItem({ title: 'Latest digest item' })],
-    });
-
-    const indexHtml = readFileSync(result.indexPath, 'utf8');
-    const targetDayHtml = readFileSync(result.dayPath, 'utf8');
-
-    expect(indexHtml).not.toContain('最近 7 天');
-    expect(indexHtml).not.toContain('href="days/2026-06-03.html"');
-    expect(indexHtml).not.toContain('href="days/2026-05-28.html"');
-    expect(targetDayHtml).not.toContain('最近 7 天');
-    expect(targetDayHtml).not.toContain('href="2026-06-03.html"');
-    expect(targetDayHtml).not.toContain('href="2026-05-28.html"');
-    expect(targetDayHtml).not.toContain('href="2026-05-27.html"');
-    expect(existsSync(join(daysDir, '2026-06-03.html'))).toBe(true);
-    expect(existsSync(join(daysDir, '2026-06-01.html'))).toBe(false);
-    expect(existsSync(join(daysDir, '2026-05-31.html'))).toBe(false);
-  });
-
-  it('removes archive pages outside the current day', async () => {
-    const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-prune-'));
-    tempDirs.push(outputDir);
-    const daysDir = join(outputDir, 'days');
-    mkdirSync(daysDir, { recursive: true });
-
-    const stalePath = join(daysDir, '2026-05-27.html');
-    writeFileSync(stalePath, '<html><body>stale page</body></html>');
-    writeFileSync(join(daysDir, '2026-05-28.html'), '<html><body><article class="digest-card">keep</article></body></html>');
+    writeFileSync(join(daysDir, '2026-06-01.html'), '<html><body><article class="digest-card">historical-0601</article></body></html>');
+    writeFileSync(join(daysDir, '2026-05-31.html'), '<html><body><article class="digest-card">historical-0531</article></body></html>');
 
     await exportStaticSite({
       outputDir,
       siteTitle: 'The Daily Scout',
       targetDate: '2026-06-03',
-      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
       items: [makeItem({ title: 'Latest digest item' })],
     });
 
-    expect(existsSync(stalePath)).toBe(false);
-    expect(existsSync(join(daysDir, '2026-05-28.html'))).toBe(false);
-    expect(existsSync(join(daysDir, '2026-06-03.html'))).toBe(true);
-  });
-
-  it('does not render recent-days navigation for historical target pages', async () => {
-    const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-anchor-only-'));
-    tempDirs.push(outputDir);
-
-    const result = await exportStaticSite({
-      outputDir,
-      siteTitle: 'The Daily Scout',
-      targetDate: '2026-05-28',
-      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
-      items: [makeItem({ title: 'Historical page item' })],
-    });
-
-    const dayHtml = readFileSync(result.dayPath, 'utf8');
-    expect(dayHtml).toContain('Historical page item');
-    expect(dayHtml).not.toContain('最近 7 天');
-    expect(dayHtml).not.toContain('href="2026-06-03.html"');
-    expect(dayHtml).not.toContain('href="2026-05-28.html"');
-    expect(dayHtml).not.toContain('href="2026-05-27.html"');
+    expect(existsSync(join(daysDir, '2026-06-01.html'))).toBe(false);
+    expect(existsSync(join(daysDir, '2026-05-31.html'))).toBe(false);
+    expect(existsSync(daysDir)).toBe(false);
   });
 });

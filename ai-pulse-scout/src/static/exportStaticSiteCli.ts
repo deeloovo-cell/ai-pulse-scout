@@ -69,25 +69,6 @@ export function defaultStaticSiteOutputDir(): string {
   return join(process.cwd(), 'data/output/site');
 }
 
-export function resolveRecentDays(targetDate: string, count = 7): string[] {
-  const [year, month, day] = targetDate.split('-').map((value) => Number.parseInt(value, 10));
-  const start = new Date(Date.UTC(year, month - 1, day, 0, 0, 0, 0));
-
-  return Array.from({ length: count }, (_, index) => {
-    const date = new Date(start.getTime() - index * 24 * 3600_000);
-    return formatDateFromShanghaiLocal(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-  });
-}
-
-export async function resolveExistingRecentDays(
-  _outputDir: string,
-  targetDate: string,
-  count = 7,
-  anchorDate?: string,
-): Promise<string[]> {
-  return resolveRecentDays(anchorDate ?? targetDate, count);
-}
-
 export function capStaticDigestItems<T>(items: T[]): T[] {
   return items.slice(0, STATIC_DIGEST_ITEM_CAP);
 }
