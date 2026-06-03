@@ -16,6 +16,7 @@ import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichS
 import { exportStaticSite } from '../static/exportStaticSite.js';
 import {
   capStaticDigestItems,
+  computeAutoDeployDigestDate,
   defaultStaticSiteOutputDir,
   resolveExistingRecentDays,
   resolveStaticSiteBuildWindow,
@@ -82,11 +83,13 @@ logger.info(`After static digest cap: ${capped.length} items`);
 const enriched = await enrichSelectedItems(capped, DEFAULT_ENRICHMENT_CAP);
 logger.info(`After enrichment: ${enriched.length} items`);
 
+const latestDigestDate = computeAutoDeployDigestDate();
+
 const result = await exportStaticSite({
   outputDir,
   siteTitle: 'The Daily Scout',
   targetDate: date,
-  recentDays: await resolveExistingRecentDays(outputDir, date),
+  recentDays: await resolveExistingRecentDays(outputDir, date, 7, latestDigestDate),
   items: enriched,
 });
 

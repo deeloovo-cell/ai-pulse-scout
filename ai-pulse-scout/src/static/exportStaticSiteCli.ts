@@ -79,8 +79,13 @@ export function resolveRecentDays(targetDate: string, count = 7): string[] {
   });
 }
 
-export async function resolveExistingRecentDays(_outputDir: string, targetDate: string, count = 7): Promise<string[]> {
-  return resolveRecentDays(targetDate, count);
+export async function resolveExistingRecentDays(
+  _outputDir: string,
+  targetDate: string,
+  count = 7,
+  anchorDate?: string,
+): Promise<string[]> {
+  return resolveRecentDays(anchorDate ?? targetDate, count);
 }
 
 export function capStaticDigestItems<T>(items: T[]): T[] {

@@ -89,7 +89,7 @@ describe('resolveRecentDays', () => {
     ]);
   });
 
-  it('keeps a calendar-contiguous seven-day window even when some archive pages are missing or empty', async () => {
+  it('anchors the seven-day navigation window to the latest digest day rather than the page being viewed', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-recent-days-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
@@ -99,14 +99,14 @@ describe('resolveRecentDays', () => {
     writeFileSync(join(daysDir, '2026-05-31.html'), '<html><body><article class="digest-card">ok</article></body></html>');
     writeFileSync(join(daysDir, '2026-05-30.html'), '<div class="empty-state">当前没有可展示的 digest 内容。</div>');
 
-    await expect(resolveExistingRecentDays(outputDir, '2026-06-02')).resolves.toEqual([
+    await expect(resolveExistingRecentDays(outputDir, '2026-05-28', 7, '2026-06-03')).resolves.toEqual([
+      '2026-06-03',
       '2026-06-02',
       '2026-06-01',
       '2026-05-31',
       '2026-05-30',
       '2026-05-29',
       '2026-05-28',
-      '2026-05-27',
     ]);
   });
 });
