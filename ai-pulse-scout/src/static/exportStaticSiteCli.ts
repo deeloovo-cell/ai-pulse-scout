@@ -1,4 +1,3 @@
-import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 const SHANGHAI_OFFSET_HOURS = 8;
@@ -80,23 +79,8 @@ export function resolveRecentDays(targetDate: string, count = 7): string[] {
   });
 }
 
-export async function resolveExistingRecentDays(outputDir: string, targetDate: string, count = 7): Promise<string[]> {
-  const candidates = resolveRecentDays(targetDate, count);
-  const resolved: string[] = [];
-
-  for (const day of candidates) {
-    try {
-      const html = await readFile(join(outputDir, 'days', `${day}.html`), 'utf8');
-      if (html.includes('当前没有可展示的 digest 内容')) {
-        continue;
-      }
-      resolved.push(day);
-    } catch {
-      continue;
-    }
-  }
-
-  return resolved;
+export async function resolveExistingRecentDays(_outputDir: string, targetDate: string, count = 7): Promise<string[]> {
+  return resolveRecentDays(targetDate, count);
 }
 
 export function capStaticDigestItems<T>(items: T[]): T[] {

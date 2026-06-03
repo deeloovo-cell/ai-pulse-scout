@@ -8,6 +8,7 @@ import {
   computeAutoDeployDigestDate,
   computeDigestWindowForDate,
   defaultStaticSiteOutputDir,
+  resolveExistingRecentDays,
   resolveRecentDays,
   resolveStaticSiteBuildWindow,
 } from '../../src/static/exportStaticSiteCli.js';
@@ -88,23 +89,24 @@ describe('resolveRecentDays', () => {
     ]);
   });
 
-  it('filters out missing and empty day pages when resolving recent navigation from output', async () => {
+  it('keeps a calendar-contiguous seven-day window even when some archive pages are missing or empty', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-recent-days-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
     mkdirSync(daysDir, { recursive: true });
 
     writeFileSync(join(daysDir, '2026-06-02.html'), '<html><body><article class="digest-card">ok</article></body></html>');
-    writeFileSync(join(daysDir, '2026-06-01.html'), '<html><body><article class="digest-card">ok</article></body></html>');
     writeFileSync(join(daysDir, '2026-05-31.html'), '<html><body><article class="digest-card">ok</article></body></html>');
     writeFileSync(join(daysDir, '2026-05-30.html'), '<div class="empty-state">当前没有可展示的 digest 内容。</div>');
-
-    const { resolveExistingRecentDays } = await import('../../src/static/exportStaticSiteCli.js');
 
     await expect(resolveExistingRecentDays(outputDir, '2026-06-02')).resolves.toEqual([
       '2026-06-02',
       '2026-06-01',
       '2026-05-31',
+      '2026-05-30',
+      '2026-05-29',
+      '2026-05-28',
+      '2026-05-27',
     ]);
   });
 });
