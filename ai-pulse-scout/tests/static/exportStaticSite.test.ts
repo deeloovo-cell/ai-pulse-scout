@@ -75,20 +75,22 @@ describe('exportStaticSite', () => {
     expect(dayHtml).toContain('Exported item');
   });
 
-  it('keeps the current target date in recent navigation and rewrites listed archive pages to the new nav format', async () => {
+  it('updates homepage and target-day navigation without overwriting historical archive content', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-refresh-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
     mkdirSync(daysDir, { recursive: true });
 
-    writeFileSync(join(daysDir, '2026-06-01.html'), '<html><body><ul class="recent-days"><li><a href="2026-05-31.html">2026-05-31</a></li></ul><a class="backlink" href="../index.html">返回首页</a><article class="digest-card">old</article></body></html>');
-    writeFileSync(join(daysDir, '2026-05-31.html'), '<html><body><ul class="recent-days"><li><a href="2026-05-30.html">2026-05-30</a></li></ul><a class="backlink" href="../index.html">返回首页</a><article class="digest-card">older</article></body></html>');
+    const historical0601 = '<html><body><article class="digest-card">historical-0601</article></body></html>';
+    const historical0531 = '<html><body><article class="digest-card">historical-0531</article></body></html>';
+    writeFileSync(join(daysDir, '2026-06-01.html'), historical0601);
+    writeFileSync(join(daysDir, '2026-05-31.html'), historical0531);
 
     const result = await exportStaticSite({
       outputDir,
       siteTitle: 'The Daily Scout',
       targetDate: '2026-06-03',
-      recentDays: ['2026-06-03', '2026-06-01', '2026-05-31'],
+      recentDays: ['2026-06-03', '2026-06-02', '2026-06-01', '2026-05-31', '2026-05-30', '2026-05-29', '2026-05-28'],
       items: [makeItem({ title: 'Latest digest item' })],
     });
 
@@ -98,16 +100,11 @@ describe('exportStaticSite', () => {
     const refreshed0531Html = readFileSync(join(daysDir, '2026-05-31.html'), 'utf8');
 
     expect(indexHtml).toContain('href="days/2026-06-03.html"');
+    expect(indexHtml).toContain('href="days/2026-05-28.html"');
     expect(targetDayHtml).toContain('href="2026-06-03.html"');
+    expect(targetDayHtml).toContain('href="2026-05-28.html"');
 
-    expect(refreshed0601Html).toContain('最近 7 天');
-    expect(refreshed0601Html).toContain('href="2026-06-03.html"');
-    expect(refreshed0601Html).not.toContain('返回首页');
-    expect(refreshed0601Html).not.toContain('padding-left: 20px');
-
-    expect(refreshed0531Html).toContain('最近 7 天');
-    expect(refreshed0531Html).toContain('href="2026-06-03.html"');
-    expect(refreshed0531Html).not.toContain('返回首页');
-    expect(refreshed0531Html).not.toContain('padding-left: 20px');
+    expect(refreshed0601Html).toBe(historical0601);
+    expect(refreshed0531Html).toBe(historical0531);
   });
 });

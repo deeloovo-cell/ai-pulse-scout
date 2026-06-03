@@ -31,19 +31,16 @@ export async function exportStaticSite(input: ExportStaticSiteInput): Promise<Ex
     items: input.items,
   });
 
+  const dayHtml = renderStaticDayPage({
+    siteTitle: input.siteTitle,
+    targetDate: input.targetDate,
+    homeHref: '../index.html',
+    recentDays,
+    items: input.items,
+  });
+
   await writeFile(indexPath, indexHtml, 'utf8');
-
-  for (const day of recentDays) {
-    const archiveHtml = renderStaticDayPage({
-      siteTitle: input.siteTitle,
-      targetDate: day,
-      homeHref: '../index.html',
-      recentDays,
-      items: day === input.targetDate ? input.items : [],
-    });
-
-    await writeFile(join(daysDir, `${day}.html`), archiveHtml, 'utf8');
-  }
+  await writeFile(dayPath, dayHtml, 'utf8');
 
   return { indexPath, dayPath };
 }
