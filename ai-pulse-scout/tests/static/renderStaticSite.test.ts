@@ -35,7 +35,7 @@ function makeItem(overrides: Partial<NormalizedItem> = {}): NormalizedItem {
 }
 
 describe('renderStaticIndexPage', () => {
-  it('renders homepage content with recent-days navigation and digest items', () => {
+  it('renders homepage content for the current digest day without recent-days navigation', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
@@ -46,14 +46,12 @@ describe('renderStaticIndexPage', () => {
     expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
     expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
-    expect(html).toContain('最近 7 天');
-    expect(html).toContain('href="days/2026-05-29.html"');
+    expect(html).not.toContain('最近 7 天');
+    expect(html).not.toContain('<nav class="nav">');
+    expect(html).not.toContain('href="days/2026-05-29.html"');
     expect(html).not.toContain('href="days/2026-05-30.html"');
-    expect(html).toContain('.recent-days { list-style: none;');
     expect(html).toContain('display: flex;');
-    expect(html).toContain('flex-wrap: wrap;');
     expect(html).toContain('gap: 12px;');
-    expect(html).toContain('.recent-days li { margin: 0; }');
     expect(html).toContain('Static export item');
     expect(html).toContain('https://example.com/posts/static-item-1');
   });
@@ -114,7 +112,7 @@ describe('renderStaticIndexPage', () => {
 });
 
 describe('renderStaticDayPage', () => {
-  it('renders archive page content with the same recent-days navigation as homepage', () => {
+  it('renders archive page content without recent-days navigation', () => {
     const html = renderStaticDayPage({
       siteTitle: 'The Daily Scout',
       targetDate: '2026-05-30',
@@ -126,9 +124,10 @@ describe('renderStaticDayPage', () => {
     expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
     expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
-    expect(html).toContain('最近 7 天');
-    expect(html).toContain('href="2026-06-02.html"');
-    expect(html).toContain('href="2026-05-30.html"');
+    expect(html).not.toContain('最近 7 天');
+    expect(html).not.toContain('<nav class="nav">');
+    expect(html).not.toContain('href="2026-06-02.html"');
+    expect(html).not.toContain('href="2026-05-30.html"');
     expect(html).not.toContain('返回首页');
     expect(html).toContain('Static export item');
   });

@@ -186,21 +186,9 @@ function renderItems(items: NormalizedItem[]): string {
   }).join('\n');
 }
 
-export function renderStaticRecentDaysNav(recentDays: string[], hrefPrefix: string): string {
-  return `
-    <nav class="nav">
-      <h2>最近 7 天</h2>
-      <ol class="recent-days">
-        ${recentDays.map((day) => `<li><a href="${escapeHtml(`${hrefPrefix}${day}.html`)}">${escapeHtml(day)}</a></li>`).join('')}
-      </ol>
-    </nav>
-  `;
-}
-
 function renderShell(input: {
   siteTitle: string;
   targetDate: string;
-  navHtml: string;
   bodyHtml: string;
 }): string {
   return `<!doctype html>
@@ -215,11 +203,7 @@ function renderShell(input: {
       .header { margin-bottom: 24px; }
       .title { margin: 0; font-size: 32px; }
       .subtitle { margin: 8px 0 0; color: #6b7280; }
-      .nav, .content { background: #ffffff; border: 1px solid #e6e4f2; border-radius: 18px; padding: 20px; box-shadow: 0 12px 36px rgba(83, 74, 183, 0.08); }
-      .nav { margin-bottom: 20px; }
-      .nav h2 { margin: 0 0 12px; font-size: 18px; }
-      .recent-days { list-style: none; margin: 0; padding-left: 0; display: flex; flex-wrap: wrap; gap: 12px; }
-      .recent-days li { margin: 0; }
+      .content { background: #ffffff; border: 1px solid #e6e4f2; border-radius: 18px; padding: 20px; box-shadow: 0 12px 36px rgba(83, 74, 183, 0.08); }
       .digest-card { padding: 20px; border-top: 1px solid #eceaf5; display: flex; flex-direction: column; gap: 10px; }
       .digest-card:first-child { border-top: 0; padding-top: 0; }
       .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
@@ -245,7 +229,7 @@ function renderShell(input: {
       .empty-state { color: #6b7280; line-height: 1.6; }
       @media (max-width: 640px) {
         .page { padding: 24px 14px 32px; }
-        .nav, .content { padding: 16px; }
+        .content { padding: 16px; }
         .digest-card { padding: 16px 0; }
         .card-top { flex-direction: column; align-items: flex-start; }
         .topic-badges { justify-content: flex-start; }
@@ -260,7 +244,6 @@ function renderShell(input: {
         <h1 class="title">${escapeHtml(input.siteTitle)}</h1>
         <p class="subtitle">${escapeHtml(input.targetDate)}</p>
       </header>
-      ${input.navHtml}
       <section class="content">${input.bodyHtml}</section>
     </main>
     <script>
@@ -297,7 +280,6 @@ export function renderStaticIndexPage(input: StaticIndexPageInput): string {
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml: renderStaticRecentDaysNav(input.recentDays, 'days/'),
     bodyHtml: renderItems(input.items),
   });
 }
@@ -306,7 +288,6 @@ export function renderStaticDayPage(input: StaticDayPageInput): string {
   return renderShell({
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
-    navHtml: renderStaticRecentDaysNav(input.recentDays, ''),
     bodyHtml: renderItems(input.items),
   });
 }

@@ -66,16 +66,17 @@ describe('exportStaticSite', () => {
     const dayHtml = readFileSync(result.dayPath, 'utf8');
 
     expect(indexHtml).toContain('AI Pulse Scout Daily');
-    expect(indexHtml).toContain('href="days/2026-06-02.html"');
-    expect(indexHtml).toContain('href="days/2026-05-30.html"');
-    expect(dayHtml).toContain('最近 7 天');
-    expect(dayHtml).toContain('href="2026-06-02.html"');
-    expect(dayHtml).toContain('href="2026-05-30.html"');
+    expect(indexHtml).not.toContain('最近 7 天');
+    expect(indexHtml).not.toContain('href="days/2026-06-02.html"');
+    expect(indexHtml).not.toContain('href="days/2026-05-30.html"');
+    expect(dayHtml).not.toContain('最近 7 天');
+    expect(dayHtml).not.toContain('href="2026-06-02.html"');
+    expect(dayHtml).not.toContain('href="2026-05-30.html"');
     expect(dayHtml).not.toContain('返回首页');
     expect(dayHtml).toContain('Exported item');
   });
 
-  it('updates homepage and existing day-page navigation without overwriting historical archive content', async () => {
+  it('keeps only the current day archive page', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-refresh-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
@@ -98,26 +99,20 @@ describe('exportStaticSite', () => {
 
     const indexHtml = readFileSync(result.indexPath, 'utf8');
     const targetDayHtml = readFileSync(result.dayPath, 'utf8');
-    const refreshed0601Html = readFileSync(join(daysDir, '2026-06-01.html'), 'utf8');
-    const refreshed0531Html = readFileSync(join(daysDir, '2026-05-31.html'), 'utf8');
 
-    expect(indexHtml).toContain('href="days/2026-06-03.html"');
-    expect(indexHtml).toContain('href="days/2026-05-28.html"');
-    expect(targetDayHtml).toContain('href="2026-06-03.html"');
-    expect(targetDayHtml).toContain('href="2026-05-28.html"');
+    expect(indexHtml).not.toContain('最近 7 天');
+    expect(indexHtml).not.toContain('href="days/2026-06-03.html"');
+    expect(indexHtml).not.toContain('href="days/2026-05-28.html"');
+    expect(targetDayHtml).not.toContain('最近 7 天');
+    expect(targetDayHtml).not.toContain('href="2026-06-03.html"');
+    expect(targetDayHtml).not.toContain('href="2026-05-28.html"');
     expect(targetDayHtml).not.toContain('href="2026-05-27.html"');
-
-    expect(refreshed0601Html).toContain('<article class="digest-card">historical-0601</article>');
-    expect(refreshed0531Html).toContain('<article class="digest-card">historical-0531</article>');
-    expect(refreshed0601Html).toContain('href="2026-06-03.html"');
-    expect(refreshed0601Html).toContain('href="2026-05-28.html"');
-    expect(refreshed0601Html).not.toContain('href="2026-05-26.html"');
-    expect(refreshed0531Html).toContain('href="2026-06-03.html"');
-    expect(refreshed0531Html).toContain('href="2026-05-28.html"');
-    expect(refreshed0531Html).not.toContain('href="2026-05-25.html"');
+    expect(existsSync(join(daysDir, '2026-06-03.html'))).toBe(true);
+    expect(existsSync(join(daysDir, '2026-06-01.html'))).toBe(false);
+    expect(existsSync(join(daysDir, '2026-05-31.html'))).toBe(false);
   });
 
-  it('removes archive pages that fall outside the latest seven-day window', async () => {
+  it('removes archive pages outside the current day', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-prune-'));
     tempDirs.push(outputDir);
     const daysDir = join(outputDir, 'days');
@@ -136,10 +131,11 @@ describe('exportStaticSite', () => {
     });
 
     expect(existsSync(stalePath)).toBe(false);
-    expect(existsSync(join(daysDir, '2026-05-28.html'))).toBe(true);
+    expect(existsSync(join(daysDir, '2026-05-28.html'))).toBe(false);
+    expect(existsSync(join(daysDir, '2026-06-03.html'))).toBe(true);
   });
 
-  it('does not force the currently viewed day into the recent-days nav when it falls outside the latest window', async () => {
+  it('does not render recent-days navigation for historical target pages', async () => {
     const outputDir = mkdtempSync(join(tmpdir(), 'ai-pulse-scout-static-anchor-only-'));
     tempDirs.push(outputDir);
 
@@ -152,11 +148,10 @@ describe('exportStaticSite', () => {
     });
 
     const dayHtml = readFileSync(result.dayPath, 'utf8');
-    expect(dayHtml).toContain('href="2026-06-03.html"');
-    expect(dayHtml).toContain('href="2026-05-28.html"');
-
-    const navLine = dayHtml.match(/<ol class="recent-days">([\s\S]*?)<\/ol>/)?.[1] ?? '';
-    expect(navLine.indexOf('2026-06-03.html')).toBeLessThan(navLine.indexOf('2026-05-28.html'));
-    expect(navLine).not.toContain('href="2026-05-27.html"');
+    expect(dayHtml).toContain('Historical page item');
+    expect(dayHtml).not.toContain('最近 7 天');
+    expect(dayHtml).not.toContain('href="2026-06-03.html"');
+    expect(dayHtml).not.toContain('href="2026-05-28.html"');
+    expect(dayHtml).not.toContain('href="2026-05-27.html"');
   });
 });
