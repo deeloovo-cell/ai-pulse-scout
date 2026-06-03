@@ -73,6 +73,11 @@ describe('renderStaticIndexPage', () => {
     expect(html).toContain('% match');
     expect(html).toContain('Relevant rank');
     expect(html).toContain('Follow-up');
+    expect(html).toContain('type="checkbox"');
+    expect(html).toContain('class="followup-checkbox"');
+    expect(html).toContain('data-followup-id="static-item-1"');
+    expect(html).toContain('ai-pulse-scout:followup:v1:');
+    expect(html).toContain('window.localStorage.setItem');
     expect(html).toContain('智能体');
   });
 

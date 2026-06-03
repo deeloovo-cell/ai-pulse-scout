@@ -140,6 +140,10 @@ function getRelevantRank(match: number): string {
   return '★★☆☆☆';
 }
 
+function getFollowupStorageId(item: NormalizedItem): string {
+  return item.id || item.fingerprint || item.item_url;
+}
+
 function renderItems(items: NormalizedItem[]): string {
   if (items.length === 0) {
     return '<div class="empty-state">当前没有可展示的 digest 内容。</div>';
@@ -151,6 +155,7 @@ function renderItems(items: NormalizedItem[]): string {
     const matchTone = getMatchTone(match);
     const summary = getPreferredSummary(item);
     const relevantRank = getRelevantRank(match);
+    const followupId = getFollowupStorageId(item);
 
     return `
     <article class="digest-card">
@@ -170,7 +175,10 @@ function renderItems(items: NormalizedItem[]): string {
         <div class="footer-divider"></div>
         <div class="footer-group footer-followup">
           <span class="footer-label">Follow-up</span>
-          <span class="followup-pill">待跟进</span>
+          <label class="followup-control">
+            <input type="checkbox" class="followup-checkbox" data-followup-id="${escapeHtml(followupId)}" />
+            <span class="followup-text">待跟进</span>
+          </label>
         </div>
       </div>
     </article>
@@ -228,9 +236,11 @@ function renderShell(input: {
       .card-footer { display: flex; align-items: center; gap: 14px; padding-top: 10px; border-top: 1px solid #eceaf5; flex-wrap: wrap; }
       .footer-group { display: flex; align-items: center; gap: 8px; }
       .footer-label { font-size: 12px; color: #6b7280; }
-      .footer-value, .followup-pill { font-size: 12px; font-weight: 600; }
+      .footer-value, .followup-text { font-size: 12px; font-weight: 600; }
       .footer-value { color: #ba7517; letter-spacing: 0.04em; }
-      .followup-pill { color: #534ab7; }
+      .followup-control { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: #534ab7; }
+      .followup-checkbox { width: 15px; height: 15px; accent-color: #534ab7; cursor: pointer; }
+      .followup-text { color: #534ab7; }
       .footer-divider { width: 1px; height: 16px; background: #e6e4f2; }
       .empty-state { color: #6b7280; line-height: 1.6; }
       @media (max-width: 640px) {
@@ -253,6 +263,32 @@ function renderShell(input: {
       ${input.navHtml}
       <section class="content">${input.bodyHtml}</section>
     </main>
+    <script>
+      (() => {
+        const storagePrefix = 'ai-pulse-scout:followup:v1:';
+        const readState = (id) => {
+          try {
+            return window.localStorage.getItem(storagePrefix + id) === 'true';
+          } catch {
+            return false;
+          }
+        };
+        const writeState = (id, checked) => {
+          try {
+            window.localStorage.setItem(storagePrefix + id, checked ? 'true' : 'false');
+          } catch {
+            // Static pages remain usable even when localStorage is unavailable.
+          }
+        };
+
+        document.querySelectorAll('.followup-checkbox').forEach((checkbox) => {
+          const id = checkbox.dataset.followupId;
+          if (!id) return;
+          checkbox.checked = readState(id);
+          checkbox.addEventListener('change', () => writeState(id, checkbox.checked));
+        });
+      })();
+    </script>
   </body>
 </html>`;
 }
