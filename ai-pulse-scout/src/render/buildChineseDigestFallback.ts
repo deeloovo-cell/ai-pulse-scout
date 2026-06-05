@@ -35,7 +35,7 @@ export function buildChineseDigestFallback(item: NormalizedItem): string {
   }
 
   if (looksEnglish(detail)) {
-    return `这条${source}的${topic}更新已进入今日摘要，核心内容与「${truncate(item.title, 60)}」相关；系统已保留原文链接，建议点击查看完整细节。`;
+    return `这条${source}的${topic}更新主要讨论「${truncate(item.title, 60)}」；当前先保留来源关键信息，建议点击查看完整细节。`;
   }
 
   return `这条${source}的${topic}更新重点是：${truncate(detail)}`;
