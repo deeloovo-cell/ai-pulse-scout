@@ -1,5 +1,6 @@
 import type {
   AppliesTo,
+  BusinessDomain,
   ExecutiveAction,
   ExecutiveBrief,
   ExecutiveInsight,
@@ -11,6 +12,7 @@ const GROWTH_LEVERS: GrowthLever[] = ['Efficiency', 'Quality', 'Revenue', 'Speed
 const APPLIES_TO: AppliesTo[] = ['Design', 'Process', 'Shop floor', 'Supply chain', 'R&D'];
 const ACTIONS: ExecutiveAction[] = ['Monitor', 'Evaluate pilot', 'Engage partner'];
 const RELEVANCE: ManufacturingRelevance[] = ['High', 'Medium', 'Low'];
+const BUSINESS_DOMAINS: BusinessDomain[] = ['销售', '研发', '生产', '质量', '人事', '财务', '供应链', '计划'];
 
 export function parseExecutiveInsightResponse(raw: string): ExecutiveInsight | null {
   const jsonText = extractJsonObject(raw);
@@ -27,6 +29,8 @@ export function parseExecutiveInsightResponse(raw: string): ExecutiveInsight | n
       applies_to: pickAppliesTo(parsed.applies_to),
       action: pickEnum(parsed.action, ACTIONS, 'Monitor'),
       manufacturing_relevance: pickOptionalEnum(parsed.manufacturing_relevance, RELEVANCE),
+      source_summary: asString(parsed.source_summary) ?? undefined,
+      business_domains: pickBusinessDomains(parsed.business_domains),
     };
   } catch {
     return null;
@@ -96,4 +100,13 @@ function pickAppliesTo(value: unknown): AppliesTo[] {
     .map((entry) => APPLIES_TO.find((allowed) => allowed.toLowerCase() === entry.toLowerCase()))
     .filter((entry): entry is AppliesTo => Boolean(entry));
   return picked.length > 0 ? picked.slice(0, 2) : ['R&D'];
+}
+
+function pickBusinessDomains(value: unknown): BusinessDomain[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const picked = value
+    .filter((entry): entry is string => typeof entry === 'string')
+    .map((entry) => BUSINESS_DOMAINS.find((allowed) => allowed === entry.trim()))
+    .filter((entry): entry is BusinessDomain => Boolean(entry));
+  return picked.length > 0 ? picked.slice(0, 3) : undefined;
 }
