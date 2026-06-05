@@ -1,5 +1,6 @@
 import type { NormalizedItem } from '../types/item.js';
 import { logger } from '../utils/logger.js';
+import { buildChineseDigestFallback } from '../render/buildChineseDigestFallback.js';
 import { requestChatCompletion, resolveLlmClient } from './chatCompletions.js';
 import {
   defaultExecutiveInsight,
@@ -12,14 +13,18 @@ const MAX_CONTEXT_CHARS = 14000;
 const ITEM_SYSTEM_PROMPT = `你在为一家高科技制造企业的 CIO / Chief AI Officer 分析 AI 与工程信号。
 请只返回合法 JSON：
 {
-  "why_it_matters": "80-120字中文，具体、克制、不空泛，说明发生了什么，以及为什么值得制造业管理层关注",
+  "source_summary": "第一段：60-100字中文，忠实概括原文内容，不带用户兴趣偏向",
+  "why_it_matters": "第二段：60-100字中文，说明为什么和用户关注方向相关；弱相关时明确写相关性有限",
   "growth_lever": "Efficiency|Quality|Revenue|Speed|Risk",
   "applies_to": ["Design|Process|Shop floor|Supply chain|R&D"],
   "action": "Monitor|Evaluate pilot|Engage partner",
-  "manufacturing_relevance": "High|Medium|Low"
+  "manufacturing_relevance": "High|Medium|Low",
+  "business_domains": ["销售","研发","生产","质量","人事","财务","供应链","计划"]
 }
 要求：
-- why_it_matters 必须使用简体中文
+- source_summary 和 why_it_matters 必须使用简体中文
+- source_summary 只总结原文，不写用户偏好
+- why_it_matters 是第二段，强相关时点名业务域，弱相关时写相关性有限
 - 返回 JSON 之外不要输出任何额外文字
 - 研究论文需要包含 manufacturing_relevance；产品/新闻类可省略
 - 重点关注 robotics、physical AI、CAD/CAM、sim-to-real、enterprise AI、manufacturing AI 等方向。`;
@@ -104,7 +109,11 @@ function attachFallbackInsight(item: NormalizedItem): NormalizedItem {
       ? 'Source link retained for manual review; automated extraction was incomplete.'
       : 'Open the source for full details.');
 
-  const insight = defaultExecutiveInsight(text, isPaperItem(item));
+  const insight = {
+    ...defaultExecutiveInsight(text, isPaperItem(item)),
+    source_summary: buildChineseDigestFallback(item),
+    business_domains: undefined,
+  };
   return {
     ...item,
     executive_insight: insight,

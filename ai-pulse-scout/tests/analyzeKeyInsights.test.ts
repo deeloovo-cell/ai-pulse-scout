@@ -99,17 +99,19 @@ describe('enrichKeyInsights', () => {
       applies_to: ['R&D'],
       action: 'Monitor',
       manufacturing_relevance: undefined,
+      source_summary: '这条该来源的AI 主题更新主要讨论「Major AI Breakthrough Released」；当前先保留来源关键信息，建议点击查看完整细节。',
+      business_domains: undefined,
     });
   });
 
-  it('requests Chinese why_it_matters from the chat completion prompt', async () => {
+  it('requests chinese source_summary and relevance fields from the chat completion prompt', async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
         choices: [
           {
             message: {
-              content: '{"why_it_matters":"这说明生产级 agent 的成本控制已经变成架构问题。","growth_lever":"Efficiency","applies_to":["R&D"],"action":"Monitor"}',
+              content: '{"source_summary":"这条更新介绍了 agent 编排框架。","why_it_matters":"这说明生产级 agent 的成本控制已经变成架构问题。","growth_lever":"Efficiency","applies_to":["R&D"],"action":"Monitor","business_domains":["研发","供应链"]}',
             },
           },
         ],
@@ -125,6 +127,8 @@ describe('enrichKeyInsights', () => {
     });
 
     expect(item.key_insight).toBe('这说明生产级 agent 的成本控制已经变成架构问题。');
+    expect(item.executive_insight?.source_summary).toBe('这条更新介绍了 agent 编排框架。');
+    expect(item.executive_insight?.business_domains).toEqual(['研发', '供应链']);
     expect(fetchMock).toHaveBeenCalledWith(
       'https://aigw.aac.tech/v1/chat/completions',
       expect.objectContaining({
@@ -141,7 +145,9 @@ describe('enrichKeyInsights', () => {
     expect(body.thinking).toEqual({ type: 'disabled' });
     expect(body.max_tokens).toBe(900);
     expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
-    expect(body.messages[0].content).toContain('why_it_matters 必须使用简体中文');
+    expect(body.messages[0].content).toContain('source_summary');
+    expect(body.messages[0].content).toContain('business_domains');
+    expect(body.messages[0].content).toContain('why_it_matters 是第二段');
     expect(body.messages[1].content).toContain('Analyze this item for the daily manufacturing AI digest.');
     expect(body.messages[1].content).toContain('Existing feed summary: New agentic AI framework for industrial use.');
   });
@@ -202,6 +208,8 @@ describe('enrichKeyInsights', () => {
       applies_to: ['R&D'],
       action: 'Monitor',
       manufacturing_relevance: undefined,
+      source_summary: '这条该来源的AI 主题更新主要讨论「Major AI Breakthrough Released」；当前先保留来源关键信息，建议点击查看完整细节。',
+      business_domains: undefined,
     });
   });
 });

@@ -3,7 +3,7 @@ import type { ExecutiveBrief, ExecutiveInsight } from '../types/executive.js';
 import { DIGEST_TOPICS } from '../topics/topicOrder.js';
 import { TOPIC_LABELS_ZH } from '../topics/topicLabels.js';
 import { defaultExecutiveInsight } from '../insights/parseExecutiveInsight.js';
-import { buildChineseDigestFallback } from './buildChineseDigestFallback.js';
+import { buildTwoPartSummary } from './buildTwoPartSummary.js';
 import { formatDigestDate } from '../utils/time.js';
 
 const ITEM_COLORS = ['#f4f8fc', '#faf6f0'];
@@ -151,9 +151,9 @@ function renderItem(item: NormalizedItem, index: number): string {
         ${meta}
         ${relevance}
       </p>
-      <p style="margin:0 0 6px 0;font-size:13px;color:#333;line-height:1.55;">
-        <strong>关键信息：</strong> ${escapeHtml(renderWhyItMatters(item, insight))}
-      </p>
+      <div class="digest-summary" style="margin:0 0 6px 0;font-size:13px;color:#333;line-height:1.55;">
+        ${renderSummaryParagraphs(item)}
+      </div>
       <p style="margin:10px 0 0 0;font-size:12px;">
         <a href="${escapeHtml(item.item_url)}" style="color:${ACCENT};text-decoration:none;">
           ${linkLabel}
@@ -176,11 +176,11 @@ function renderMetaTags(insight: ExecutiveInsight): string {
   ].join('');
 }
 
-function renderWhyItMatters(item: NormalizedItem, insight: ExecutiveInsight): string {
-  if (item.executive_insight || item.key_insight) {
-    return insight.why_it_matters;
-  }
-  return buildChineseDigestFallback(item);
+function renderSummaryParagraphs(item: NormalizedItem): string {
+  return buildTwoPartSummary(item)
+    .split('\n\n')
+    .map((paragraph) => `<p style="margin:0 0 10px 0;"><strong>关键信息：</strong> ${escapeHtml(paragraph)}</p>`)
+    .join('');
 }
 
 function resolveExecutiveInsight(item: NormalizedItem): ExecutiveInsight {

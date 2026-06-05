@@ -1,5 +1,5 @@
 import type { NormalizedItem } from '../types/item.js';
-import { buildChineseDigestFallback } from '../render/buildChineseDigestFallback.js';
+import { buildTwoPartSummary } from '../render/buildTwoPartSummary.js';
 
 interface StaticPageInput {
   siteTitle: string;
@@ -30,31 +30,8 @@ function truncateText(value: string, maxLength: number): string {
   return `${value.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
 }
 
-type EnrichmentLikeItem = NormalizedItem & {
-  why_it_matters?: string;
-};
-
-function hasChinese(text: string): boolean {
-  return /[\u4e00-\u9fff]/.test(text);
-}
-
 function getPreferredSummary(item: NormalizedItem): string {
-  const enrichmentCandidate = (item as EnrichmentLikeItem).why_it_matters;
-  const executiveCandidate = item.executive_insight?.why_it_matters;
-  const candidateFields = [enrichmentCandidate, executiveCandidate, item.key_insight, item.summary];
-
-  const text = candidateFields.find((value) => typeof value === 'string' && value.trim().length > 0)?.trim() ?? '';
-  const normalized = normalizeWhitespace(text);
-
-  if (!normalized) {
-    return truncateText(buildChineseDigestFallback(item), 360);
-  }
-
-  if (hasChinese(normalized)) {
-    return truncateText(normalized, 360);
-  }
-
-  return truncateText(buildChineseDigestFallback(item), 360);
+  return truncateText(normalizeWhitespace(buildTwoPartSummary(item)), 360);
 }
 
 function inferTopicBadges(item: NormalizedItem): string[] {

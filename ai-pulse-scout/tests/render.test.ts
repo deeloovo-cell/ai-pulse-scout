@@ -66,15 +66,27 @@ describe('renderHtmlEmail', () => {
     expect(html).toContain('href="https://example.com/article"');
   });
 
-  it('prefers analyzed key insight over feed summary', () => {
+  it('renders the two-part summary in html outputs without changing card structure', () => {
     const html = renderHtmlEmail({
-      items: [makeItem({ key_insight: '这是 LLM 生成的中文关键信息。' })],
+      items: [makeItem({
+        executive_insight: {
+          why_it_matters: '这对研发流程自动化更值得关注。',
+          growth_lever: 'Efficiency',
+          applies_to: ['R&D'],
+          action: 'Monitor',
+          manufacturing_relevance: 'High',
+          source_summary: '这条更新介绍了新的 agent 编排框架。',
+          business_domains: ['研发'],
+        },
+        key_insight: '这对研发流程自动化更值得关注。',
+      })],
       date: new Date(),
       subjectTemplate: 'AI Pulse Scout -- {date}',
     });
 
-    expect(html).toContain('这是 LLM 生成的中文关键信息。');
-    expect(html).not.toContain('New agentic AI framework for industrial use.');
+    expect(html).toContain('这条更新介绍了新的 agent 编排框架。');
+    expect(html).toContain('相关业务域：研发');
+    expect(html).toContain('digest-summary');
   });
 
   it('escapes HTML entities in title', () => {
