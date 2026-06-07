@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname } from 'node:path';
+import { computeDailyCutoffWindow } from '../utils/time.js';
 
 export interface StaticSitePublishCheckpoint {
   lastSuccessfulFetchCompletedAt: string;
@@ -34,22 +35,22 @@ export function resolveStaticSitePublishWindow({
 }): {
   windowStart: Date;
   windowEnd: Date;
-  source: 'checkpoint' | 'fallback_24h';
+  source: 'daily_cutoff' | 'fallback_24h';
 } {
   const checkpoint = readStaticSitePublishCheckpoint(checkpointPath);
-  const windowEnd = runStartedAt;
 
   if (checkpoint) {
+    const dailyWindow = computeDailyCutoffWindow(runStartedAt);
     return {
-      windowStart: new Date(checkpoint.lastSuccessfulFetchCompletedAt),
-      windowEnd,
-      source: 'checkpoint',
+      windowStart: dailyWindow.windowStart,
+      windowEnd: dailyWindow.windowEnd,
+      source: 'daily_cutoff',
     };
   }
 
   return {
     windowStart: new Date(runStartedAt.getTime() - 24 * 60 * 60 * 1000),
-    windowEnd,
+    windowEnd: runStartedAt,
     source: 'fallback_24h',
   };
 }
