@@ -7,25 +7,28 @@ import {
   resolveStaticSitePublishWindow,
   writeStaticSitePublishCheckpoint,
 } from '../../src/state/staticSitePublishCheckpoint.js';
+import { computeDailyCutoffWindow } from '../../src/utils/time.js';
 
 describe('staticSitePublishCheckpoint', () => {
-  it('uses previous successful completion as window start', () => {
+  it('uses the fixed daily cutoff window even when a recent checkpoint exists', () => {
     const dir = mkdtempSync(join(tmpdir(), 'aps-checkpoint-'));
     const checkpointPath = join(dir, 'checkpoint.json');
     writeStaticSitePublishCheckpoint(checkpointPath, {
-      lastSuccessfulFetchCompletedAt: '2026-06-01T07:32:18.000Z',
-      runStartedAt: '2026-06-02T07:00:00.000Z',
-      completedAt: '2026-06-02T07:41:00.000Z',
+      lastSuccessfulFetchCompletedAt: '2026-06-06T13:45:30.842Z',
+      runStartedAt: '2026-06-06T13:30:00.000Z',
+      completedAt: '2026-06-06T13:45:30.842Z',
     });
 
+    const runStartedAt = new Date('2026-06-06T23:00:01.818Z');
     const resolved = resolveStaticSitePublishWindow({
       checkpointPath,
-      runStartedAt: new Date('2026-06-03T07:00:00.000Z'),
+      runStartedAt,
     });
+    const expected = computeDailyCutoffWindow(runStartedAt);
 
-    expect(resolved.windowStart.toISOString()).toBe('2026-06-01T07:32:18.000Z');
-    expect(resolved.windowEnd.toISOString()).toBe('2026-06-03T07:00:00.000Z');
-    expect(resolved.source).toBe('checkpoint');
+    expect(resolved.windowStart.toISOString()).toBe(expected.windowStart.toISOString());
+    expect(resolved.windowEnd.toISOString()).toBe(expected.windowEnd.toISOString());
+    expect(resolved.source).toBe('daily_cutoff');
   });
 
   it('falls back to 24h before run start when checkpoint is missing', () => {
