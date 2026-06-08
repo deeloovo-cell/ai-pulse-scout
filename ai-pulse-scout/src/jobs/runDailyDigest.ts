@@ -41,7 +41,7 @@ export async function runDailyDigest(
 ): Promise<DigestRunResult> {
   const config = loadConfig();
   const now = new Date();
-  const { windowStart, windowEnd } = computeDailyCutoffWindow(now);
+  const { windowStart, windowEnd } = computeDailyCutoffWindow(now, config.digest.safety_buffer_hours ?? 0);
 
   logger.info(`Collection window: ${windowStart.toISOString()} → ${windowEnd.toISOString()}`);
 
@@ -70,7 +70,7 @@ export async function runDailyDigest(
       logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
       for (const result of ingestion.results) {
         logger.info(
-          `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
+          `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}${result.diagnostics.fallback ? ' [fallback]' : ''}`,
         );
       }
 

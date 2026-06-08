@@ -34,6 +34,14 @@ function loadInboxUrls(): string[] {
   return [...raw.matchAll(/https?:\/\/\S+/g)].map((match) => match[0]);
 }
 
+function isTraceableToInbox(source: SourceConfig, inboxUrls: string[]): boolean {
+  return inboxUrls.includes(source.url) || inboxUrls.some((url) => source.notes?.includes(url));
+}
+
+function sourcesCoverInboxUrl(sources: SourceConfig[], inboxUrl: string): boolean {
+  return sources.some((source) => source.url === inboxUrl || source.notes?.includes(inboxUrl));
+}
+
 describe('sources.yaml schema', () => {
   it('parses without error and has entries', () => {
     const sources = loadSources();
@@ -81,13 +89,37 @@ describe('sources.yaml schema', () => {
     }
   });
 
-  it('expands the arXiv inbox entry into canonical AI-category RSS feeds', () => {
+  it('covers every inbox URL with at least one live registry source', () => {
     const sources = loadSources();
     const inboxUrls = loadInboxUrls();
+    const enabled = sources.filter((s) => s.enabled !== false);
 
-    expect(inboxUrls).toEqual(['https://arxiv.org/']);
-    expect(sources.every((s) => s.url.startsWith('https://arxiv.org/rss/'))).toBe(true);
-    expect(sources.every((s) => s.notes?.includes('https://arxiv.org/'))).toBe(true);
+    for (const inboxUrl of inboxUrls) {
+      expect(enabled, `missing enabled registry source derived from ${inboxUrl}`).toSatisfy(
+        (registry: SourceConfig[]) => sourcesCoverInboxUrl(registry, inboxUrl),
+      );
+    }
+  });
+
+  it('keeps every enabled registry source traceable to source-inbox.md', () => {
+    const sources = loadSources();
+    const inboxUrls = loadInboxUrls();
+    const enabled = sources.filter((s) => s.enabled !== false);
+
+    for (const source of enabled) {
+      expect(
+        isTraceableToInbox(source, inboxUrls),
+        `enabled source "${source.name}" is not traceable to source-inbox.md`,
+      ).toBe(true);
+    }
+  });
+
+  it('expands the arXiv inbox entry into canonical AI-category RSS feeds', () => {
+    const sources = loadSources();
+    const arxivSources = sources.filter((s) => s.notes?.includes('https://arxiv.org/'));
+
+    expect(arxivSources.length).toBeGreaterThan(0);
+    expect(arxivSources.every((s) => s.url.startsWith('https://arxiv.org/rss/'))).toBe(true);
   });
 
   it('covers core AI arXiv categories', () => {
@@ -130,17 +162,17 @@ describe('sources.yaml schema', () => {
     expect(unique.size).toBe(urls.length);
   });
 
-  it('enabled sources are research papers from arXiv', () => {
+  it('enabled sources are live RSS sources across blog and research categories', () => {
     const sources = loadSources();
     const enabled = sources.filter((s) => s.enabled !== false);
     const cats = new Set(enabled.map((s) => s.category));
-    expect(cats).toEqual(new Set(['research']));
+    expect(cats).toEqual(new Set(['blog', 'research']));
     expect(enabled.every((s) => s.type === 'rss')).toBe(true);
   });
 });
 
 describe('loadConfig source filtering', () => {
-  it('loads all enabled arXiv RSS sources for digest runs', () => {
+  it('loads all enabled live RSS sources for digest runs', () => {
     const all = loadSources();
     const enabled = all.filter((s) => s.enabled !== false);
     expect(enabled.length).toBe(all.length);

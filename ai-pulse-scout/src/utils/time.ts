@@ -1,7 +1,5 @@
 import { format, subHours, subDays } from 'date-fns';
 
-const SHANGHAI_OFFSET_HOURS = 8;
-const DAILY_CUTOFF_HOUR = 7;
 const ONE_DAY_HOURS = 24;
 
 export interface DailyCutoffWindow {
@@ -18,21 +16,19 @@ export function computeWindowStart(lastRun: Date | null, windowHours: number, bu
   return subHours(anchor, bufferHours);
 }
 
-export function computeDailyCutoffWindow(now: Date): DailyCutoffWindow {
-  const localMs = now.getTime() + SHANGHAI_OFFSET_HOURS * 3600_000;
-  const localNow = new Date(localMs);
-
-  const localYear = localNow.getUTCFullYear();
-  const localMonth = localNow.getUTCMonth();
-  const localDate = localNow.getUTCDate();
-  const localHour = localNow.getUTCHours();
-
-  const cutoffDay = localHour >= DAILY_CUTOFF_HOUR ? localDate : localDate - 1;
-  const windowEnd = new Date(
-    Date.UTC(localYear, localMonth, cutoffDay, DAILY_CUTOFF_HOUR - SHANGHAI_OFFSET_HOURS, 0, 0, 0),
-  );
-  const windowStart = new Date(windowEnd.getTime() - ONE_DAY_HOURS * 3600_000);
-
+/**
+ * Computes a rolling 24-hour collection window ending at `now`.
+ *
+ * Previously this used a fixed 07:00 Shanghai cutoff, which caused two bugs:
+ *   1. Items published after 07:00 on run day were silently excluded.
+ *   2. Any run outside the exact daily cadence would miss content.
+ *
+ * Now the window is always [now - 24h, now], optionally extended by
+ * `safetyBufferHours` on the start side to avoid gaps on retries.
+ */
+export function computeDailyCutoffWindow(now: Date, safetyBufferHours = 0): DailyCutoffWindow {
+  const windowEnd = now;
+  const windowStart = new Date(now.getTime() - (ONE_DAY_HOURS + safetyBufferHours) * 3600_000);
   return { windowStart, windowEnd };
 }
 

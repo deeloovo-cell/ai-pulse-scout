@@ -61,6 +61,7 @@ export async function ingestAllSources(
         aiAccepted: capped.counts.aiAccepted,
         aiRejected: capped.counts.aiRejected,
         capped: capped.counts.capped,
+        fallback: capped.counts.fallback,
         dropped:
           ingested.diagnostics.dropped +
           capped.counts.aiRejected +

@@ -43,6 +43,7 @@ export interface IngestionDiagnostics {
   aiAccepted?: number;
   aiRejected?: number;
   capped?: number;
+  fallback?: boolean;
   reason?: string;
   adapterType?: string;
 }

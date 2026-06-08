@@ -136,14 +136,13 @@ describe('real inbox coverage summary', () => {
   it('accounts for every source in the coverage summary', async () => {
     const markdown = readFileSync('config/source-inbox.md', 'utf8');
     const universe = buildSourceUniverse(markdown);
-    const handledSource = universe[0]!;
     const fakeAdapter = {
-      canHandle: vi.fn().mockImplementation((source: SourceUniverseRecord) => source.url === handledSource.url),
-      run: vi.fn().mockResolvedValue({
-        source: handledSource,
+      canHandle: vi.fn().mockReturnValue(true),
+      run: vi.fn().mockImplementation(async (source: SourceUniverseRecord) => ({
+        source,
         status: 'success',
         discoveredCount: 1,
-      }),
+      })),
     };
     const results = await runSourceCoverage(universe, { adapters: [fakeAdapter] });
     const summary = summarizeCoverage(results);
@@ -152,5 +151,6 @@ describe('real inbox coverage summary', () => {
     expect(summary.success + summary.empty + summary.remove + summary.failed).toBe(universe.length);
     expect(summary.success).toBe(universe.length);
     expect(summary.remove).toBe(0);
+    expect(fakeAdapter.run).toHaveBeenCalledTimes(universe.length);
   });
 });
