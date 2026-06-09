@@ -59,5 +59,27 @@ describe('capStaticDigestItems', () => {
       Array.from({ length: 50 }, (_, index) => `item-${index + 1}`),
     );
   });
-});
 
+  it('limits arXiv as one source family before filling the static cap', () => {
+    const arxivItems = Array.from({ length: 60 }, (_, index) => ({
+      id: `arxiv-${index + 1}`,
+      source_name: index % 2 === 0 ? 'arXiv CS.AI' : 'arXiv CS.LG',
+      source_url: index % 2 === 0 ? 'https://arxiv.org/rss/cs.AI' : 'https://arxiv.org/rss/cs.LG',
+    }));
+    const externalItems = [
+      { id: 'google-cloud', source_name: 'Google Cloud Blog AI & Machine Learning', source_url: 'https://cloudblog.withgoogle.com/products/ai-machine-learning/rss/' },
+      { id: 'simon-willison', source_name: 'Simon Willison Everything', source_url: 'http://feeds.simonwillison.net/swn-everything' },
+    ];
+
+    const capped = capStaticDigestItems([...arxivItems, ...externalItems]);
+
+    expect(capped).toHaveLength(50);
+    expect(capped.map((item) => item.id)).toContain('google-cloud');
+    expect(capped.map((item) => item.id)).toContain('simon-willison');
+    expect(capped.slice(0, 12).map((item) => item.id)).toEqual([
+      ...Array.from({ length: 10 }, (_, index) => `arxiv-${index + 1}`),
+      'google-cloud',
+      'simon-willison',
+    ]);
+  });
+});
