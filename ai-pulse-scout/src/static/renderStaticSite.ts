@@ -147,7 +147,6 @@ function renderItems(items: NormalizedItem[]): string {
           <span class="footer-label">Follow-up</span>
           <label class="followup-control">
             <input type="checkbox" class="followup-checkbox" data-followup-id="${escapeHtml(followupId)}" />
-            <span class="followup-text">待跟进</span>
           </label>
         </div>
       </div>
