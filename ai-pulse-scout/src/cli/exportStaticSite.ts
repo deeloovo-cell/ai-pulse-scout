@@ -75,7 +75,7 @@ logger.info(`After dedupe: ${deduped.length} items`);
 const ordered = selectItems(deduped, config.digest);
 logger.info(`After ordering: ${ordered.length} items`);
 
-const capped = capStaticDigestItems(ordered);
+const capped = capStaticDigestItems(ordered, config.digest.max_items);
 logger.info(`After static digest cap: ${capped.length} items`);
 
 const enriched = await enrichSelectedItems(capped, DEFAULT_ENRICHMENT_CAP);

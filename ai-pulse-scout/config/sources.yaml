@@ -167,6 +167,13 @@ sources:
     enabled: true
     coverage_status: live
     notes: "RSS feed validated from user-provided source list"
+  - name: "Google Blog"
+    category: blog
+    url: "https://blog.google/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed validated from user-provided source list"
   - name: "Google AI Blog"
     category: blog
     url: "https://www.blog.google/technology/ai/rss/"

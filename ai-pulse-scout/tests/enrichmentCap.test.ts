@@ -56,18 +56,18 @@ function makeItem(index: number): NormalizedItem {
 }
 
 describe('insight enrichment cap', () => {
-  it('enriches only the first 50 selected items but still returns all selected items', async () => {
+  it('enriches only the first 60 selected items but still returns all selected items', async () => {
     const { enrichSelectedItems } = await import('../src/insights/enrichSelectedItems.js');
     const items = Array.from({ length: 70 }, (_, index) => makeItem(index + 1));
 
     const result = await enrichSelectedItems(items);
 
     expect(enrichKeyInsightsMock).toHaveBeenCalledTimes(1);
-    expect(enrichKeyInsightsMock.mock.calls[0]?.[0]).toHaveLength(50);
+    expect(enrichKeyInsightsMock.mock.calls[0]?.[0]).toHaveLength(60);
     expect(result).toHaveLength(70);
     expect(result[0]?.key_insight).toBe('insight:item-1');
-    expect(result[49]?.key_insight).toBe('insight:item-50');
-    expect(result[50]?.key_insight).toBeUndefined();
+    expect(result[59]?.key_insight).toBe('insight:item-60');
+    expect(result[60]?.key_insight).toBeUndefined();
   });
 
   it('enriches all selected items when count is below the default cap', async () => {

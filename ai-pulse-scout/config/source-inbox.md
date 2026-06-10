@@ -27,6 +27,7 @@
 - https://blogs.sw.siemens.com/simcenter/feed/
 - https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_research.xml
 - https://developers.openai.com/rss.xml
+- https://blog.google/rss/
 - https://www.blog.google/technology/ai/rss/
 - https://research.google/blog/rss/
 - http://bair.berkeley.edu/blog/feed.xml

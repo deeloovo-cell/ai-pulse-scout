@@ -2,7 +2,7 @@ import { join } from 'node:path';
 
 const SHANGHAI_OFFSET_HOURS = 8;
 const DAILY_CUTOFF_HOUR = 7;
-export const STATIC_DIGEST_ITEM_CAP = 50;
+export const STATIC_DIGEST_ITEM_CAP = 60;
 export const STATIC_DIGEST_SOURCE_FAMILY_CAP = 10;
 
 function formatDateFromShanghaiLocal(localYear: number, localMonth: number, localDate: number): string {

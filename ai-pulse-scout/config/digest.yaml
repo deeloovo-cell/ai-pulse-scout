@@ -4,8 +4,8 @@
 
 digest:
   # Max recent posts to include in each digest.
-  # This config remains for shared selection logic even though production output is the static site.
-  max_items: 18
+  # The production static exporter uses this value as its item ceiling.
+  max_items: 60
 
   # Fetch posts published in the last 24 hours.
   collection_window_hours: 24

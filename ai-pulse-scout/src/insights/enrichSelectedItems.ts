@@ -1,7 +1,7 @@
 import type { NormalizedItem } from '../types/item.js';
 import { enrichKeyInsights } from './analyzeKeyInsights.js';
 
-export const DEFAULT_ENRICHMENT_CAP = 50;
+export const DEFAULT_ENRICHMENT_CAP = 60;
 
 export async function enrichSelectedItems(
   items: NormalizedItem[],
