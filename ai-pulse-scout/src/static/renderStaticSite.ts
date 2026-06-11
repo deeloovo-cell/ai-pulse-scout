@@ -73,45 +73,18 @@ function inferTopicBadges(item: NormalizedItem): string[] {
   return badges.slice(0, 2);
 }
 
-function computeDisplayMatch(index: number, total: number, item: NormalizedItem): number {
-  const explicitScore = item.relevance_scores?.overall;
-  if (typeof explicitScore === 'number' && Number.isFinite(explicitScore) && explicitScore > 0) {
-    return Math.max(61, Math.min(95, Math.round(explicitScore * 100)));
-  }
-
-  if (total <= 1) {
-    return 92;
-  }
-
-  const ratio = 1 - index / Math.max(total - 1, 1);
-  return Math.max(61, Math.min(95, Math.round(61 + ratio * 34)));
-}
-
-function getMatchTone(match: number): 'high' | 'mid' | 'low' {
-  if (match >= 80) {
-    return 'high';
-  }
-  if (match >= 60) {
-    return 'mid';
-  }
-  return 'low';
-}
-
-function getRelevantRank(match: number): string {
-  if (match >= 90) {
+function getRelevantRank(item: NormalizedItem): string {
+  const score = item.relevance_scores?.overall ?? 0;
+  if (score >= 0.9) {
     return '★★★★★';
   }
-  if (match >= 80) {
+  if (score >= 0.8) {
     return '★★★★☆';
   }
-  if (match >= 70) {
+  if (score >= 0.7) {
     return '★★★☆☆';
   }
   return '★★☆☆☆';
-}
-
-function getFollowupStorageId(item: NormalizedItem): string {
-  return item.id || item.fingerprint || item.item_url;
 }
 
 function renderItems(items: NormalizedItem[]): string {
@@ -119,37 +92,20 @@ function renderItems(items: NormalizedItem[]): string {
     return '<div class="empty-state">当前没有可展示的 digest 内容。</div>';
   }
 
-  return items.map((item, index) => {
+  return items.map((item) => {
     const badges = inferTopicBadges(item);
-    const match = computeDisplayMatch(index, items.length, item);
-    const matchTone = getMatchTone(match);
     const summary = getPreferredSummary(item);
-    const relevantRank = getRelevantRank(match);
-    const followupId = getFollowupStorageId(item);
-
+    const relevantRank = getRelevantRank(item);
     return `
     <article class="digest-card">
       <div class="card-top">
-        <span class="match-pill match-${matchTone}">${match}% match</span>
+        <span class="rank-pill">Relevant rank ${relevantRank}</span>
         <div class="topic-badges">${badges.map((badge) => `<span class="topic-badge">${escapeHtml(badge)}</span>`).join('')}</div>
       </div>
       <h2 class="digest-title">
         <a href="${escapeHtml(item.item_url)}">${escapeHtml(item.title)}</a>
       </h2>
       <p class="digest-summary">${escapeHtml(summary)}</p>
-      <div class="card-footer">
-        <div class="footer-group">
-          <span class="footer-label">Relevant rank</span>
-          <span class="footer-value">${relevantRank}</span>
-        </div>
-        <div class="footer-divider"></div>
-        <div class="footer-group footer-followup">
-          <span class="footer-label">Follow-up</span>
-          <label class="followup-control">
-            <input type="checkbox" class="followup-checkbox" data-followup-id="${escapeHtml(followupId)}" />
-          </label>
-        </div>
-      </div>
     </article>
   `;
   }).join('\n');
@@ -170,31 +126,21 @@ function renderShell(input: {
       body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f6f5fb; color: #1f2937; }
       .page { max-width: 920px; margin: 0 auto; padding: 32px 20px 48px; }
       .header { margin-bottom: 24px; }
+      .back-link { display: inline-block; margin-bottom: 14px; color: #534ab7; font-size: 14px; font-weight: 600; text-decoration: none; }
+      .back-link:hover { text-decoration: underline; }
       .title { margin: 0; font-size: 32px; }
       .subtitle { margin: 8px 0 0; color: #6b7280; }
       .content { background: #ffffff; border: 1px solid #e6e4f2; border-radius: 18px; padding: 20px; box-shadow: 0 12px 36px rgba(83, 74, 183, 0.08); }
       .digest-card { padding: 20px; border-top: 1px solid #eceaf5; display: flex; flex-direction: column; gap: 10px; }
       .digest-card:first-child { border-top: 0; padding-top: 0; }
       .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-      .match-pill { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px; flex-shrink: 0; }
-      .match-high { background: #eaf3de; color: #3b6d11; }
-      .match-mid { background: #faeeda; color: #ba7517; }
-      .match-low { background: #fcebeb; color: #a32d2d; }
+      .rank-pill { font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 999px; flex-shrink: 0; background: #faeeda; color: #ba7517; letter-spacing: 0.02em; }
       .topic-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
       .topic-badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: #eeedfe; color: #3c3489; }
       .digest-title { margin: 0; font-size: 20px; line-height: 1.45; }
       .digest-title a { color: #0f172a; text-decoration: none; }
       .digest-title a:hover { text-decoration: underline; }
       .digest-summary { margin: 0; font-size: 14px; line-height: 1.75; color: #4b5563; }
-      .card-footer { display: flex; align-items: center; gap: 14px; padding-top: 10px; border-top: 1px solid #eceaf5; flex-wrap: wrap; }
-      .footer-group { display: flex; align-items: center; gap: 8px; }
-      .footer-label { font-size: 12px; color: #6b7280; }
-      .footer-value, .followup-text { font-size: 12px; font-weight: 600; }
-      .footer-value { color: #ba7517; letter-spacing: 0.04em; }
-      .followup-control { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; color: #534ab7; }
-      .followup-checkbox { width: 15px; height: 15px; accent-color: #534ab7; cursor: pointer; }
-      .followup-text { color: #534ab7; }
-      .footer-divider { width: 1px; height: 16px; background: #e6e4f2; }
       .empty-state { color: #6b7280; line-height: 1.6; }
       @media (max-width: 640px) {
         .page { padding: 24px 14px 32px; }
@@ -202,45 +148,18 @@ function renderShell(input: {
         .digest-card { padding: 16px 0; }
         .card-top { flex-direction: column; align-items: flex-start; }
         .topic-badges { justify-content: flex-start; }
-        .card-footer { align-items: flex-start; }
-        .footer-divider { display: none; }
       }
     </style>
   </head>
   <body>
     <main class="page">
       <header class="header">
+        <a class="back-link" href="https://deanlu.ai/">← 返回 deanlu.ai</a>
         <h1 class="title">${escapeHtml(input.siteTitle)}</h1>
         <p class="subtitle">${escapeHtml(input.targetDate)}</p>
       </header>
       <section class="content">${input.bodyHtml}</section>
     </main>
-    <script>
-      (() => {
-        const storagePrefix = 'ai-pulse-scout:followup:v1:';
-        const readState = (id) => {
-          try {
-            return window.localStorage.getItem(storagePrefix + id) === 'true';
-          } catch {
-            return false;
-          }
-        };
-        const writeState = (id, checked) => {
-          try {
-            window.localStorage.setItem(storagePrefix + id, checked ? 'true' : 'false');
-          } catch {
-            // Static pages remain usable even when localStorage is unavailable.
-          }
-        };
-
-        document.querySelectorAll('.followup-checkbox').forEach((checkbox) => {
-          const id = checkbox.dataset.followupId;
-          if (!id) return;
-          checkbox.checked = readState(id);
-          checkbox.addEventListener('change', () => writeState(id, checkbox.checked));
-        });
-      })();
-    </script>
   </body>
 </html>`;
 }
@@ -252,4 +171,3 @@ export function renderStaticIndexPage(input: StaticIndexPageInput): string {
     bodyHtml: renderItems(input.items),
   });
 }
-

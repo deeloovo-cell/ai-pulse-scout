@@ -43,6 +43,7 @@ describe('renderStaticIndexPage', () => {
     });
 
     expect(html).toContain('<title>The Daily Scout - 2026-05-30</title>');
+    expect(html).toContain('<a class="back-link" href="https://deanlu.ai/">← 返回 deanlu.ai</a>');
     expect(html).toContain('<h1 class="title">The Daily Scout</h1>');
     expect(html).toContain('2026-05-30');
     expect(html).not.toContain('最近 7 天');
@@ -53,7 +54,7 @@ describe('renderStaticIndexPage', () => {
     expect(html).toContain('https://example.com/posts/static-item-1');
   });
 
-  it('renders match pill, Chinese topic badges, and footer metadata for each item', () => {
+  it('renders relevant rank in the top pill with Chinese topic badges', () => {
     const html = renderStaticIndexPage({
       siteTitle: 'AI Pulse Scout',
       targetDate: '2026-05-31',
@@ -64,14 +65,14 @@ describe('renderStaticIndexPage', () => {
       })],
     });
 
-    expect(html).toContain('% match');
-    expect(html).toContain('Relevant rank');
-    expect(html).toContain('Follow-up');
-    expect(html).toContain('type="checkbox"');
-    expect(html).toContain('class="followup-checkbox"');
-    expect(html).toContain('data-followup-id="static-item-1"');
-    expect(html).toContain('ai-pulse-scout:followup:v1:');
-    expect(html).toContain('window.localStorage.setItem');
+    expect(html).toContain('<span class="rank-pill">Relevant rank ★★★★☆</span>');
+    expect(html).not.toContain('% match');
+    expect(html).not.toContain('match-pill');
+    expect(html).not.toContain('card-footer');
+    expect(html).not.toContain('Follow-up');
+    expect(html).not.toContain('待跟进');
+    expect(html).not.toContain('followup-checkbox');
+    expect(html).not.toContain('ai-pulse-scout:followup:v1:');
     expect(html).toContain('智能体');
   });
 
