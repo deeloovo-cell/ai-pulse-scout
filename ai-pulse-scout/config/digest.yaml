@@ -3,9 +3,11 @@
 # Email sending is not the active production path.
 
 digest:
-  # Max recent posts to include in each digest.
-  # The production static exporter uses this value as its item ceiling.
-  max_items: 60
+  # Soft ceiling on digest items (guard against feed floods on busy days).
+  # Relevance is the primary volume control: items rated 'Low' by the LLM
+  # relevance gate are dropped after enrichment, so the digest normally
+  # stays well below this ceiling.
+  max_items: 100
 
   # Fetch posts published in the last 24 hours.
   collection_window_hours: 24

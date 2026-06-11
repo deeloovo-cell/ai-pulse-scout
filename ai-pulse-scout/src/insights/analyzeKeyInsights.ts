@@ -26,7 +26,7 @@ const ITEM_SYSTEM_PROMPT = `你在为一家高科技制造企业的 CIO / Chief 
 - source_summary 只总结原文，不写用户偏好
 - why_it_matters 是第二段，强相关时点名业务域，弱相关时写相关性有限
 - 返回 JSON 之外不要输出任何额外文字
-- 研究论文需要包含 manufacturing_relevance；产品/新闻类可省略
+- 所有条目都必须包含 manufacturing_relevance：与用户关注方向高度贴合为 High，一般相关为 Medium，关系微弱或无关为 Low；Low 的条目将不会出现在最终简报中，请严格评估
 - 重点关注 robotics、physical AI、CAD/CAM、sim-to-real、enterprise AI、manufacturing AI 等方向。`;
 
 export interface KeyInsightOptions {

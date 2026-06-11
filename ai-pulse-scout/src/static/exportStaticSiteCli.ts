@@ -1,9 +1,14 @@
 import { join } from 'node:path';
+import {
+  capDigestItems,
+  DIGEST_ITEM_CAP,
+  DIGEST_SOURCE_FAMILY_CAP,
+} from '../filtering/capDigestItems.js';
 
 const SHANGHAI_OFFSET_HOURS = 8;
 const DAILY_CUTOFF_HOUR = 7;
-export const STATIC_DIGEST_ITEM_CAP = 60;
-export const STATIC_DIGEST_SOURCE_FAMILY_CAP = 10;
+export const STATIC_DIGEST_ITEM_CAP = DIGEST_ITEM_CAP;
+export const STATIC_DIGEST_SOURCE_FAMILY_CAP = DIGEST_SOURCE_FAMILY_CAP;
 
 function formatDateFromShanghaiLocal(localYear: number, localMonth: number, localDate: number): string {
   const month = String(localMonth + 1).padStart(2, '0');
@@ -75,42 +80,5 @@ export function capStaticDigestItems<T extends { source_name?: string; source_ur
   limit = STATIC_DIGEST_ITEM_CAP,
   sourceFamilyLimit = STATIC_DIGEST_SOURCE_FAMILY_CAP,
 ): T[] {
-  const selected: T[] = [];
-  const selectedItems = new Set<T>();
-  const familyCounts = new Map<string, number>();
-
-  for (const item of items) {
-    if (selected.length >= limit) break;
-
-    const family = sourceFamilyKey(item);
-    const count = familyCounts.get(family) ?? 0;
-    if (count >= sourceFamilyLimit) continue;
-
-    selected.push(item);
-    selectedItems.add(item);
-    familyCounts.set(family, count + 1);
-  }
-
-  for (const item of items) {
-    if (selected.length >= limit) break;
-    if (selectedItems.has(item)) continue;
-    selected.push(item);
-  }
-
-  return selected;
-}
-
-function sourceFamilyKey(item: { source_name?: string; source_url?: string }): string {
-  const sourceName = item.source_name ?? '';
-  const sourceUrl = item.source_url ?? '';
-
-  if (/^arxiv\b/i.test(sourceName) || /:\/\/(?:www\.)?arxiv\.org\//i.test(sourceUrl)) {
-    return 'arxiv';
-  }
-
-  try {
-    return new URL(sourceUrl).hostname.replace(/^www\./, '').toLowerCase();
-  } catch {
-    return sourceName.trim().toLowerCase() || 'unknown';
-  }
+  return capDigestItems(items, limit, sourceFamilyLimit);
 }

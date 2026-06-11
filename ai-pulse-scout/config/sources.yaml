@@ -1,9 +1,7 @@
 # AI Pulse Scout -- Source Registry
 # Synced from config/source-inbox.md.
-# Current inbox contains https://arxiv.org/, https://huggingface.co/blog,
-# and https://developer.nvidia.com/blog, so production sources are RSS-only:
-# the canonical arXiv RSS expansions plus the Hugging Face Blog RSS feed
-# and the NVIDIA Developer Blog Atom feed.
+# Production sources are RSS-only. Website entries in the inbox are mapped to
+# their canonical feeds, including the arXiv category expansions.
 
 sources:
   - name: "Anthropic News"
@@ -167,6 +165,27 @@ sources:
     enabled: true
     coverage_status: live
     notes: "RSS feed validated from user-provided source list"
+  - name: "OpenAI News"
+    category: blog
+    url: "https://openai.com/news/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "OpenAI Research"
+    category: research
+    url: "https://openai.com/research/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Anthropic News Official"
+    category: blog
+    url: "https://www.anthropic.com/news/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
   - name: "Google Blog"
     category: blog
     url: "https://blog.google/rss/"
@@ -181,6 +200,118 @@ sources:
     enabled: true
     coverage_status: live
     notes: "RSS feed validated from user-provided source list"
+  - name: "Google DeepMind"
+    category: research
+    url: "https://deepmind.google/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Meta AI"
+    category: research
+    url: "https://ai.meta.com/blog/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Mistral AI"
+    category: blog
+    url: "https://mistral.ai/news/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Cohere"
+    category: blog
+    url: "https://cohere.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Perplexity"
+    category: blog
+    url: "https://www.perplexity.ai/hub/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "NVIDIA AI Blog"
+    category: blog
+    url: "https://blogs.nvidia.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Microsoft AI Blog"
+    category: blog
+    url: "https://blogs.microsoft.com/ai/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "AWS Machine Learning Blog"
+    category: blog
+    url: "https://aws.amazon.com/blogs/machine-learning/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Azure AI Blog"
+    category: blog
+    url: "https://azure.microsoft.com/en-us/blog/topics/ai-machine-learning/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "IBM AI Blog"
+    category: blog
+    url: "https://www.ibm.com/blog/category/artificial-intelligence/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Databricks AI and Machine Learning"
+    category: blog
+    url: "https://www.databricks.com/blog/category/ai-machine-learning/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Together AI"
+    category: blog
+    url: "https://www.together.ai/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Fireworks AI"
+    category: blog
+    url: "https://fireworks.ai/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Groq"
+    category: blog
+    url: "https://groq.com/blog/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Cerebras"
+    category: blog
+    url: "https://www.cerebras.ai/blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
+  - name: "Scale AI"
+    category: blog
+    url: "https://scale.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Official RSS feed from config/source-inbox.md"
   - name: "Google Research Blog"
     category: research
     url: "https://research.google/blog/rss/"
@@ -202,6 +333,286 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Atom feed validated from user-provided source list"
+  - name: "LangChain Developer Blog"
+    category: blog
+    url: "https://blog.langchain.dev/rss/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "CrewAI Blog"
+    category: blog
+    url: "https://www.crewai.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "LlamaIndex Blog"
+    category: blog
+    url: "https://www.llamaindex.ai/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "GitHub Blog"
+    category: blog
+    url: "https://github.blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "GitHub Changelog"
+    category: blog
+    url: "https://github.blog/changelog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Flowise Blog"
+    category: blog
+    url: "https://flowiseai.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Langflow Blog"
+    category: blog
+    url: "https://www.langflow.org/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Continue Blog"
+    category: blog
+    url: "https://blog.continue.dev/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "NVIDIA Omniverse Blog"
+    category: blog
+    url: "https://developer.nvidia.com/blog/tag/omniverse/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "NVIDIA Isaac Blog"
+    category: blog
+    url: "https://developer.nvidia.com/blog/tag/isaac/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "NVIDIA Research Publications"
+    category: research
+    url: "https://research.nvidia.com/publication-feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Figure AI News"
+    category: blog
+    url: "https://figure.ai/news/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Boston Dynamics Blog"
+    category: blog
+    url: "https://bostondynamics.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Agility Robotics"
+    category: blog
+    url: "https://agilityrobotics.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Siemens Software Blogs"
+    category: blog
+    url: "https://blogs.sw.siemens.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Dassault Systemes Blog"
+    category: blog
+    url: "https://blog.3ds.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "PTC Blogs"
+    category: blog
+    url: "https://www.ptc.com/en/blogs/rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Autodesk Blogs"
+    category: blog
+    url: "https://www.autodesk.com/blogs/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Ansys Blog"
+    category: blog
+    url: "https://www.ansys.com/blog/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Manufacturing Dive"
+    category: blog
+    url: "https://www.manufacturingdive.com/feeds/news/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "IndustryWeek"
+    category: blog
+    url: "https://www.industryweek.com/rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Automation World"
+    category: blog
+    url: "https://www.automationworld.com/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Control Engineering"
+    category: blog
+    url: "https://www.controleng.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Smart Industry"
+    category: blog
+    url: "https://www.smartindustry.com/rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "SAP News"
+    category: blog
+    url: "https://news.sap.com/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Salesforce Blog"
+    category: blog
+    url: "https://www.salesforce.com/blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Microsoft Industry Blog"
+    category: blog
+    url: "https://cloudblogs.microsoft.com/industry-blog/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Hugging Face Papers"
+    category: research
+    url: "https://huggingface.co/papers/rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Hacker News Front Page"
+    category: blog
+    url: "https://hnrss.org/frontpage"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Hacker News Newest"
+    category: blog
+    url: "https://hnrss.org/newest"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "GitHub Trending Daily"
+    category: blog
+    url: "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "GitHub Trending Python Daily"
+    category: blog
+    url: "https://mshibanami.github.io/GitHubTrendingRSS/daily/python.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit LocalLLaMA"
+    category: blog
+    url: "https://www.reddit.com/r/LocalLLaMA/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit MachineLearning"
+    category: blog
+    url: "https://www.reddit.com/r/MachineLearning/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit OpenAI"
+    category: blog
+    url: "https://www.reddit.com/r/OpenAI/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit ClaudeAI"
+    category: blog
+    url: "https://www.reddit.com/r/ClaudeAI/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit Artificial"
+    category: blog
+    url: "https://www.reddit.com/r/artificial/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit Robotics"
+    category: blog
+    url: "https://www.reddit.com/r/robotics/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit Manufacturing"
+    category: blog
+    url: "https://www.reddit.com/r/manufacturing/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
+  - name: "Reddit PLC"
+    category: blog
+    url: "https://www.reddit.com/r/PLC/.rss"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "User-provided RSS feed from config/source-inbox.md"
   - name: "arXiv CS.AI"
     category: research
     url: "https://arxiv.org/rss/cs.AI"

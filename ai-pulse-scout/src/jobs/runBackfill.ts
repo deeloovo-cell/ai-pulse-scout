@@ -9,8 +9,7 @@ import { DocsAdapter } from '../adapters/docsAdapter.js';
 import { CommunityAdapter } from '../adapters/communityAdapter.js';
 import { PapersAdapter } from '../adapters/papersAdapter.js';
 import { loadConfig } from '../config/loadConfig.js';
-import { dedupeItems } from '../filtering/dedupeItems.js';
-import { selectItems } from '../filtering/selectItems.js';
+import { prepareDigestItems } from '../filtering/prepareDigestItems.js';
 import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
@@ -70,25 +69,24 @@ export async function runBackfill(
   logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
   for (const result of ingestion.results) {
     logger.info(
-      `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}`,
+      `Source ${result.source.name}: raw=${result.diagnostics.attempted} capped=${result.diagnostics.capped ?? result.items.length} dropped=${result.diagnostics.dropped}`,
     );
   }
 
   // Preview: use empty ledger so all historical items are visible.
   // Send: check real ledger to avoid re-sending items already delivered.
   const ledger = options.send ? loadLedger() : new Set<string>();
-  const deduped = dedupeItems(allItems, ledger);
-  logger.info(`After dedup: ${deduped.length} items`);
 
   const backfillDigestConfig = {
     ...config.digest,
     max_items: Math.max(config.digest.max_items, BACKFILL_MAX_ITEMS),
   };
 
-  const ordered = selectItems(deduped, backfillDigestConfig);
-  logger.info(`Selected before enrichment: ${ordered.length} items for backfill digest`);
-  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(ordered.length, DEFAULT_ENRICHMENT_CAP)} items`);
-  const selected = await enrichSelectedItems(ordered, DEFAULT_ENRICHMENT_CAP);
+  const prepared = prepareDigestItems(allItems, backfillDigestConfig, ledger);
+  logger.info(`After dedup: ${prepared.deduped.length} items`);
+  logger.info(`Selected before enrichment: ${prepared.selected.length} items for backfill digest`);
+  logger.info(`Enrichment cap: ${DEFAULT_ENRICHMENT_CAP}; enriching ${Math.min(prepared.selected.length, DEFAULT_ENRICHMENT_CAP)} items`);
+  const selected = await enrichSelectedItems(prepared.selected, DEFAULT_ENRICHMENT_CAP);
   logger.info(`Selected after enrichment: ${selected.length} items for backfill digest`);
 
   const executiveBrief = await generateExecutiveBrief(selected);

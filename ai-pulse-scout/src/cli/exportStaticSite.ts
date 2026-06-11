@@ -9,13 +9,12 @@ import { DocsAdapter } from '../adapters/docsAdapter.js';
 import { CommunityAdapter } from '../adapters/communityAdapter.js';
 import { PapersAdapter } from '../adapters/papersAdapter.js';
 import { loadConfig } from '../config/loadConfig.js';
-import { dedupeItems } from '../filtering/dedupeItems.js';
-import { selectItems } from '../filtering/selectItems.js';
+import { gateByLlmRelevance } from '../filtering/gateByLlmRelevance.js';
+import { prepareDigestItems } from '../filtering/prepareDigestItems.js';
 import { ingestAllSources } from '../ingest/ingestAllSources.js';
 import { enrichSelectedItems, DEFAULT_ENRICHMENT_CAP } from '../insights/enrichSelectedItems.js';
 import { exportStaticSite } from '../static/exportStaticSite.js';
 import {
-  capStaticDigestItems,
   defaultStaticSiteOutputDir,
   resolveStaticSiteBuildWindow,
 } from '../static/exportStaticSiteCli.js';
@@ -69,26 +68,25 @@ const ingestion = await ingestAllSources({
 
 logger.info(`Unified ingestion fetched ${ingestion.items.length} items across ${ingestion.summary.totalSources} sources`);
 
-const deduped = dedupeItems(ingestion.items, new Set<string>());
+const { deduped, ordered, selected } = prepareDigestItems(ingestion.items, config.digest);
 logger.info(`After dedupe: ${deduped.length} items`);
-
-const ordered = selectItems(deduped, config.digest);
 logger.info(`After ordering: ${ordered.length} items`);
+logger.info(`After static digest cap: ${selected.length} items`);
 
-const capped = capStaticDigestItems(ordered, config.digest.max_items);
-logger.info(`After static digest cap: ${capped.length} items`);
-
-const enriched = await enrichSelectedItems(capped, DEFAULT_ENRICHMENT_CAP);
+const enriched = await enrichSelectedItems(selected, DEFAULT_ENRICHMENT_CAP);
 logger.info(`After enrichment: ${enriched.length} items`);
+
+const gated = gateByLlmRelevance(enriched);
+logger.info(`After LLM relevance gate: ${gated.kept} items (dropped ${gated.dropped} rated Low)`);
 
 const result = await exportStaticSite({
   outputDir,
   siteTitle: 'The Daily Scout',
   targetDate: date,
-  items: enriched,
+  items: gated.items,
 });
 
 console.log('---');
 console.log(`Digest date: ${date}`);
-console.log(`Items:       ${enriched.length}`);
+console.log(`Items:       ${gated.items.length}`);
 console.log(`Index:       ${result.indexPath}`);

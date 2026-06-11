@@ -51,12 +51,12 @@ describe('defaultStaticSiteOutputDir', () => {
 });
 
 describe('capStaticDigestItems', () => {
-  it('keeps the top 60 ordered items for static digest export', () => {
-    const items = Array.from({ length: 70 }, (_, index) => ({ id: `item-${index + 1}` }));
+  it('keeps the top 100 ordered items for static digest export', () => {
+    const items = Array.from({ length: 110 }, (_, index) => ({ id: `item-${index + 1}` }));
 
-    expect(capStaticDigestItems(items)).toHaveLength(60);
+    expect(capStaticDigestItems(items)).toHaveLength(100);
     expect(capStaticDigestItems(items).map((item) => item.id)).toEqual(
-      Array.from({ length: 60 }, (_, index) => `item-${index + 1}`),
+      Array.from({ length: 100 }, (_, index) => `item-${index + 1}`),
     );
   });
 
@@ -73,7 +73,7 @@ describe('capStaticDigestItems', () => {
 
     const capped = capStaticDigestItems([...arxivItems, ...externalItems]);
 
-    expect(capped).toHaveLength(60);
+    expect(capped).toHaveLength(62);
     expect(capped.map((item) => item.id)).toContain('google-cloud');
     expect(capped.map((item) => item.id)).toContain('simon-willison');
     expect(capped.slice(0, 12).map((item) => item.id)).toEqual([

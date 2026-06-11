@@ -1,7 +1,7 @@
 import { loadConfig } from '../config/loadConfig.js';
 import { renderHtmlEmail, buildSubject } from '../render/renderHtmlEmail.js';
 import { saveSuccessfulRun } from '../state/runState.js';
-import { appendToLedger } from '../state/ledger.js';
+import { appendToLedger, loadLedger } from '../state/ledger.js';
 import { openPipelineDb, initializePipelineSchema } from '../state/db.js';
 import { saveDigestReviewItems } from '../state/reviewRepository.js';
 import { computeDailyCutoffWindow } from '../utils/time.js';
@@ -22,6 +22,7 @@ import { CommunityAdapter } from '../adapters/communityAdapter.js';
 import { PapersAdapter } from '../adapters/papersAdapter.js';
 import { runPipeline } from './runPipeline.js';
 import { enrichSingleItem } from '../insights/analyzeKeyInsights.js';
+import { prepareDigestItems } from '../filtering/prepareDigestItems.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, '../../data/output');
@@ -46,6 +47,7 @@ export async function runDailyDigest(
   logger.info(`Collection window: ${windowStart.toISOString()} → ${windowEnd.toISOString()}`);
 
   const pipelineDbPath = process.env.PIPELINE_DB_PATH ?? (process.env.VITEST ? join(tmpdir(), `ai-pulse-scout-${now.getTime()}.sqlite`) : undefined);
+  let ingestionTotal: number | null = null;
 
   const pipelineResult = await runPipeline({
     now,
@@ -66,16 +68,22 @@ export async function runDailyDigest(
         ],
       });
 
+      ingestionTotal = ingestion.items.length;
       logger.info(`Unified ingestion fetched ${ingestion.items.length} items across ${ingestion.summary.totalSources} sources`);
       logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
       for (const result of ingestion.results) {
         logger.info(
-          `Source ${result.source.name}: raw=${result.diagnostics.attempted} aiAccepted=${result.diagnostics.aiAccepted ?? 0} aiRejected=${result.diagnostics.aiRejected ?? 0} capped=${result.diagnostics.capped ?? result.items.length}${result.diagnostics.fallback ? ' [fallback]' : ''}`,
+          `Source ${result.source.name}: raw=${result.diagnostics.attempted} capped=${result.diagnostics.capped ?? result.items.length} dropped=${result.diagnostics.dropped}`,
         );
       }
 
+      const ledger = sendEmail ? loadLedger() : new Set<string>();
+      const { deduped, selected } = prepareDigestItems(ingestion.items, config.digest, ledger);
+      logger.info(`After dedupe: ${deduped.length} items`);
+      logger.info(`After ordering and global cap: ${selected.length} items`);
+
       return {
-        items: ingestion.items.map((item) => ({
+        items: selected.map((item) => ({
           id: item.id,
           sourceId: item.source_url,
           url: item.item_url,
@@ -180,7 +188,7 @@ export async function runDailyDigest(
     html,
     items: typedItems,
     itemCount: typedItems.length,
-    totalFetched: pipelineResult.totalItems ?? typedItems.length,
+    totalFetched: ingestionTotal ?? pipelineResult.totalItems ?? typedItems.length,
     outputPath,
   };
 }

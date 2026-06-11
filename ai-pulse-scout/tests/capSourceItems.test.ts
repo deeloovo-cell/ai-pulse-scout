@@ -48,7 +48,7 @@ function makeSource(name: string, url: string): SourceConfig {
 }
 
 describe('capSourceItems', () => {
-  it('drops non-ai items before ranking and truncation', () => {
+  it('keeps in-window items regardless of keyword content', () => {
     const result = capSourceItems(
       [
         makeItem({ id: 'ai-1', title: 'LLM inference serving for agents' }),
@@ -62,8 +62,9 @@ describe('capSourceItems', () => {
       10,
     );
 
-    expect(result.items.map((item) => item.id)).toEqual(['ai-1']);
-    expect(result.counts.aiRejected).toBe(1);
+    expect(result.items.map((item) => item.id)).toEqual(['ai-1', 'non-ai']);
+    expect(result.counts.raw).toBe(2);
+    expect(result.counts.capped).toBe(2);
   });
 
   it('keeps only the top 10 per source after ranking', () => {
@@ -79,7 +80,6 @@ describe('capSourceItems', () => {
 
     expect(result.items).toHaveLength(10);
     expect(result.counts.raw).toBe(12);
-    expect(result.counts.aiAccepted).toBe(12);
     expect(result.counts.capped).toBe(10);
     expect(result.items[0]?.id).toBe('item-12');
     expect(result.items.at(-1)?.id).toBe('item-3');
@@ -146,8 +146,8 @@ describe('ingestAllSources', () => {
 
     expect(result.items).toHaveLength(20);
     expect(result.summary.totalItems).toBe(20);
-    expect(result.results[0]?.diagnostics.aiAccepted).toBe(12);
     expect(result.results[0]?.diagnostics.capped).toBe(10);
+    expect(result.results[0]?.diagnostics.dropped).toBe(2);
     expect(result.results[1]?.diagnostics.capped).toBe(10);
   });
 });

@@ -47,7 +47,8 @@ function buildHaystack(item: NormalizedItem): string {
  *   1          → weak positive signal, penalised by soft negative; borderline
  *   2+         → clear positive signal; included with confidence
  *
- * This replaces the previous binary `isAiRelevant` gate.  Soft-negative items
+ * This replaces the previous binary relevance gate (isAiRelevant, now removed).
+ * Soft-negative items
  * are no longer silently dropped — they still compete but rank lower, so the
  * cap naturally prefers stronger matches while maintaining a floor of content.
  */
