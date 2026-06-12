@@ -79,7 +79,6 @@ describe('reviewServer', () => {
 
     expect(html.indexOf('Older item')).toBeLessThan(html.indexOf('Newer item'));
     expect(html).toContain('data-rating="5"');
-    expect(html).toContain('checked');
   });
 
   it('rejects invalid rating values', async () => {

@@ -34,10 +34,6 @@ export function renderReviewPage(input: { items: ReviewFeedItem[] }): string {
           <p class="item-excerpt">${escapeHtml(item.excerpt)}</p>
           <div class="item-footer">
             <div class="rating" data-rating="${item.rating ?? ''}">${stars}</div>
-            <label class="followup-label">
-              <input type="checkbox" ${item.followUp ? 'checked' : ''} />
-              Follow-up
-            </label>
           </div>
         </article>
       `;

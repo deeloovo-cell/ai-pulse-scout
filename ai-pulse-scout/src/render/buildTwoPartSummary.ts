@@ -11,6 +11,10 @@ function pickParagraphOne(item: NormalizedItem): string {
   if (explicit) {
     return explicit;
   }
+  const keyInsight = item.key_insight?.trim();
+  if (keyInsight) {
+    return keyInsight;
+  }
   return buildChineseDigestFallback(item);
 }
 

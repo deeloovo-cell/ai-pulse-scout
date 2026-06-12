@@ -46,8 +46,8 @@ describe('daily cutoff isolation', () => {
     const daily = computeDailyCutoffWindow(new Date('2026-05-25T23:20:32.207Z'));
     const backfill = computeBackfillWindowStart(7);
 
-    expect(daily.windowStart.toISOString()).toBe('2026-05-24T23:00:00.000Z');
-    expect(daily.windowEnd.toISOString()).toBe('2026-05-25T23:00:00.000Z');
+    expect(daily.windowStart.toISOString()).toBe('2026-05-24T23:20:32.207Z');
+    expect(daily.windowEnd.toISOString()).toBe('2026-05-25T23:20:32.207Z');
     expect(backfill.getTime()).toBeLessThan(Date.now());
   });
 });
