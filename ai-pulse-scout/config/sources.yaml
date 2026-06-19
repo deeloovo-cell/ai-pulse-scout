@@ -739,3 +739,157 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Expanded from https://arxiv.org/ in config/source-inbox.md"
+  - name: "Together AI Feed"
+    category: blog
+    url: "https://together.ai/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://together.ai/"
+  - name: "Google Research Blog"
+    category: research
+    url: "https://blog.research.google/atom.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Atom feed adapted from https://blog.research.google/"
+  - name: "Magenta Blog"
+    category: research
+    url: "https://magenta.tensorflow.org/feed.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://magenta.tensorflow.org/"
+  - name: "PromptArmor Substack"
+    category: blog
+    url: "https://promptarmor.substack.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://promptarmor.substack.com/"
+  - name: "MIT Schwarzman College of Computing"
+    category: research
+    url: "https://computing.mit.edu/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://computing.mit.edu/"
+  - name: "Yoonho Lee"
+    category: research
+    url: "https://yoonholee.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://yoonholee.com/"
+  - name: "Liman Ling"
+    category: research
+    url: "https://limanling.github.io/index.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://limanling.github.io/"
+  - name: "Siddharth Karamcheti"
+    category: research
+    url: "https://siddkaramcheti.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://siddkaramcheti.com/"
+  - name: "Dylan Losey"
+    category: research
+    url: "https://dylanlosey.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://dylanlosey.com/"
+  - name: "Michael Zhang"
+    category: research
+    url: "https://michaelzhang.xyz/index.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://michaelzhang.xyz/"
+  - name: "CMU MRSD"
+    category: research
+    url: "https://mrsd.ri.cmu.edu/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://mrsd.ri.cmu.edu/"
+  - name: "CMU NREC"
+    category: research
+    url: "https://nrec.ri.cmu.edu/feed/"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://nrec.ri.cmu.edu/"
+  - name: "ACL Anthology"
+    category: research
+    url: "https://aclanthology.org/index.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://aclanthology.org/"
+  - name: "ACL 2024"
+    category: research
+    url: "https://2024.aclweb.org/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://2024.aclweb.org/"
+  - name: "LangChain Changelog"
+    category: blog
+    url: "https://changelog.langchain.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://changelog.langchain.com/"
+  - name: "LangChain Blog"
+    category: blog
+    url: "https://blog.langchain.com/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://blog.langchain.com/"
+  - name: "LangChain Company Blog"
+    category: blog
+    url: "https://langchain.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://langchain.com/"
+  - name: "Microsoft Developer Blog"
+    category: blog
+    url: "https://developer.microsoft.com/blog/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://developer.microsoft.com/"
+  - name: "OpenAI Deployment Safety"
+    category: blog
+    url: "https://deploymentsafety.openai.com/posts.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "Atom feed adapted from https://deploymentsafety.openai.com/"
+  - name: "NVIDIA Docs"
+    category: docs
+    url: "https://docs.nvidia.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://docs.nvidia.com/"
+  - name: "NVIDIA Newsroom"
+    category: blog
+    url: "https://nvidianews.nvidia.com/feed"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://nvidianews.nvidia.com/"
+  - name: "CoreWeave Blog"
+    category: blog
+    url: "https://coreweave.com/blog/rss.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed adapted from https://coreweave.com/"

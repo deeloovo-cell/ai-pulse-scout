@@ -91,3 +91,26 @@
 - https://www.reddit.com/r/robotics/.rss
 - https://www.reddit.com/r/manufacturing/.rss
 - https://www.reddit.com/r/PLC/.rss
+
+- https://together.ai/feed
+- https://blog.research.google/atom.xml
+- https://magenta.tensorflow.org/feed.xml
+- https://promptarmor.substack.com/feed
+- https://computing.mit.edu/rss.xml
+- https://yoonholee.com/feed
+- https://limanling.github.io/index.xml
+- https://siddkaramcheti.com/feed
+- https://dylanlosey.com/feed
+- https://michaelzhang.xyz/index.xml
+- https://mrsd.ri.cmu.edu/feed
+- https://nrec.ri.cmu.edu/feed/
+- https://aclanthology.org/index.xml
+- https://2024.aclweb.org/feed
+- https://changelog.langchain.com/feed
+- https://blog.langchain.com/rss.xml
+- https://langchain.com/blog/rss.xml
+- https://developer.microsoft.com/blog/feed
+- https://deploymentsafety.openai.com/posts.xml
+- https://docs.nvidia.com/feed
+- https://nvidianews.nvidia.com/feed
+- https://coreweave.com/blog/rss.xml
