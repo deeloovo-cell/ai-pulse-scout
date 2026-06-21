@@ -893,3 +893,10 @@ sources:
     enabled: true
     coverage_status: live
     notes: "RSS feed adapted from https://coreweave.com/"
+  - name: "Model Context Protocol Blog"
+    category: blog
+    url: "https://blog.modelcontextprotocol.io/index.xml"
+    type: rss
+    enabled: true
+    coverage_status: live
+    notes: "RSS feed for https://blog.modelcontextprotocol.io/ from config/source-inbox.md"

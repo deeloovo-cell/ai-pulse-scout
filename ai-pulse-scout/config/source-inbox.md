@@ -114,3 +114,5 @@
 - https://docs.nvidia.com/feed
 - https://nvidianews.nvidia.com/feed
 - https://coreweave.com/blog/rss.xml
+- https://blog.modelcontextprotocol.io/
+
