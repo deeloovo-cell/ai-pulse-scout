@@ -873,7 +873,7 @@ sources:
     coverage_status: live
     notes: "Atom feed adapted from https://deploymentsafety.openai.com/"
   - name: "NVIDIA Docs"
-    category: docs
+    category: blog
     url: "https://docs.nvidia.com/feed"
     type: rss
     enabled: true
