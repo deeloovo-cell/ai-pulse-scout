@@ -6,3 +6,5 @@ data/state/*.jsonl
 data/cache/
 data/logs/
 data/output/
+
+.worktrees/
