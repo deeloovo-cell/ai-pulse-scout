@@ -20,7 +20,7 @@ export interface FetchResult {
   error?: string;
 }
 
-interface FetchRssSourceOptions {
+export interface FetchRssSourceOptions {
   fetchImpl?: typeof fetch;
   parser?: Pick<Parser, 'parseString'>;
   sleep?: (ms: number) => Promise<void>;
@@ -105,10 +105,34 @@ export async function fetchAllSources(
   sources: SourceConfig[],
   windowStart: Date,
   now: Date,
+  options: FetchRssSourceOptions = {},
 ): Promise<FetchResult[]> {
   const rssSources = sources.filter((s) => s.type === 'rss' || s.type === 'atom' || s.type === 'podcast');
-  const results = await Promise.allSettled(
-    rssSources.map((s) => fetchRssSource(s, windowStart, now)),
+  const serialSources = rssSources.filter(isHighRiskThrottledSource);
+  const parallelSources = rssSources.filter((source) => !isHighRiskThrottledSource(source));
+
+  const serialResults: FetchResult[] = [];
+  for (const source of serialSources) {
+    serialResults.push(await fetchRssSource(source, windowStart, now, options));
+  }
+
+  const parallelSettled = await Promise.allSettled(
+    parallelSources.map((source) => fetchRssSource(source, windowStart, now, options)),
   );
-  return results.map((r) => (r.status === 'fulfilled' ? r.value : { source: rssSources[0], items: [], error: 'Promise rejected' }));
+  const parallelResults = parallelSettled.map((result, index) =>
+    result.status === 'fulfilled'
+      ? result.value
+      : { source: parallelSources[index]!, items: [], error: 'Promise rejected' },
+  );
+
+  const resultByUrl = new Map<string, FetchResult>();
+  for (const result of [...serialResults, ...parallelResults]) {
+    resultByUrl.set(result.source.url, result);
+  }
+
+  return rssSources.map((source) => resultByUrl.get(source.url) ?? { source, items: [], error: 'Promise rejected' });
+}
+
+function isHighRiskThrottledSource(source: SourceConfig): boolean {
+  return /reddit\.com|hnrss\.org/i.test(source.url);
 }
