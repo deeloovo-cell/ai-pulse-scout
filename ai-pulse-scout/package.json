@@ -19,6 +19,7 @@
     "schedule:status": "launchctl list com.ai-pulse-scout.daily 2>/dev/null || echo 'Not loaded'",
     "coverage:sources": "tsx src/cli/coverage.ts",
     "pipeline:run": "tsx src/cli/runPipeline.ts",
+    "site:render-snapshot": "tsx src/cli/renderStaticSiteFromSnapshot.ts",
     "review:web": "tsx src/cli/reviewServer.ts",
     "site:export": "tsx src/cli/exportStaticSite.ts"
   },
