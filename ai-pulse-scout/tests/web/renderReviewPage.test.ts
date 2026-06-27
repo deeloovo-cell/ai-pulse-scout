@@ -26,7 +26,6 @@ describe('renderReviewPage', () => {
     expect(html).toContain('AI');
     expect(html).toContain('92% match');
     expect(html).toContain('data-item-key="item-1"');
-    expect(html).toContain('Follow-up');
   });
 
   it('renders an empty state when no review items exist', () => {

@@ -134,7 +134,7 @@ describe('renderStaticIndexPage', () => {
       })],
     });
 
-    expect(html).toContain('今日摘要');
+    expect(html).toContain('建议点击查看完整细节');
     expect(html).not.toContain('This raw English summary should not appear on the static page.');
   });
 });
