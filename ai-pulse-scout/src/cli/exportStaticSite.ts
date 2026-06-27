@@ -18,6 +18,7 @@ import {
   defaultStaticSiteOutputDir,
   resolveStaticSiteBuildWindow,
 } from '../static/exportStaticSiteCli.js';
+import { defaultSelectedSnapshotPath, writeSelectedSnapshot } from '../static/selectedSnapshot.js';
 import { logger } from '../utils/logger.js';
 
 function readFlag(name: string): string | null {
@@ -72,6 +73,10 @@ const { deduped, ordered, selected } = prepareDigestItems(ingestion.items, confi
 logger.info(`After dedupe: ${deduped.length} items`);
 logger.info(`After ordering: ${ordered.length} items`);
 logger.info(`After static digest cap: ${selected.length} items`);
+
+const selectedSnapshotPath = defaultSelectedSnapshotPath(outputDir, date);
+await writeSelectedSnapshot(selectedSnapshotPath, selected);
+logger.info(`Selected snapshot: ${selectedSnapshotPath}`);
 
 const enriched = await enrichSelectedItems(selected, DEFAULT_ENRICHMENT_CAP);
 logger.info(`After enrichment: ${enriched.length} items`);
