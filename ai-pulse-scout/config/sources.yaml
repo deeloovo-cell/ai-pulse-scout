@@ -242,13 +242,6 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Cerebras"
-    category: blog
-    url: "https://www.cerebras.ai/blog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
   - name: "Scale AI"
     category: blog
     url: "https://scale.com/blog/rss.xml"

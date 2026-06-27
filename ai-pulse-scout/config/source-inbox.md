@@ -38,7 +38,6 @@
 - https://azure.microsoft.com/en-us/blog/topics/ai-machine-learning/feed/
 - https://www.ibm.com/blog/category/artificial-intelligence/feed/
 - https://www.together.ai/blog/rss.xml
-- https://www.cerebras.ai/blog/feed/
 - https://scale.com/blog/rss.xml
 - https://research.google/blog/rss/
 - http://bair.berkeley.edu/blog/feed.xml
