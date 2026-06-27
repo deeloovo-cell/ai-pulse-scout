@@ -1,5 +1,6 @@
 export const DIGEST_ITEM_CAP = 100;
-export const DIGEST_SOURCE_FAMILY_CAP = 10;
+export const DIGEST_SOURCE_FAMILY_CAP = 20;
+export const DIGEST_ARXIV_FAMILY_CAP = 40;
 
 export function capDigestItems<T extends { source_name?: string; source_url?: string }>(
   items: T[],
@@ -15,17 +16,12 @@ export function capDigestItems<T extends { source_name?: string; source_url?: st
 
     const family = sourceFamilyKey(item);
     const count = familyCounts.get(family) ?? 0;
-    if (count >= sourceFamilyLimit) continue;
+    const familyLimit = family === 'arxiv' ? DIGEST_ARXIV_FAMILY_CAP : sourceFamilyLimit;
+    if (count >= familyLimit) continue;
 
     selected.push(item);
     selectedItems.add(item);
     familyCounts.set(family, count + 1);
-  }
-
-  for (const item of items) {
-    if (selected.length >= limit) break;
-    if (selectedItems.has(item)) continue;
-    selected.push(item);
   }
 
   return selected;

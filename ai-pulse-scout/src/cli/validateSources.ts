@@ -49,22 +49,50 @@ for (const [type, count] of Object.entries(typeCount)) {
 console.log(`\nFetching enabled sources (48h window)...\n`);
 
 let ok = 0;
+let empty = 0;
 let failed = 0;
+let discoveredPosts = 0;
+const failureReasons: Record<string, number> = {};
 
 for (const source of enabled) {
   const result = await fetchRssSource(source, windowStart, now);
   if (result.error) {
     console.log(`  FAIL  ${source.name}: ${result.error}`);
     failed++;
+    const reason = normalizeFailureReason(result.error);
+    failureReasons[reason] = (failureReasons[reason] ?? 0) + 1;
   } else {
-    console.log(`  OK    ${source.name} (${result.items.length} items in 48h window)`);
-    ok++;
+    discoveredPosts += result.items.length;
+    if (result.items.length > 0) {
+      console.log(`  OK    ${source.name} (${result.items.length} items in 48h window)`);
+      ok++;
+    } else {
+      console.log(`  EMPTY ${source.name} (0 items in 48h window)`);
+      empty++;
+    }
   }
 }
 
 console.log(`\n── Results ────────────────────────────────────`);
-console.log(`  ${ok} OK, ${failed} failed out of ${enabled.length} enabled sources`);
+console.log(`  ${ok} OK, ${empty} empty, ${failed} failed out of ${enabled.length} enabled sources`);
+console.log(`  Discovered posts in 48h window: ${discoveredPosts}`);
+if (Object.keys(failureReasons).length > 0) {
+  console.log(`  Failure reasons:`);
+  for (const [reason, count] of Object.entries(failureReasons).sort((a, b) => b[1] - a[1])) {
+    console.log(`    ${reason.padEnd(24)} ${count}`);
+  }
+}
 if (failed > 0) {
   console.log(`  (Failures are often transient or indicate a feed URL that needs updating.)`);
   process.exit(1);
+}
+
+function normalizeFailureReason(error: string): string {
+  const trimmed = error.trim();
+  if (/Status code \d+/.test(trimmed)) return trimmed.match(/Status code \d+/)?.[0] ?? trimmed;
+  if (/Request timed out/i.test(trimmed)) return 'Request timed out';
+  if (/Feed not recognized/i.test(trimmed)) return 'Feed not recognized';
+  if (/Attribute without value/i.test(trimmed)) return 'Malformed XML';
+  if (/Invalid character in entity name/i.test(trimmed)) return 'Malformed XML';
+  return trimmed;
 }

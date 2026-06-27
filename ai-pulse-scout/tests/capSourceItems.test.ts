@@ -67,8 +67,8 @@ describe('capSourceItems', () => {
     expect(result.counts.capped).toBe(2);
   });
 
-  it('keeps only the top 10 per source after ranking', () => {
-    const items = Array.from({ length: 12 }, (_, index) =>
+  it('keeps only the top 20 per source after ranking', () => {
+    const items = Array.from({ length: 25 }, (_, index) =>
       makeItem({
         id: `item-${index + 1}`,
         title: `LLM systems item ${index + 1}`,
@@ -76,13 +76,13 @@ describe('capSourceItems', () => {
       }),
     );
 
-    const result = capSourceItems(items, 10);
+    const result = capSourceItems(items, 20);
 
-    expect(result.items).toHaveLength(10);
-    expect(result.counts.raw).toBe(12);
-    expect(result.counts.capped).toBe(10);
-    expect(result.items[0]?.id).toBe('item-12');
-    expect(result.items.at(-1)?.id).toBe('item-3');
+    expect(result.items).toHaveLength(20);
+    expect(result.counts.raw).toBe(25);
+    expect(result.counts.capped).toBe(20);
+    expect(result.items[0]?.id).toBe('item-25');
+    expect(result.items.at(-1)?.id).toBe('item-6');
   });
 
   it('uses extraction level and timestamp confidence as tie-breakers', () => {
@@ -144,10 +144,10 @@ describe('ingestAllSources', () => {
       adapters: [adapter],
     });
 
-    expect(result.items).toHaveLength(20);
-    expect(result.summary.totalItems).toBe(20);
-    expect(result.results[0]?.diagnostics.capped).toBe(10);
-    expect(result.results[0]?.diagnostics.dropped).toBe(2);
-    expect(result.results[1]?.diagnostics.capped).toBe(10);
+    expect(result.items).toHaveLength(24);
+    expect(result.summary.totalItems).toBe(24);
+    expect(result.results[0]?.diagnostics.capped).toBe(12);
+    expect(result.results[0]?.diagnostics.dropped).toBe(0);
+    expect(result.results[1]?.diagnostics.capped).toBe(12);
   });
 });

@@ -172,20 +172,6 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Official RSS feed from config/source-inbox.md"
-  - name: "OpenAI Research"
-    category: research
-    url: "https://openai.com/research/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Anthropic News Official"
-    category: blog
-    url: "https://www.anthropic.com/news/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
   - name: "Google Blog"
     category: blog
     url: "https://blog.google/rss/"
@@ -203,20 +189,6 @@ sources:
   - name: "Google DeepMind"
     category: research
     url: "https://deepmind.google/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Meta AI"
-    category: research
-    url: "https://ai.meta.com/blog/rss/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Mistral AI"
-    category: blog
-    url: "https://mistral.ai/news/rss.xml"
     type: rss
     enabled: true
     coverage_status: live
@@ -242,13 +214,6 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Microsoft AI Blog"
-    category: blog
-    url: "https://blogs.microsoft.com/ai/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
   - name: "AWS Machine Learning Blog"
     category: blog
     url: "https://aws.amazon.com/blogs/machine-learning/feed/"
@@ -270,30 +235,9 @@ sources:
     enabled: true
     coverage_status: live
     notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Databricks AI and Machine Learning"
-    category: blog
-    url: "https://www.databricks.com/blog/category/ai-machine-learning/feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
   - name: "Together AI"
     category: blog
     url: "https://www.together.ai/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Fireworks AI"
-    category: blog
-    url: "https://fireworks.ai/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
-  - name: "Groq"
-    category: blog
-    url: "https://groq.com/blog/rss/"
     type: rss
     enabled: true
     coverage_status: live
@@ -340,20 +284,6 @@ sources:
     enabled: true
     coverage_status: live
     notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "CrewAI Blog"
-    category: blog
-    url: "https://www.crewai.com/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "LlamaIndex Blog"
-    category: blog
-    url: "https://www.llamaindex.ai/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
   - name: "GitHub Blog"
     category: blog
     url: "https://github.blog/feed/"
@@ -364,13 +294,6 @@ sources:
   - name: "GitHub Changelog"
     category: blog
     url: "https://github.blog/changelog/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "Flowise Blog"
-    category: blog
-    url: "https://flowiseai.com/blog/rss.xml"
     type: rss
     enabled: true
     coverage_status: live
@@ -403,51 +326,9 @@ sources:
     enabled: true
     coverage_status: live
     notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "NVIDIA Research Publications"
-    category: research
-    url: "https://research.nvidia.com/publication-feed"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "Figure AI News"
-    category: blog
-    url: "https://figure.ai/news/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "Boston Dynamics Blog"
-    category: blog
-    url: "https://bostondynamics.com/blog/rss.xml"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "Agility Robotics"
-    category: blog
-    url: "https://agilityrobotics.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
   - name: "Siemens Software Blogs"
     category: blog
     url: "https://blogs.sw.siemens.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "Dassault Systemes Blog"
-    category: blog
-    url: "https://blog.3ds.com/feed/"
-    type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
-  - name: "PTC Blogs"
-    category: blog
-    url: "https://www.ptc.com/en/blogs/rss"
     type: rss
     enabled: true
     coverage_status: live

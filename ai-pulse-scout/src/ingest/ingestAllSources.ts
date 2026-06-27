@@ -51,7 +51,7 @@ export async function ingestAllSources(
       windowEnd: input.windowEnd,
     });
 
-    const capped = capSourceItems(ingested.items, 10);
+    const capped = capSourceItems(ingested.items, 20);
 
     results.push({
       ...ingested,

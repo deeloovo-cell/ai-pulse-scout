@@ -12,7 +12,7 @@ export interface SourceCapResult {
 }
 
 /** Keep the newest, highest-quality in-window items without keyword filtering. */
-export function capSourceItems(items: NormalizedItem[], limit = 10): SourceCapResult {
+export function capSourceItems(items: NormalizedItem[], limit = 20): SourceCapResult {
   const capped = rankSourceItems(items).slice(0, limit);
 
   return {
