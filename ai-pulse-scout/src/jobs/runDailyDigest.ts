@@ -23,6 +23,8 @@ import { PapersAdapter } from '../adapters/papersAdapter.js';
 import { runPipeline } from './runPipeline.js';
 import { enrichSingleItem } from '../insights/analyzeKeyInsights.js';
 import { prepareDigestItems } from '../filtering/prepareDigestItems.js';
+import { writeGenerationLog } from '../output/writeGenerationLog.js';
+import type { IngestAllSourcesResult } from '../ingest/types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = join(__dirname, '../../data/output');
@@ -34,6 +36,7 @@ export interface DigestRunResult {
   itemCount: number;
   totalFetched: number;
   outputPath: string;
+  generationLogPath: string;
 }
 
 export async function runDailyDigest(
@@ -48,6 +51,7 @@ export async function runDailyDigest(
 
   const pipelineDbPath = process.env.PIPELINE_DB_PATH ?? (process.env.VITEST ? join(tmpdir(), `ai-pulse-scout-${now.getTime()}.sqlite`) : undefined);
   let ingestionTotal: number | null = null;
+  let ingestionSnapshot: IngestAllSourcesResult | null = null;
 
   const pipelineResult = await runPipeline({
     now,
@@ -68,6 +72,7 @@ export async function runDailyDigest(
         ],
       });
 
+      ingestionSnapshot = ingestion;
       ingestionTotal = ingestion.items.length;
       logger.info(`Unified ingestion fetched ${ingestion.items.length} items across ${ingestion.summary.totalSources} sources`);
       logger.info(`Support summary: ${JSON.stringify(ingestion.summary.byStatus)}`);
@@ -183,6 +188,27 @@ export async function runDailyDigest(
   pipelineResultCache.subject = subject;
   pipelineResultCache.items = typedItems;
 
+  const generationLogPath = ingestionSnapshot
+    ? writeGenerationLog({
+        date: datePart,
+        generatedAt: now,
+        subject,
+        windowStart,
+        windowEnd,
+        ingestionResults: ingestionSnapshot.results,
+        publishedItems: typedItems.map((item) => ({
+          title: item.title,
+          url: item.item_url,
+          sourceName: item.source_name,
+        })),
+        published: pipelineResult.publishable !== false,
+      })
+    : '';
+
+  if (generationLogPath) {
+    logger.info(`Generation log saved: ${generationLogPath}`);
+  }
+
   return {
     subject,
     html,
@@ -190,6 +216,7 @@ export async function runDailyDigest(
     itemCount: typedItems.length,
     totalFetched: ingestionTotal ?? pipelineResult.totalItems ?? typedItems.length,
     outputPath,
+    generationLogPath,
   };
 }
 

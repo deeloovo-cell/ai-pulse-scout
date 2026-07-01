@@ -11,6 +11,9 @@ try {
   console.log(`Subject: ${result.subject}`);
   console.log(`Items:   ${result.itemCount}`);
   console.log(`Output:  ${result.outputPath}`);
+  if (result.generationLogPath) {
+    console.log(`Gen log: ${result.generationLogPath}`);
+  }
   if (result.itemCount === 0) {
     console.log('\n[!] No items found in the collection window. Check feed activity or widen collection_window_hours in config/digest.yaml');
   }

@@ -20,6 +20,7 @@ import {
 } from '../static/exportStaticSiteCli.js';
 import { defaultSelectedSnapshotPath, writeSelectedSnapshot } from '../static/selectedSnapshot.js';
 import { logger } from '../utils/logger.js';
+import { writeGenerationLog } from '../output/writeGenerationLog.js';
 
 function readFlag(name: string): string | null {
   const args = process.argv.slice(2);
@@ -91,7 +92,23 @@ const result = await exportStaticSite({
   items: gated.items,
 });
 
+const generationLogPath = writeGenerationLog({
+  date,
+  generatedAt: new Date(),
+  windowStart,
+  windowEnd,
+  ingestionResults: ingestion.results,
+  publishedItems: gated.items.map((item) => ({
+    title: item.title,
+    url: item.item_url,
+    sourceName: item.source_name,
+  })),
+});
+
+logger.info(`Generation log saved: ${generationLogPath}`);
+
 console.log('---');
 console.log(`Digest date: ${date}`);
 console.log(`Items:       ${gated.items.length}`);
 console.log(`Index:       ${result.indexPath}`);
+console.log(`Gen log:     ${generationLogPath}`);

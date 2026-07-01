@@ -115,7 +115,11 @@ function renderShell(input: {
   siteTitle: string;
   targetDate: string;
   bodyHtml: string;
+  itemCount: number;
 }): string {
+  const countBadge = input.itemCount > 0
+    ? `<span style="margin-left:12px;font-size:14px;font-weight:500;color:#6b7280;vertical-align:middle;">今日更新 ${input.itemCount} 条</span>`
+    : '';
   return `<!doctype html>
 <html lang="zh-CN">
   <head>
@@ -155,7 +159,7 @@ function renderShell(input: {
     <main class="page">
       <header class="header">
         <a class="back-link" href="https://deanlu.ai/">← 返回 deanlu.ai</a>
-        <h1 class="title">${escapeHtml(input.siteTitle)}</h1>
+        <h1 class="title">${escapeHtml(input.siteTitle)}${countBadge}</h1>
         <p class="subtitle">${escapeHtml(input.targetDate)}</p>
       </header>
       <section class="content">${input.bodyHtml}</section>
@@ -169,5 +173,6 @@ export function renderStaticIndexPage(input: StaticIndexPageInput): string {
     siteTitle: input.siteTitle,
     targetDate: input.targetDate,
     bodyHtml: renderItems(input.items),
+    itemCount: input.items.length,
   });
 }
