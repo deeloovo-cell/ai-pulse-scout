@@ -197,16 +197,16 @@ sources:
     category: blog
     url: "https://cohere.com/blog/rss.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: feed URL returns 'Feed not recognized as RSS 1 or 2' — structure changed, no valid feed"
   - name: "Perplexity"
     category: blog
     url: "https://www.perplexity.ai/hub/blog/rss.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 403 — feed blocked for automated access"
   - name: "NVIDIA AI Blog"
     category: blog
     url: "https://blogs.nvidia.com/feed/"
@@ -232,9 +232,9 @@ sources:
     category: blog
     url: "https://www.ibm.com/blog/category/artificial-intelligence/feed/"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: persistent malformed XML (attribute without value at line 68) — feed is broken server-side"
   - name: "Together AI"
     category: blog
     url: "https://www.together.ai/blog/rss.xml"
@@ -246,9 +246,9 @@ sources:
     category: blog
     url: "https://scale.com/blog/rss.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Official RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: persistent malformed XML (attribute without value at line 12) — feed is broken server-side"
   - name: "Google Research Blog"
     category: research
     url: "https://research.google/blog/rss/"
@@ -274,9 +274,9 @@ sources:
     category: blog
     url: "https://blog.langchain.dev/rss/"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: persistent malformed XML (invalid character in entity name) — feed broken server-side"
   - name: "GitHub Blog"
     category: blog
     url: "https://github.blog/feed/"
@@ -302,9 +302,9 @@ sources:
     category: blog
     url: "https://blog.continue.dev/rss.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: 'Feed not recognized as RSS 1 or 2' — URL no longer serves a valid feed"
   - name: "NVIDIA Omniverse Blog"
     category: blog
     url: "https://developer.nvidia.com/blog/tag/omniverse/feed/"
@@ -330,9 +330,9 @@ sources:
     category: blog
     url: "https://www.autodesk.com/blogs/feed/"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: connect ECONNREFUSED 127.0.0.1:443 — WAF redirects server-side requests to localhost, permanently blocked"
   - name: "Ansys Blog"
     category: blog
     url: "https://www.ansys.com/blog/feed"
@@ -351,30 +351,30 @@ sources:
     category: blog
     url: "https://www.industryweek.com/rss"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 403 — feed blocked for automated access"
   - name: "Automation World"
     category: blog
     url: "https://www.automationworld.com/rss.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 403 — feed blocked for automated access"
   - name: "Control Engineering"
     category: blog
     url: "https://www.controleng.com/feed/"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 403 — feed blocked for automated access"
   - name: "Smart Industry"
     category: blog
     url: "https://www.smartindustry.com/rss"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 403 — feed blocked for automated access"
   - name: "SAP News"
     category: blog
     url: "https://news.sap.com/feed/"
@@ -400,9 +400,9 @@ sources:
     category: research
     url: "https://huggingface.co/papers/rss"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "User-provided RSS feed from config/source-inbox.md"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: HTTP 401 — feed requires authentication"
   - name: "Hacker News Front Page"
     category: blog
     url: "https://hnrss.org/frontpage"
@@ -624,9 +624,9 @@ sources:
     category: research
     url: "https://blog.research.google/atom.xml"
     type: rss
-    enabled: true
-    coverage_status: live
-    notes: "Atom feed adapted from https://blog.research.google/"
+    enabled: false
+    coverage_status: deferred_no_feed
+    notes: "Disabled 2026-07-03: duplicate of research.google/blog/rss/ (already enabled above); alternate domain kept here for reference"
   - name: "Magenta Blog"
     category: research
     url: "https://magenta.tensorflow.org/feed.xml"

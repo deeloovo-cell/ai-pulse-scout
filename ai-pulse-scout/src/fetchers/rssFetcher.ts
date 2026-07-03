@@ -14,6 +14,17 @@ const DEFAULT_HEADERS = {
   'accept-language': 'en-US,en;q=0.9',
 };
 
+// How many times to retry after a 429 before giving up on a source.
+const MAX_RETRY_ATTEMPTS = 2;
+
+// Base delay (ms) when the server sends no Retry-After header.
+// Grows exponentially: 5 s → 10 s on the second retry.
+const FALLBACK_RETRY_DELAY_MS = 5_000;
+
+// Pause inserted between consecutive serial Reddit / HN fetches so we don't
+// immediately 429 the next subreddit right after finishing the previous one.
+const HIGH_RISK_INTER_SOURCE_DELAY_MS = 2_000;
+
 export interface FetchResult {
   source: SourceConfig;
   items: NormalizedItem[];
@@ -64,16 +75,22 @@ async function fetchRssXml(
   fetchImpl: typeof fetch,
   sleep: (ms: number) => Promise<void>,
 ): Promise<string> {
-  const first = await fetchOnce(url, fetchImpl);
-  if (first.status === 429) {
-    await sleep(retryDelayMs(first.response));
-    const second = await fetchOnce(url, fetchImpl);
-    if (!second.response.ok) throw new Error(`Status code ${second.status}`);
-    return await second.response.text();
+  for (let attempt = 0; attempt <= MAX_RETRY_ATTEMPTS; attempt++) {
+    const result = await fetchOnce(url, fetchImpl);
+    if (result.response.ok) return await result.response.text();
+
+    if (result.status === 429 && attempt < MAX_RETRY_ATTEMPTS) {
+      const delay = retryDelayMs(result.response, attempt);
+      logger.warn(`  → 429 rate-limited (${url}); retry ${attempt + 1}/${MAX_RETRY_ATTEMPTS} in ${delay}ms`);
+      await sleep(delay);
+      continue;
+    }
+
+    throw new Error(`Status code ${result.status}`);
   }
 
-  if (!first.response.ok) throw new Error(`Status code ${first.status}`);
-  return await first.response.text();
+  // Unreachable — the loop always either returns or throws — but satisfies TS.
+  throw new Error('fetchRssXml: max retries exceeded');
 }
 
 async function fetchOnce(url: string, fetchImpl: typeof fetch): Promise<{ response: Response; status: number }> {
@@ -90,11 +107,12 @@ async function fetchOnce(url: string, fetchImpl: typeof fetch): Promise<{ respon
   }
 }
 
-function retryDelayMs(response: Response): number {
+function retryDelayMs(response: Response, attempt = 0): number {
   const retryAfter = response.headers.get('Retry-After');
   const seconds = retryAfter ? Number(retryAfter) : NaN;
   if (Number.isFinite(seconds) && seconds >= 0) return seconds * 1000;
-  return 1500;
+  // Exponential back-off: 5 s on the first retry, 10 s on the second.
+  return FALLBACK_RETRY_DELAY_MS * Math.pow(2, attempt);
 }
 
 async function defaultSleep(ms: number): Promise<void> {
@@ -111,9 +129,13 @@ export async function fetchAllSources(
   const serialSources = rssSources.filter(isHighRiskThrottledSource);
   const parallelSources = rssSources.filter((source) => !isHighRiskThrottledSource(source));
 
+  const sleep = options.sleep ?? defaultSleep;
   const serialResults: FetchResult[] = [];
-  for (const source of serialSources) {
-    serialResults.push(await fetchRssSource(source, windowStart, now, options));
+  for (let i = 0; i < serialSources.length; i++) {
+    // Pause between consecutive high-risk sources (Reddit, HN) so we don't
+    // immediately trigger a 429 on the next domain right after the last.
+    if (i > 0) await sleep(HIGH_RISK_INTER_SOURCE_DELAY_MS);
+    serialResults.push(await fetchRssSource(serialSources[i]!, windowStart, now, options));
   }
 
   const parallelSettled = await Promise.allSettled(

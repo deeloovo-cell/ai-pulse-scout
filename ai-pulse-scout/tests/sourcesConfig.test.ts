@@ -172,10 +172,22 @@ describe('sources.yaml schema', () => {
 });
 
 describe('loadConfig source filtering', () => {
-  it('loads all enabled live RSS sources for digest runs', () => {
+  it('loads enabled live RSS sources for digest runs', () => {
     const all = loadSources();
     const enabled = all.filter((s) => s.enabled !== false);
-    expect(enabled.length).toBe(all.length);
+    // Some sources may be disabled (e.g. blocked, broken feed) — just ensure
+    // there is a meaningful pool and every enabled source is coverage_status: live.
+    expect(enabled.length).toBeGreaterThan(0);
+    expect(enabled.length).toBeLessThanOrEqual(all.length);
     expect(enabled.every((s) => s.coverage_status === 'live')).toBe(true);
+  });
+
+  it('disabled sources use a deferred coverage_status', () => {
+    const all = loadSources();
+    const disabled = all.filter((s) => s.enabled === false);
+    const deferredStatuses = ['deferred_youtube', 'deferred_podcast', 'deferred_social', 'deferred_no_feed', 'deferred_github_watch'];
+    for (const s of disabled) {
+      expect(deferredStatuses, `disabled source "${s.name}" must have a deferred coverage_status`).toContain(s.coverage_status);
+    }
   });
 });
